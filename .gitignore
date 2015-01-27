@@ -1,0 +1,17 @@
+*.pyc
+
+# Packages
+*.egg
+*.egg-info
+AUTHORS
+ChangeLog
+
+# documentation
+doc/build
+doc/source/_build
+
+# tests
+.tox
+env
+.testrepository
+*.swp
