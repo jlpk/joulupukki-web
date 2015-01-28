@@ -18,7 +18,8 @@ app = {
 }
 
 logging = {
-    'root': {'level': 'INFO', 'handlers': ['console']},
+#    'root': {'level': 'INFO', 'handlers': ['console']},
+    'root': {'level': 'DEBUG', 'handlers': ['console']},
     'loggers': {
         'packer': {'level': 'DEBUG', 'handlers': ['console']},
         'pecan.commands.serve': {'level': 'DEBUG', 'handlers': ['console']},
@@ -49,6 +50,7 @@ logging = {
 # Custom Configurations must be in Python dictionary format::
 #
 # foo = {'bar':'baz'}
+tmp_path = '%(confdir)s/tmp'
 #
 # All configurations are accessible at::
 # pecan.conf
