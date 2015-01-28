@@ -2,6 +2,7 @@
 from io import BytesIO
 import os
 import sys
+import tarfile
 import re
 
 from docker import Client
@@ -14,7 +15,7 @@ from dulwich.client import get_transport_and_path
 
 cli = Client(base_url='unix://var/run/docker.sock', version="1.15")
 
-
+# Distro
 distros = {"ubuntu_12.04": "ubuntu:12.04",
            "ubuntu_14.04": "ubuntu:14.04",
            "debian_7": "debian:7",
@@ -30,6 +31,8 @@ if not os.path.exists(packer_tmp_path):
 
 # Prepare git name and path
 project_name = "shinken"
+user_name = "user"
+output_folder = os.path.join("/tmp", project_name)
 git_local_path = os.path.join(packer_tmp_path, project_name)
 
 # Prepare git client
@@ -68,12 +71,7 @@ for root, dirs, files in os.walk(git_local_path):
         # Get deb dependencies
     
 
-
-
-
-docker_output_path = '/tmp/user/' + project_name
-local_output_path = '/tmp/user2/' + project_name
-container_tag = 'user/' + project_name
+container_tag = "/".join((user_name, project_name))
 dependencies = " ".join(deps)
 
 distro = distros['ubuntu_14.04']
@@ -96,27 +94,6 @@ CMD ["/bin/sh"]
 
 
 
-
-
-'''
-ADD https://build.opensuse.org/source/home:kaji-project/adagios/adagios_1.6.1.orig.tar.gz?rev=20f972668e954e1a5c1de31ce485fdf5 /tmp/adagios_1.6.1.orig.tar.gz
-ADD https://build.opensuse.org/source/home:kaji-project/adagios/adagios_1.6.1-2kaji0.2_amd64.changes?rev=20f972668e954e1a5c1de31ce485fdf5 /tmp/adagios_1.6.1-2kaji0.2_amd64.changes
-ADD https://build.opensuse.org/source/home:kaji-project/adagios/adagios_1.6.1-2kaji0.2.dsc?rev=20f972668e954e1a5c1de31ce485fdf5 /tmp/adagios_1.6.1-2kaji0.2.dsc
-ADD https://build.opensuse.org/source/home:kaji-project/adagios/adagios_1.6.1-2kaji0.2.debian.tar.xz?rev=20f972668e954e1a5c1de31ce485fdf5 /tmp/adagios_1.6.1-2kaji0.2.debian.tar.xz
-
-WORKDIR /tmp
-RUN ["dpkg-source", "-x", "adagios_1.6.1-2kaji0.2.dsc"]
-WORKDIR adagios-1.6.1
-RUN ["dpkg-buildpackage", "-us", "-uc"]
-RUN yum install -y %(dependencies)s
-RUN mkdir -p %(docker_output_path)s
-CMD cp ../*.deb %(docker_output_path)s
-''' % {'docker_output_path': docker_output_path,
-       'dependencies': dependencies,
-       'distro': distro}
-
-
-
 f = BytesIO(dockerfile.encode('utf-8'))
 
 output = cli.build(fileobj=f, rm=True, tag=container_tag, forcerm=True)
@@ -130,49 +107,51 @@ for i in output:
 
 
 commands = [
-"""git clone git://172.17.42.1:9418/shinken shinken """,
-"""cd shinken """,
+"""git clone git://172.17.42.1:9418/%s""" % project_name,
+"""cd %s""" % project_name,
 """yum install -y %s""" % dependencies,
 """easy_install sphinx""",
-"""rpmbuild -ba shinken.spec --define "_sourcedir /shinken/" """,
-"""ls /root/rpmbuild/BUILDROOT/shinken-2.0.3-3kaji0.2.x86_64/etc/ """,
+"""rpmbuild -ba %s.spec --define "_sourcedir /%s/" """ % (project_name, project_name),
 ]
 
 command = "bash -c '%s'" % " && ".join(commands)
 
-container = cli.create_container(container_tag, volumes=[local_output_path], command=command)
+container = cli.create_container(container_tag, command=command)
 
-cli.start(container['Id'], binds={local_output_path: {'bind': docker_output_path, 'ro': False}})
+cli.start(container['Id'])
 
 for line in cli.attach(container['Id'], stdout=True, stderr=True, stream=True):
     print line
-
-
-build_script = """
-
-"""
-commands = [
-#"""git clone git://172.17.42.1:9418/shinken shinken""",
-#"""git clone %s %s""" % (git_url, project_name),
-#"""ping 172.17.42.1"""
-#"""git clone git://172.17.42.1:9418/shinken %s""" % project_name,
-#"""ls""",
-#"""cd %s""" % project_name,
-]
-
-
-#for command in commands:
-#    print "================"
-#    print command
-#    stream = cli.execute(container, command, detach=False, stream=True)
-#    for line in stream:
-#        print line
-#    cli.wait(container)
-#    for line in cli.execute(container['Id'], command, stream=True,  detach=False):
-#        print line
+# Stop container
 cli.stop(container['Id'])
+
+
+# Get RPMS
+rpms_raw = cli.copy(container['Id'], "/root/rpmbuild/RPMS")
+rpms_tar_file_name = os.path.join(output_folder, project_name + "_rpms.tar")
+rpms_tar_file = open(rpms_tar_file_name, "w")
+rpms_tar_file.write(rpms_raw.read())
+rpms_tar_file.close()
+# Get SRPM
+srpms_raw = cli.copy(container['Id'], "/root/rpmbuild/SRPMS")
+srpms_tar_file_name = os.path.join(output_folder, project_name + "_srpms.tar")
+srpms_tar_file = open(srpms_tar_file_name, "w")
+srpms_tar_file.write(srpms_raw.read())
+srpms_tar_file.close()
+
+# Delete container
 cli.remove_container(container['Id'])
 
-#for image in cli.images(container_tag):
-#    cli.remove_image(image['Id'])
+# Untar RPM
+rpms_tar = tarfile.open(rpms_tar_file_name)
+rpms_tar.extractall(output_folder)
+rpms_tar.close()
+# Untar SRPM
+srpms_tar = tarfile.open(srpms_tar_file_name)
+srpms_tar.extractall(output_folder)
+srpms_tar.close()
 
+
+# Remove images
+for image in cli.images(container_tag):
+    cli.remove_image(image['Id'])

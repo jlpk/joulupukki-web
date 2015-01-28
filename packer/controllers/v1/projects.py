@@ -47,5 +47,4 @@ class ProjectsController(rest.RestController):
     def get_all(self):
         """Returns all projects."""
         projects = [{"name": "shinken"}]
-
         return [project.Project(**j) for j in projects]
