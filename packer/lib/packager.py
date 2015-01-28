@@ -129,7 +129,8 @@ def packager(git_folder, git_url, config, raw_distro):
     folder_name = name + "-" + version
     commands = [
 
-    """git clone %s %s""" % (git_url, folder_name),
+    """git clone %s %s --depth=1""" % (git_url, folder_name),
+    # TODO checkout branch or commit
     """rm -rf %s/.git""" % folder_name,
     """tar czf %s %s""" % (source, folder_name),
     ]
