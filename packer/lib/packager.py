@@ -27,8 +27,8 @@ def packager(git_folder, git_url, config, raw_distro):
     
     deps_pip = config.get("deps_pip")
     # TODO handle multiple spec files
-    spec_file = config.get("spec")[0]
-    debian = config.get("debian")[0]
+    spec_file = config.get("spec")
+    debian = config.get("debian")
 
     distro = distros.get(raw_distro)
     if distro is None:
@@ -82,7 +82,7 @@ def packager(git_folder, git_url, config, raw_distro):
     sources = []
     for source in raw_sources:
         source_p = urlparse(source)
-        source = source_p.path.strip('/kaji-project/kaji/')
+        source = source_p.path.rsplit('/', 1)[-1]
         source = source.replace("%{release}", release)
         source = source.replace("%{version}", version)
         source = source.replace("%{name}", name)
