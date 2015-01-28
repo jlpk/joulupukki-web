@@ -50,10 +50,8 @@ class Builder(Thread):
         distros = packer_conf.get("distro")
         for distro in distros:
             packager(git_local_folder, self.git_url, packer_conf, distro)
-            import ipdb;ipdb.set_trace()
 
-
-
+        # Delete tmp git folder
         logging.debug("[build %s] tmp folder deleting" % self.uuid)
         shutil.rmtree(git_local_folder)
         logging.debug("[build %s] tmp folder deleted" % self.uuid)
