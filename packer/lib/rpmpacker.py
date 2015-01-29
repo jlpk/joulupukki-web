@@ -9,39 +9,21 @@ from urlparse import urlparse
 
 from docker import Client
 
-
+from distros import supported_distros
 
 cli = Client(base_url='unix://var/run/docker.sock', version="1.15")
 
 
-def packager(git_folder, git_url, config, raw_distro):
+def rpmpacker(git_folder, git_url, config, raw_distro):
     # Distro
-
-    distros = {"ubuntu_12.04": "ubuntu:12.04",
-               "ubuntu_14.04": "ubuntu:14.04",
-               "debian_7": "debian:7",
-               "debian_8": "debian:8",
-               "centos_6": "centos:6",
-               "centos_7": "centos:7",
-              }
-    
     deps_pip = config.get("deps_pip")
-    # TODO handle multiple spec files
     spec_file = config.get("spec")
-    debian = config.get("debian")
-
-    distro = distros.get(raw_distro)
-    if distro is None:
-        logging.error("distro %s not supported" % raw_distro)
-        return
-            
+    distro = supported_distros.get(raw_distro)
 
     # TODO find a better output folder
     output_folder = os.path.join(git_folder, "../__packer__output")
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
-
-
 
     # Browse
     deps = []
@@ -51,33 +33,29 @@ def packager(git_folder, git_url, config, raw_distro):
     name_pattern = re.compile("^name *:(.*)", re.IGNORECASE)
     release_pattern = re.compile("^release *:(.*)", re.IGNORECASE)
     sources_pattern = re.compile("^source[0-9]* *:(.*)", re.IGNORECASE)
-    for root, dirs, files in os.walk(git_folder):
-        for file_ in files:
-            # SPEC file
-            abs_file_path = root.replace(git_folder, "") + "/" + file_
-            if abs_file_path.strip("/") == spec_file:
-                for line in open(os.path.join(root, file_), 'r'):
-                    # Get rpm dependencies
-                    match = deps_pattern.match(line)
-                    if match:
-                        deps.append(match.group(1).strip())
-                    # Get rpm sources names
-                    match = sources_pattern.match(line)
-                    if match:
-                        raw_sources.append(match.group(1).strip())
-                    # Get version
-                    match = version_pattern.match(line)
-                    if match:
-                        version = match.group(1).strip()
-                    # Get release
-                    match = release_pattern.match(line)
-                    if match:
-                        release = match.group(1).strip()
-                    # Get name
-                    match = name_pattern.match(line)
-                    if match:
-                        name = match.group(1).strip()
-            # Get deb dependencies
+
+    spec_file_path = os.path.join(git_folder, spec_file)
+    for line in open(spec_file_path, 'r'):
+        # Get rpm dependencies
+        match = deps_pattern.match(line)
+        if match:
+            deps.append(match.group(1).strip())
+        # Get rpm sources names
+        match = sources_pattern.match(line)
+        if match:
+            raw_sources.append(match.group(1).strip())
+        # Get version
+        match = version_pattern.match(line)
+        if match:
+            version = match.group(1).strip()
+        # Get release
+        match = release_pattern.match(line)
+        if match:
+            release = match.group(1).strip()
+        # Get name
+        match = name_pattern.match(line)
+        if match:
+            name = match.group(1).strip()
 
     sources = []
     for source in raw_sources:
@@ -88,7 +66,10 @@ def packager(git_folder, git_url, config, raw_distro):
         source = source.replace("%{name}", name)
         sources.append(source)
 
-    # TODO remove
+    # TODO Impossible to get more than one source
+    if len(sources) != 1:
+        # BAD number of source
+        return
     source = sources[0]
 
     container_tag = "packer"

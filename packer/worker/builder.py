@@ -19,7 +19,9 @@ import logging
 
 import shutil
 
-from packer.lib.packager import packager
+from packer.lib.rpmpacker import rpmpacker
+from packer.lib.debpacker import debpacker
+from packer.lib.distros import supported_distros, distro_templates
 
 
 class Builder(Thread):
@@ -49,7 +51,14 @@ class Builder(Thread):
         # DOCKER
         distros = packer_conf.get("distro")
         for distro in distros:
-            packager(git_local_folder, self.git_url, packer_conf, distro)
+            if distro not in supported_distros:
+                logging.debug("[build %s] distro %s not supported" % (self.uuid, distro))
+                continue
+
+            distro_type = distro_templates.get(distro)
+            logging.debug("[build %s] distro %s is an %s distro" % (self.uuid, distro, distro_type))
+            packer_function = globals().get(distro_type + 'packer')
+            packer_function(git_local_folder, self.git_url, packer_conf, distro)
 
         # Delete tmp git folder
         logging.debug("[build %s] tmp folder deleting" % self.uuid)
