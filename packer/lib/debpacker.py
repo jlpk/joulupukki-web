@@ -56,6 +56,7 @@ def debpacker(git_folder, git_url, config, raw_distro):
     container_tag = "packer"
 
     # DOCKER FILE TEMPLATE
+    # Create and user an user "builder"
     dockerfile = '''
     FROM %(distro)s
     RUN apt-get update

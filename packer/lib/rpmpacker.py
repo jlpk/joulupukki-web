@@ -76,15 +76,7 @@ def rpmpacker(git_folder, git_url, config, raw_distro):
     dependencies = " ".join(deps)
 
     # DOCKER FILE TEMPLATE
-    dockerfile = '''
-    FROM %(distro)s
-    RUN apt-get update
-    RUN apt-get upgrade -y
-    RUN apt-get install -y devscripts debianutils debhelper build-essential git-core tar
-    ''' % {'distro': distro}
-
-
-
+    # Create and user an user "builder"
     dockerfile= '''
     FROM %(distro)s
     RUN yum upgrade -y
