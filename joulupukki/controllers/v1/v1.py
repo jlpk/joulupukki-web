@@ -1,5 +1,5 @@
-from packer.controllers.v1 import builds
-from packer.controllers.v1 import hello
+from joulupukki.controllers.v1 import builds
+from joulupukki.controllers.v1 import hello
 
 
 class V1Controller(object):

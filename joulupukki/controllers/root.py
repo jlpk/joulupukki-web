@@ -4,7 +4,7 @@ from webob.exc import status_map
 
 
 
-from packer.controllers.v1 import v1
+from joulupukki.controllers.v1 import v1
 
 
 class RootController(object):

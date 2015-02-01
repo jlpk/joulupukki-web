@@ -11,46 +11,18 @@ from urlparse import urlparse
 
 from docker import Client
 
-from packer.lib.distros import supported_distros
+from joulupukki.lib.packer import Packer
 
-class RpmPacker(object):
+class RpmPacker(Packer):
 
-    def __init__(self, builder, config):
-        self.logger = builder.logger
-        self.dlogger = builder.dlogger
-        self.config = config
-        self.git_url = builder.git_url
-        self.cli = builder.cli
-
-        self.folder_output_tmp = os.path.join(builder.folder,
-                                              'tmp',
-                                              self.config['distro'])
-        self.folder_output = os.path.join(builder.folder_output,
-                                          self.config['distro'])
-        os.makedirs(self.folder_output)
-        self.folder = builder.folder
-
-        self.spec_file_path = os.path.join(self.folder,
-                                           'git',
-                                           self.config['root_folder'],
-                                           self.config['spec'])
-
-        self.container_tag = "packer"
-        self.container = None
-
-    def run(self):
-       # import ipdb;ipdb.set_trace()
-
-        self.parse_spec()
-        self.docker_build()
-        self.docker_run()
-        self.get_rpms()
-        self.clean_up()
-
-    def parse_spec(self):
-
+    def parse_specdeb(self):
         # Get spec infos
         self.logger.info("Find informations from spec file")
+        spec_file_path = os.path.join(self.folder,
+                                      'git',
+                                       self.config['root_folder'],
+                                       self.config['spec'])
+
         # Prepare datas
         self.config['deps'] = self.config.get('deps', [])
         self.config['deps_pip'] = self.config.get('deps_pip', [])
@@ -68,7 +40,7 @@ class RpmPacker(object):
         sources_pattern = re.compile("^source[0-9]* *:(.*)", re.IGNORECASE)
         source_folder_pattern = re.compile("^%setup .* -n ([^ ]*) ?.*")
 
-        for line in open(self.spec_file_path, 'r'):
+        for line in open(spec_file_path, 'r'):
             # Get rpm dependencies
             match = deps_pattern.match(line)
             if match:
@@ -106,7 +78,7 @@ class RpmPacker(object):
         # TODO Impossible to get more than one source ??
         if len(sources) != 1:
             # BAD number of source
-            return
+            return False
         self.config['source'] = sources[0]
         # Try to find the name of the folder which rpmbuild needs to find
         # in the source tarball
@@ -125,11 +97,11 @@ class RpmPacker(object):
         self.logger.info("Version: %(version)s", self.config)
         self.logger.info("Release: %(release)s", self.config)
         self.logger.info("Buildrequires: %s", ", ".join(self.config['deps']))
+        return True
 
 
     def docker_build(self):
         self.logger.info("Dockerfile preparation")
-        dependencies = " ".join(self.config['deps'])
         # DOCKER FILE TEMPLATE
         # Create and user an user "builder"
         dockerfile= '''
@@ -153,6 +125,7 @@ class RpmPacker(object):
                 else:
                     self.dlogger.info(str(i))
         self.logger.info("Docker Image Built")
+        return True
             
 
     def docker_run(self):
@@ -192,9 +165,10 @@ class RpmPacker(object):
         # Stop container
         self.cli.stop(self.container['Id'])
         self.logger.info("RPM Build finished")
+        return True
 
 
-    def get_rpms(self):
+    def get_output(self):
         # Get RPMS from the container
         self.logger.info("Get RPM files")
         rpms_raw = self.cli.copy(self.container['Id'], "/root/rpmbuild/RPMS")
@@ -214,20 +188,4 @@ class RpmPacker(object):
             shutil.move(rpm, self.folder_output)
         
         self.logger.info("RPM and SRPM files deposed in output folder")
-
-
-    def clean_up(self):
-        # Delete container
-        self.logger.debug('Deleting docker container: %s', self.container['Id'])
-        self.cli.remove_container(self.container['Id'])
-
-        # Remove images
-        for image in self.cli.images(self.container_tag):
-            try:
-                self.logger.debug('Deleting docker image: %s', image['Id'])
-                self.cli.remove_image(image['Id'])
-            except Exception as error:
-                self.logger.debug('Cannot deleting docker image: %s'
-                                  ' - Error: %s', image['Id'], error)
-
-
+        return True

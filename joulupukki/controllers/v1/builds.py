@@ -6,10 +6,10 @@ from pecan import rest
 
 import uuid
 
-from packer.controllers.v1.datamodel.build import Build
+from joulupukki.controllers.v1.datamodel.build import Build
 
 
-from packer.lib.queues import build_tasks
+from joulupukki.lib.queues import build_tasks
 
 #from webob.exc import status_map
 

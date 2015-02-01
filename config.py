@@ -6,10 +6,10 @@ server = {
 
 # Pecan Application Configurations
 app = {
-    'root': 'packer.controllers.root.RootController',
-    'modules': ['packer'],
+    'root': 'joulupukki.controllers.root.RootController',
+    'modules': ['joulupukki'],
     'static_root': '%(confdir)s/public',
-    'template_path': '%(confdir)s/packer/templates',
+    'template_path': '%(confdir)s/joulupukki/templates',
     'debug': True,
     'errors': {
         404: '/error/404',
@@ -21,7 +21,7 @@ logging = {
 #    'root': {'level': 'INFO', 'handlers': ['console']},
     'root': {'level': 'DEBUG', 'handlers': ['console']},
     'loggers': {
-        'packer': {'level': 'DEBUG', 'handlers': ['console']},
+        'joulupukki': {'level': 'DEBUG', 'handlers': ['console']},
         'pecan.commands.serve': {'level': 'DEBUG', 'handlers': ['console']},
         'py.warnings': {'handlers': ['console']},
         '__force_dict__': True

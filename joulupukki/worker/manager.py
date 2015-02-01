@@ -5,10 +5,10 @@ import logging
 
 from threading import Thread
 
-from packer.worker.builder import Builder
+from joulupukki.worker.builder import Builder
 
 
-from packer.lib.queues import build_tasks
+from joulupukki.lib.queues import build_tasks
 
 
 

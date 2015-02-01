@@ -14,39 +14,12 @@ from docker import Client
 from deb_pkg_tools.control import parse_depends
 from deb_pkg_tools.control import load_control_file
 
-from packer.lib.distros import supported_distros
-
-class DebPacker(object):
-
-    def __init__(self, builder, config):
-        self.logger = builder.logger
-        self.dlogger = builder.dlogger
-        self.config = config
-        self.git_url = builder.git_url
-        self.cli = builder.cli
-
-        self.folder_output_tmp = os.path.join(builder.folder,
-                                              'tmp',
-                                              self.config['distro'])
-        self.folder_output = os.path.join(builder.folder_output,
-                                          self.config['distro'])
-        os.makedirs(self.folder_output)
-        self.folder = builder.folder
+from joulupukki.lib.packer import Packer
 
 
-        self.container_tag = "packer"
-        self.container = None
+class DebPacker(Packer):
 
-    def run(self):
-       # import ipdb;ipdb.set_trace()
-
-        self.parse_spec()
-        self.docker_build()
-        self.docker_run()
-        self.get_rpms()
-        self.clean_up()
-
-    def parse_spec(self):
+    def parse_specdeb(self):
         # Get debian infos
         self.logger.info("Find informations from spec file")
 
@@ -80,7 +53,7 @@ class DebPacker(object):
         match = version_release_pattern.match(first_line)
 
         if not match:
-            return
+            return False
 
         version_release = match.group(1)
         self.config['version'], self.config['release'] = version_release.split("-", 1)
@@ -92,11 +65,11 @@ class DebPacker(object):
         self.logger.info("Version: %(version)s", self.config)
         self.logger.info("Release: %(release)s", self.config)
         self.logger.info("Builddepends: %s", ", ".join(self.config['deps']))
+        return True
 
 
     def docker_build(self):
         self.logger.info("Dockerfile preparation")
-        dependencies = " ".join(self.config['deps'])
         # DOCKER FILE TEMPLATE
         # Create and user an user "builder"
         dockerfile = '''
@@ -121,6 +94,7 @@ class DebPacker(object):
                 else:
                     self.dlogger.info(str(i))
         self.logger.info("Docker Image Built")
+        return True
             
 
     def docker_run(self):
@@ -164,9 +138,10 @@ class DebPacker(object):
         # Stop container
         self.cli.stop(self.container['Id'])
         self.logger.info("DEB Build finished")
+        return True
 
 
-    def get_rpms(self):
+    def get_output(self):
         # Get debs from the container
         debs_raw = self.cli.copy(self.container['Id'], "/output")
         debs_tar = tarfile.open(fileobj=BytesIO(debs_raw.read()))
@@ -178,20 +153,4 @@ class DebPacker(object):
 
         
         self.logger.info("DEBS files deposed in output folder")
-
-
-    def clean_up(self):
-        # Delete container
-        self.logger.debug('Deleting docker container: %s', self.container['Id'])
-        self.cli.remove_container(self.container['Id'])
-
-        # Remove images
-        for image in self.cli.images(self.container_tag):
-            try:
-                self.logger.debug('Deleting docker image: %s', image['Id'])
-                self.cli.remove_image(image['Id'])
-            except Exception as error:
-                self.logger.debug('Cannot deleting docker image: %s'
-                                  ' - Error: %s', image['Id'], error)
-
-
+        return True

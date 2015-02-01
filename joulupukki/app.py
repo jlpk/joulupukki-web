@@ -1,5 +1,5 @@
 from pecan import make_app
-from packer import model
+from joulupukki import model
 
 import logging
 

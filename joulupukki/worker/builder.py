@@ -7,31 +7,20 @@ import pecan
 import git
 import yaml
 
-from packer.lib.rpmpacker import RpmPacker
-from packer.lib.debpacker import DebPacker
-from packer.lib.distros import supported_distros, distro_templates
-from packer.lib.logger import get_logger, get_logger_docker
+from joulupukki.lib.rpmpacker import RpmPacker
+from joulupukki.lib.debpacker import DebPacker
+from joulupukki.lib.distros import supported_distros, distro_templates
+from joulupukki.lib.logger import get_logger, get_logger_docker
 
 
 from docker import Client
 import re
 
 """
-succeeded
-failed
-unresolvable
-broken
-blocked
-dispatching
 scheduled
-building
+clonning
+dispatching
 finished
-signing
-disabled
-excluded
-locked
-deleting
-unknown
 """
 
 class Builder(Thread):
@@ -45,7 +34,8 @@ class Builder(Thread):
         # Create docker client
         self.cli = Client(base_url='unix://var/run/docker.sock', version="1.15")
         # Set status
-        self.status = "scheduled"
+        self.status = {'task': 'scheduled',
+                       'builds': {}}
         # Set folders
         self.folder = os.path.join(pecan.conf.tmp_path, self.uuid)
         self.folder_output = os.path.join(self.folder, 'output')
@@ -76,9 +66,11 @@ class Builder(Thread):
 
     def run_packer(self, packer_conf, root_folder):
         # DOCKER
+        self.status['task'] = 'dispatching'
         for distro_name, build_conf in packer_conf.items():
             if distro_name not in supported_distros:
                 self.logger.error("Distro %s not supported", distro_name)
+                self.status['builds'][build_conf['distro']] = 'distro_not_supported'
                 continue
             distro_type = distro_templates.get(distro_name)
             # Prepare distro configuration
@@ -89,14 +81,19 @@ class Builder(Thread):
             self.logger.info("Distro %s is an %s distro", distro_name, distro_type)
             packer_class = globals().get(distro_type.capitalize() + 'Packer')
             packer = packer_class(self, build_conf)
+            self.status['builds'][build_conf['distro']] = 'building'
             packer.run()
+            self.status['builds'][build_conf['distro']] = 'succeeded'
 
     def run(self):
         # GIT
         self.logger.info("Started")
+        self.status['task'] = 'clonning'
         self.git_clone()
+        
         # YAML
         self.logger.debug("Read .packer.yml")
+        self.status['task'] = 'reading'
         global_packer_conf_file_name = os.path.join(self.folder_git, ".packer.yml")
         global_packer_conf_stream = file(global_packer_conf_file_name, 'r')
         global_packer_conf = yaml.load(global_packer_conf_stream)
@@ -113,28 +110,10 @@ class Builder(Thread):
         else:
              self.run_packer(global_packer_conf, ".")
 
-        # DOCKER
-#        for package_path, distros in packer_conf.items():
-#            for distro in distros:
-#                distro_name, distro_conf = distro.items()[0]
-#                if distro_name not in supported_distros:
-#                    self.logger.error("Distro %s not supported", distro_name)
-#                    continue
-#                distro_type = distro_templates.get(distro_name)
-#                # Prepare distro configuration
-#                distro_conf['name'] = supported_distros.get(distro_name)
-#                distro_conf['branch'] = self.branch
-#                distro_conf['path'] = self.branch
-#                # Launcher build
-#                self.logger.info("Distro %s is an %s distro", distro_name, distro_type)                
-#                packer_function = globals().get(distro_type + 'packer')
-#                packer_function(git_local_folder, self.git_url, distro_conf, self)
-
         # Delete tmp git folder
         self.logger.info("Tmp folder deleting")
         if os.path.exists(os.path.join(self.folder,'tmp')):
             shutil.rmtree(os.path.join(self.folder,'tmp'))
         shutil.rmtree(self.folder_git)
         self.logger.info("Tmp folder deleted")
-        self.logger.debug("Log file: %s", )
-        task_status.put({self.uuid: "succeeded"})
+        self.status['task'] = 'finished'

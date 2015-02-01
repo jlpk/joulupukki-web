@@ -1,7 +1,7 @@
 import wsme
 import wsme.types as wtypes
 
-from packer.controllers.v1.datamodel import types
+from joulupukki.controllers.v1.datamodel import types
 
 
 class Build(types.Base):
