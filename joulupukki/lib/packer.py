@@ -33,7 +33,7 @@ class Packer(object):
         self.config = config
         self.git_url = builder.git_url
         self.cli = builder.cli
-        self.status = builder.status
+        self.set_status_builder = builder.set_status
 
         self.folder_output_tmp = os.path.join(builder.folder,
                                               self.config['distro'],
@@ -53,6 +53,10 @@ class Packer(object):
         self.container_tag = "joulupukki"
         self.container = None
 
+
+    def set_status(self, status):
+        self.set_status_builder(status, self.config['distro'])
+
     def run(self):
         steps = (('preparing', self.parse_specdeb),
                  ('building', self.docker_build),
@@ -62,12 +66,12 @@ class Packer(object):
                  )
 
         for step_name, step_function in steps:
-            self.status['builds'][self.config['distro']] = step_name
+            self.set_status(step_name)
             if step_function() is not True:
                 self.logger.debug("Task failed during step: %s", step_name)
-                self.status['builds'][self.config['distro']] = 'failed'
+                self.set_status('failed')
                 return False
-        self.status['builds'][self.config['distro']] = 'succeeded'
+        self.set_status('succeeded')
         return True
 
     def parse_specdeb(self):
