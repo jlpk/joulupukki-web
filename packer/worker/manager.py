@@ -2,15 +2,13 @@
 import logging
 
 
-import Queue
-
-
 
 from threading import Thread
 
 from packer.worker.builder import Builder
 
-build_tasks = Queue.Queue()
+
+from packer.lib.queues import build_tasks
 
 
 
@@ -19,14 +17,11 @@ class Manager(Thread):
         Thread.__init__(self)
         self.must_run = False
         self.app = app
-
-
+        self.build_list = {}
 
     def shutdown(self):
         logging.debug("Stopping Manager")
         self.must_run = False
-
-
 
     def run(self):
         self.must_run = True
@@ -37,6 +32,7 @@ class Manager(Thread):
                 logging.debug("Task received")
                 build_task = build_tasks.get()
                 builder = Builder(build_task)
+                self.build_list[builder.uuid] = builder
                 builder.start()
                 build_tasks.task_done()
 

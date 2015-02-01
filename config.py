@@ -35,13 +35,13 @@ logging = {
     },
     'formatters': {
         'simple': {
-            'format': ('%(asctime)s %(levelname)-5.5s [%(name)s]'
-                       '[%(threadName)s] %(message)s')
+            'format': ('%(asctime)s %(levelname)-5.5s [%(name)s] '
+                       '%(message)s')
         },
         'color': {
             '()': 'pecan.log.ColorFormatter',
-            'format': ('%(asctime)s [%(padded_color_levelname)s] [%(name)s]'
-                       '[%(threadName)s] %(message)s'),
+            'format': ('%(asctime)s [%(padded_color_levelname)s] [%(name)s] '
+                       '%(message)s'),
         '__force_dict__': True
         }
     }

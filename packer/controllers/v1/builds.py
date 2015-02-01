@@ -9,12 +9,13 @@ import uuid
 from packer.controllers.v1.datamodel.build import Build
 
 
-from packer.worker.manager import build_tasks
+from packer.lib.queues import build_tasks
 
 #from webob.exc import status_map
 
 
 class BuildBuildController(rest.RestController):
+
 
     @pecan.expose()
     def get(self):
