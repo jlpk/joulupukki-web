@@ -13,6 +13,8 @@ from docker import Client
 
 from deb_pkg_tools.control import parse_depends
 from deb_pkg_tools.control import load_control_file
+from joulupukki.lib.logger import get_logger, get_logger_docker
+
 
 """
 preparing
@@ -27,19 +29,24 @@ succeeded
 class Packer(object):
 
     def __init__(self, builder, config):
-        self.logger = builder.logger
-        self.dlogger = builder.dlogger
+
         self.config = config
         self.git_url = builder.git_url
         self.cli = builder.cli
         self.status = builder.status
 
         self.folder_output_tmp = os.path.join(builder.folder,
-                                              'tmp',
-                                              self.config['distro'])
-        self.folder_output = os.path.join(builder.folder_output,
-                                          self.config['distro'])
+                                              self.config['distro'],
+                                              'tmp')
+        self.folder_output = os.path.join(builder.folder,
+                                          self.config['distro'],
+                                          'output'
+                                          )
         os.makedirs(self.folder_output)
+        os.makedirs(self.folder_output_tmp)
+
+        self.logger = get_logger_docker(builder.uuid, config['distro'])
+
         self.folder = builder.folder
 
 
@@ -62,7 +69,6 @@ class Packer(object):
                 return False
         self.status['builds'][self.config['distro']] = 'succeeded'
         return True
-
 
     def parse_specdeb(self):
         return False

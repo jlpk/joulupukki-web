@@ -118,12 +118,12 @@ class RpmPacker(Packer):
         for i in output:
             dict_ = eval(i)
             if "stream" in dict_:
-                self.dlogger.info(dict_["stream"].strip())
+                self.logger.info(dict_["stream"].strip())
             else:
                 if 'error' in dict_:
-                    self.dlogger.info(dict_['errorDetail']['message'].strip())
+                    self.logger.info(dict_['errorDetail']['message'].strip())
                 else:
-                    self.dlogger.info(str(i))
+                    self.logger.info(str(i))
         self.logger.info("Docker Image Built")
         return True
             
@@ -161,7 +161,7 @@ class RpmPacker(Packer):
         self.cli.start(self.container['Id'])
 
         for line in self.cli.attach(self.container['Id'], stdout=True, stderr=True, stream=True):
-            self.dlogger.info(line.strip())
+            self.logger.info(line.strip())
         # Stop container
         self.cli.stop(self.container['Id'])
         self.logger.info("RPM Build finished")
