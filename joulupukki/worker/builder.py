@@ -11,11 +11,14 @@ from joulupukki.lib.rpmpacker import RpmPacker
 from joulupukki.lib.debpacker import DebPacker
 from joulupukki.lib.distros import supported_distros, distro_templates
 from joulupukki.lib.logger import get_logger, get_logger_docker
+import json
+
 
 
 from docker import Client
 import re
 
+import time
 
 #from urllib.parse import urlparse
 import urlparse
@@ -34,16 +37,36 @@ class Builder(Thread):
         self.branch = data.branch
         self.commit = data.commit
         self.uuid = data.uuid
+        self.created = time.time()
+        self.package_name = None
+        self.package_version = None
+        self.package_release = None
 
         # Create docker client
         self.cli = Client(base_url='unix://var/run/docker.sock', version="1.15")
         # Set folders
-        self.folder = os.path.join(pecan.conf.tmp_path, self.uuid)
+        self.folder = os.path.join(pecan.conf.builds_path, self.uuid)
         self.folder_git = os.path.join(self.folder, 'git')
         os.makedirs(self.folder)
         # Prepare logger
         self.logger = get_logger(self.uuid)
+        # Save
+        self.save_to_disk()
 
+    def save_to_disk(self):
+        build_file = os.path.join(self.folder, "build.cfg")
+        data = json.dumps({"git_url": self.git_url,
+                           "branch": self.branch,
+                           "commit": self.commit,
+                           "uuid": self.uuid,
+                           "created": self.created,
+                           "package_name": self.package_name,
+                           "package_version": self.package_version,
+                           "package_release": self.package_release,
+                           })
+
+        with open(build_file, 'w') as f:
+            f.write(data)
 
     def set_status(self, status, distro=None):
         if distro is None:
@@ -163,5 +186,7 @@ class Builder(Thread):
         self.logger.info("Tmp folders deleting")
         if os.path.exists(os.path.join(self.folder,'tmp')):
             shutil.rmtree(os.path.join(self.folder,'tmp'))
+        for tmp_dir in glob.glob(os.path.join(self.folder, '*/tmp')):
+            shutil.rmtree(tmp_dir)
         shutil.rmtree(self.folder_git)
         self.logger.info("Tmp folders deleted")

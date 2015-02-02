@@ -6,6 +6,8 @@ supported_distros = {"ubuntu_12.04": "ubuntu:12.04",
                      "centos_7": "centos:7",
                     }
 
+reverse_supported_distros = {v: k for k, v in supported_distros.items()}
+
 
 distro_templates = {"ubuntu_12.04": "deb",
                     "ubuntu_14.04": "deb",

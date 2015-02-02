@@ -8,7 +8,7 @@ import pecan
 
 
 def get_logger(uuid, distro=None):
-    log_file = os.path.join(pecan.conf.tmp_path, uuid, "log.txt")
+    log_file = os.path.join(pecan.conf.builds_path, uuid, "log.txt")
     logger = logging.getLogger("#".join(("Builder", uuid)))
     # create formatter
     formatter = logging.Formatter('[%(msecs)d] [%(levelname)-5.5s] [%(name)s] %(message)s')
@@ -27,7 +27,7 @@ def get_logger(uuid, distro=None):
 
 
 def get_logger_docker(uuid, distro):
-    log_file = os.path.join(pecan.conf.tmp_path, uuid, distro, "log.txt")
+    log_file = os.path.join(pecan.conf.builds_path, uuid, distro, "log.txt")
     logger = logging.getLogger("#".join(("Docker", uuid, distro)))
     # create logger
     logger.setLevel(logging.DEBUG)

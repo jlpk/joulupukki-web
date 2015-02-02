@@ -50,7 +50,7 @@ logging = {
 # Custom Configurations must be in Python dictionary format::
 #
 # foo = {'bar':'baz'}
-tmp_path = '%(confdir)s/tmp'
+builds_path = '%(confdir)s/tmp'
 #
 # All configurations are accessible at::
 # pecan.conf

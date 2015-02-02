@@ -34,6 +34,7 @@ class Packer(object):
         self.git_url = builder.git_url
         self.cli = builder.cli
         self.set_status_builder = builder.set_status
+        self.builder = builder
 
         self.folder_output_tmp = os.path.join(builder.folder,
                                               self.config['distro'],
@@ -71,8 +72,19 @@ class Packer(object):
                 self.logger.debug("Task failed during step: %s", step_name)
                 self.set_status('failed')
                 return False
+            # Save package name in build.cfg 
+            if self.config.get('name') is not None and self.builder.package_name is None:
+                self.builder.package_name = self.config.get('name')
+                self.builder.save_to_disk()
+            if self.config.get('version') is not None and self.builder.package_version is None:
+                self.builder.package_version = self.config.get('version')
+                self.builder.save_to_disk()
+            if self.config.get('release') is not None and self.builder.package_release is None:
+                self.builder.package_release = self.config.get('release')
+                self.builder.save_to_disk()
         self.set_status('succeeded')
         return True
+
 
     def parse_specdeb(self):
         return False

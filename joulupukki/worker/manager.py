@@ -3,6 +3,7 @@ import logging
 
 
 
+import time
 from threading import Thread
 
 from joulupukki.worker.builder import Builder
@@ -28,6 +29,7 @@ class Manager(Thread):
         logging.debug("Starting Manager")
 
         while self.must_run:
+            time.sleep(0.1)
             if not build_tasks.empty():
                 logging.debug("Task received")
                 build_task = build_tasks.get()
