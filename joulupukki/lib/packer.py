@@ -31,7 +31,8 @@ class Packer(object):
     def __init__(self, builder, config):
 
         self.config = config
-        self.git_url = builder.git_url
+        self.source_url = builder.source_url
+        self.source_type = builder.source_type
         self.cli = builder.cli
         self.set_status_builder = builder.set_status
         self.builder = builder
@@ -43,8 +44,10 @@ class Packer(object):
                                           self.config['distro'],
                                           'output'
                                           )
-        os.makedirs(self.folder_output)
-        os.makedirs(self.folder_output_tmp)
+        if not os.path.exists(self.folder_output):
+            os.makedirs(self.folder_output)
+        if not os.path.exists(self.folder_output_tmp):
+            os.makedirs(self.folder_output_tmp)
 
         self.logger = get_logger_docker(builder.uuid, config['distro'])
 

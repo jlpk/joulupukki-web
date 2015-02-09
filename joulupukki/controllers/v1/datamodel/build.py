@@ -3,9 +3,11 @@ import wsme.types as wtypes
 
 from joulupukki.controllers.v1.datamodel import types
 
+source_types = wtypes.Enum(str, 'local', 'git')
 
 class Build(types.Base):
-    git_url = wsme.wsattr(wtypes.text, mandatory=False)
+    source_url = wsme.wsattr(wtypes.text, mandatory=True)
+    source_type = wsme.wsattr(source_types, mandatory=True, default="git")
     uuid = wsme.wsattr(wtypes.text, mandatory=False)
     commit = wsme.wsattr(wtypes.text, mandatory=False, default=None)
     branch = wsme.wsattr(wtypes.text, mandatory=False, default=None)
@@ -17,6 +19,7 @@ class Build(types.Base):
     @classmethod
     def sample(cls):
         return cls(
-            git_url="https://github.com/kaji-project/shinken.git",
+            source_url="https://github.com/kaji-project/shinken.git",
+            source_type="git",
             branch="master",
         )

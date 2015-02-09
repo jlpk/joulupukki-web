@@ -24,12 +24,12 @@ class DebPacker(Packer):
         self.logger.info("Find informations from spec file")
 
         control_file_path = os.path.join(self.folder,
-                                         'git',
+                                         'sources',
                                          self.config['root_folder'],
                                          self.config['debian'],
                                          'control')
         changelog_file_path = os.path.join(self.folder,
-                                           'git',
+                                           'sources',
                                            self.config['root_folder'],
                                            self.config['debian'],
                                            'changelog')
@@ -76,7 +76,7 @@ class DebPacker(Packer):
         FROM %(distro)s
         RUN apt-get update
         RUN apt-get upgrade -y
-        RUN apt-get install -y devscripts debianutils debhelper build-essential git-core tar
+        RUN apt-get install -y devscripts debianutils debhelper build-essential tar
         ''' % self.config
         f = BytesIO(dockerfile.encode('utf-8'))
 
@@ -102,15 +102,10 @@ class DebPacker(Packer):
         docker_source_root_folder = os.path.join('upstream', self.config['root_folder'])
         commands = [
         """mkdir -p /sources""",
-        """git clone %s upstream""" % self.git_url,
-        """cd upstream""",
-        """git checkout %s""" % self.config['branch'],
-        """rm -rf .git""",
-        """ls /sources""",
         """cp -r /%s /sources/%s""" % (docker_source_root_folder, self.config['name']), 
         """cd /sources/""",
+        """rm -rf .git""",
         """tar czf /sources/%s %s""" % (self.config['source'], self.config['name']),
-        """ls /sources/""",
         ]
 
         # Handle build dependencies
@@ -130,11 +125,15 @@ class DebPacker(Packer):
 
         # RUN
         self.logger.info("DEB Build starting")
-        self.container = self.cli.create_container(self.container_tag, command=command)
-        self.cli.start(self.container['Id'])
+        self.container = self.cli.create_container(self.container_tag, command=command, volumes=["/upstream"])
+        local_source_folder = os.path.join(self.folder, "sources")
+        self.cli.start(self.container['Id'],
+                       binds={local_source_folder: {"bind": "/upstream",
+                                                    "ro": True}})
 
         for line in self.cli.attach(self.container['Id'], stdout=True, stderr=True, stream=True):
             self.logger.info(line.strip())
+        # TODO get build exit code
         # Stop container
         self.cli.stop(self.container['Id'])
         self.logger.info("DEB Build finished")

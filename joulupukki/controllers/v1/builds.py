@@ -78,10 +78,12 @@ class DownloadDistroBuildController(rest.RestController):
 
         # Set headers
         build = get_build(pecan.request.context['build_uuid'])
+        distro = pecan.request.context['distro_name']
         headers = pecan.response.headers
         if build.get('package_name') is None:
             return
         filename = "%(package_name)s_%(package_version)s-%(package_release)s" % build
+        filename = filename + "-" + distro
         filename = ".".join((filename, extension))
         headers.add("Content-Disposition", str("attachment;filename=%s" % filename))
         # returns
@@ -164,7 +166,8 @@ class BuildsController(rest.RestController):
     def _lookup(self, build_uuid, *remainder):
         return BuildController(build_uuid), remainder
 
-    #curl -X POST -H "Content-Type: application/json" -i  -d '{"git_url": "https://github.com/kaji-project/kaji.git", "branch": "packer"}' http://127.0.0.1:8080/v1/builds/
+    #curl -X POST -H "Content-Type: application/json" -i  -d '{"source_url": "https://github.com/kaji-project/kaji.git", "source_type": "git", "branch": "packer"}' http://127.0.0.1:8080/v1/builds/
+    #curl -X POST -H "Content-Type: application/json" -i  -d '{"source_url": "/home/tcohen/projet_communautaire/kaji/meta/packages/grafana", "source_type": "local", "branch": "packer"}' http://127.0.0.1:8080/v1/builds/
     @wsme_pecan.wsexpose(wtypes.text, body=Build, status_code=201)
     def post(self, build):
         """ launch build """

@@ -20,7 +20,6 @@ import re
 
 import time
 
-#from urllib.parse import urlparse
 import urlparse
 
 """
@@ -33,7 +32,8 @@ finished
 class Builder(Thread):
     def __init__(self, data):
         Thread.__init__(self, name=data.uuid)
-        self.git_url = data.git_url
+        self.source_url = data.source_url
+        self.source_type = data.source_type
         self.branch = data.branch
         self.commit = data.commit
         self.uuid = data.uuid
@@ -46,7 +46,7 @@ class Builder(Thread):
         self.cli = Client(base_url='unix://var/run/docker.sock', version="1.15")
         # Set folders
         self.folder = os.path.join(pecan.conf.builds_path, self.uuid)
-        self.folder_git = os.path.join(self.folder, 'git')
+        self.folder_source = os.path.join(self.folder, 'sources')
         os.makedirs(self.folder)
         # Prepare logger
         self.logger = get_logger(self.uuid)
@@ -55,7 +55,8 @@ class Builder(Thread):
 
     def save_to_disk(self):
         build_file = os.path.join(self.folder, "build.cfg")
-        data = json.dumps({"git_url": self.git_url,
+        data = json.dumps({"source_url": self.source_url,
+                           "source_type": self.source_type,
                            "branch": self.branch,
                            "commit": self.commit,
                            "uuid": self.uuid,
@@ -79,7 +80,7 @@ class Builder(Thread):
     def git_clone(self):
         self.logger.info("Cloning")
         # Reworking url to handle password
-        url_splitted = urlparse.urlsplit(self.git_url)
+        url_splitted = urlparse.urlsplit(self.source_url)
         username = url_splitted.username
         if username is None:
             username = 'anonymous'
@@ -89,10 +90,10 @@ class Builder(Thread):
         url_data = [d for d in list(url_splitted)]
         new_netloc = username + ":" + password + "@" + url_data[1]
         url_data[1] = new_netloc
-        git_url = urlparse.urlunsplit(url_data)
+        source_url = urlparse.urlunsplit(url_data)
         # Clone repo
         try:
-            repo = git.Repo.clone_from(git_url, self.folder_git)
+            repo = git.Repo.clone_from(source_url, self.folder_source)
         except Exception as exp:
             self.logger.error("Clonning error: %s", exp)
             return False
@@ -122,6 +123,22 @@ class Builder(Thread):
         self.logger.info("Cloned")
         return True
 
+    def get_sources(self):
+        if self.source_type == 'git':
+            return self.git_clone()
+        elif self.source_type == 'local':
+            url_splitted = urlparse.urlsplit(self.source_url)
+            source_path = url_splitted.path
+            if not os.path.isdir(source_path):
+                self.logger.error("Source folder %s does not exist", source_path)
+                return False
+            shutil.copytree(source_path, self.folder_source)
+            return True
+        else:
+            self.logger.error("Source type %s not supported", self.source_type)
+            return False
+        return False
+
     def run_packer(self, packer_conf, root_folder):
         # DOCKER
         failed = False
@@ -129,7 +146,7 @@ class Builder(Thread):
         for distro_name, build_conf in packer_conf.items():
             if distro_name not in supported_distros:
                 self.logger.error("Distro %s not supported", distro_name)
-                self.set_status('distro_not_supported', build_conf['distro'])
+                self.set_status('distro_not_supported', distro_name)
                 continue
             distro_type = distro_templates.get(distro_name)
             # Prepare distro configuration
@@ -156,21 +173,21 @@ class Builder(Thread):
         # GIT
         self.logger.info("Started")
         self.set_status('clonning')
-        if self.git_clone() is True:
+        if self.get_sources() is True:
             # YAML
             self.logger.debug("Read .packer.yml")
             self.set_status('reading')
-            global_packer_conf_file_name = os.path.join(self.folder_git, ".packer.yml")
+            global_packer_conf_file_name = os.path.join(self.folder_source, ".packer.yml")
             if os.path.exists(global_packer_conf_file_name):
                 global_packer_conf_stream = file(global_packer_conf_file_name, 'r')
                 global_packer_conf = yaml.load(global_packer_conf_stream)
                 if 'include' in global_packer_conf:
                     for packer_file_glob in global_packer_conf.get("include"):
-                        for packer_conf_file_name in glob.glob(os.path.join(self.folder_git, packer_file_glob)):
+                        for packer_conf_file_name in glob.glob(os.path.join(self.folder_source, packer_file_glob)):
                             packer_conf_stream = file(packer_conf_file_name, 'r')
                             packer_conf = yaml.load(packer_conf_stream)
                             # Get root folder of this package
-                            packer_conf_relative_file_name = packer_conf_file_name.replace(self.folder_git, "").strip("/")
+                            packer_conf_relative_file_name = packer_conf_file_name.replace(self.folder_source, "").strip("/")
                             root_folder = os.path.dirname(packer_conf_relative_file_name)
                             # Run packer
                             self.run_packer(packer_conf, root_folder)
@@ -182,11 +199,12 @@ class Builder(Thread):
         else:
             self.set_status('failed')
 
-        # Delete tmp git folder
+        # Delete tmp source folder
         self.logger.info("Tmp folders deleting")
         if os.path.exists(os.path.join(self.folder,'tmp')):
             shutil.rmtree(os.path.join(self.folder,'tmp'))
         for tmp_dir in glob.glob(os.path.join(self.folder, '*/tmp')):
             shutil.rmtree(tmp_dir)
-        shutil.rmtree(self.folder_git)
+        if os.path.exists(self.folder_source):
+            shutil.rmtree(self.folder_source)
         self.logger.info("Tmp folders deleted")
