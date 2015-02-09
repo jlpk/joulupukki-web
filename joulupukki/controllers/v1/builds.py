@@ -16,6 +16,7 @@ import os
 import json
 import uuid
 import datetime
+import shutil
 
 from io import BytesIO
 from joulupukki.controllers.v1.datamodel.build import Build
@@ -154,6 +155,17 @@ class BuildController(rest.RestController):
             return Build(**build)
         else:
             return None
+
+
+    # curl -X DELETE http://127.0.0.1:8080/v1/builds/c1afd1d8-17ee-4858-8dd1-964cb065d141/
+    @pecan.expose()
+    def delete(self):
+        """Delete build and build folder"""
+        build = get_build(self._id)
+        if os.path.exists(os.path.join(pecan.conf.builds_path, self._id)):
+            shutil.rmtree(os.path.join(pecan.conf.builds_path, self._id))
+            return "Deleted"
+        return "Doesn't exist"
 
     @pecan.expose()
     def _lookup(self, *remainder):
