@@ -127,17 +127,20 @@ class DebPacker(Packer):
         self.logger.info("DEB Build starting")
         self.container = self.cli.create_container(self.container_tag, command=command, volumes=["/upstream"])
         local_source_folder = os.path.join(self.folder, "sources")
-        self.cli.start(self.container['Id'],
+        toto = self.cli.start(self.container['Id'],
                        binds={local_source_folder: {"bind": "/upstream",
                                                     "ro": True}})
 
         for line in self.cli.attach(self.container['Id'], stdout=True, stderr=True, stream=True):
             self.logger.info(line.strip())
-        # TODO get build exit code
         # Stop container
         self.cli.stop(self.container['Id'])
         self.logger.info("DEB Build finished")
-        return True
+        # Get exit code
+        if self.cli.wait(self.container['Id']) != 0:
+            return False
+        else:
+            return True
 
 
     def get_output(self):

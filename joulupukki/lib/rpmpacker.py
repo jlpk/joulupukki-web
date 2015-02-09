@@ -163,12 +163,14 @@ class RpmPacker(Packer):
 
         for line in self.cli.attach(self.container['Id'], stdout=True, stderr=True, stream=True):
             self.logger.info(line.strip())
-        # TODO get build exit code
         # Stop container
         self.cli.stop(self.container['Id'])
         self.logger.info("RPM Build finished")
-        return True
-
+        # Get exit code
+        if self.cli.wait(self.container['Id']) != 0:
+            return False
+        else:
+            return True
 
     def get_output(self):
         # Get RPMS from the container
