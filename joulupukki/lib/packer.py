@@ -15,6 +15,8 @@ from docker import Client
 from deb_pkg_tools.control import parse_depends
 from deb_pkg_tools.control import load_control_file
 from joulupukki.lib.logger import get_logger, get_logger_docker
+from joulupukki.lib.distros import reverse_supported_distros
+
 
 
 """
@@ -56,7 +58,8 @@ class Packer(object):
         self.folder = builder.folder
 
 
-        self.container_tag = "joulupukki"
+        distro = reverse_supported_distros.get(config['distro'])
+        self.container_tag = "joulupukki:" + distro.replace(":", "_")
         self.container = None
 
 
