@@ -132,7 +132,7 @@ class Builder(Thread):
             if not os.path.isdir(source_path):
                 self.logger.error("Source folder %s does not exist", source_path)
                 return False
-            shutil.copytree(source_path, self.folder_source)
+            shutil.copytree(source_path, self.folder_source, symlinks=True)
             return True
         else:
             self.logger.error("Source type %s not supported", self.source_type)
