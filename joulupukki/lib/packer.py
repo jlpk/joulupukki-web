@@ -8,6 +8,7 @@ import logging
 import shutil
 import glob
 from urlparse import urlparse
+from datetime import datetime
 
 from docker import Client
 
@@ -17,6 +18,7 @@ from joulupukki.lib.logger import get_logger, get_logger_docker
 
 
 """
+setup
 preparing
 building
 packaging
@@ -62,7 +64,8 @@ class Packer(object):
         self.set_status_builder(status, self.config['distro'])
 
     def run(self):
-        steps = (('preparing', self.parse_specdeb),
+        steps = (('setup', self.setup),
+                 ('preparing', self.parse_specdeb),
                  ('building', self.docker_build),
                  ('packaging', self.docker_run),
                  ('finishing', self.get_output),
@@ -101,17 +104,24 @@ class Packer(object):
     def get_output(self):
         return False
 
+    def setup(self):
+        # Remove images
+        for image in self.cli.images(self.container_tag):
+            try:
+                creation_date = datetime.fromtimestamp(image.get('Created'))
+                delta_time = datetime.now() - creation_date
+                if delta_time.days >= 1:
+                    self.logger.debug('Deleting docker image: %s', image['Id'])
+                    self.cli.remove_image(image['Id'])
+            except Exception as error:
+                self.logger.debug('Cannot deleting docker image: %s'
+                                  ' - Error: %s', image['Id'], error)
+        return True
+
     def clean_up(self):
         # Delete container
         self.logger.debug('Deleting docker container: %s', self.container['Id'])
         self.cli.remove_container(self.container['Id'])
 
-        # Remove images
-        for image in self.cli.images(self.container_tag):
-            try:
-                self.logger.debug('Deleting docker image: %s', image['Id'])
-                self.cli.remove_image(image['Id'])
-            except Exception as error:
-                self.logger.debug('Cannot deleting docker image: %s'
-                                  ' - Error: %s', image['Id'], error)
+
         return True
