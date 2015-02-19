@@ -144,6 +144,12 @@ class Builder(Thread):
         failed = False
         self.set_status('dispatching')
         for distro_name, build_conf in packer_conf.items():
+            # Check yml format
+            if not isinstance(build_conf, dict):
+                self.logger.error("Packer yml file seems malformated" )
+                self.set_status('bad_yml_file')
+                continue
+            # Check distro name
             if distro_name not in supported_distros:
                 self.logger.error("Distro %s not supported", distro_name)
                 self.set_status('distro_not_supported', distro_name)
