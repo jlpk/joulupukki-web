@@ -86,7 +86,11 @@ class RpmPacker(Packer):
         for conf_name, config_value in self.config.items()[:]:
             if isinstance(config_value, str):
                 tmp_ = re.sub(r"%{([^?}]*)}", r"%(\1)s", config_value)
-                self.config[conf_name] = re.sub(r"%{(\?[^}]*)}", r"%%{\1}", tmp_) % defines
+                try:
+                   self.config[conf_name] = re.sub(r"%{(\?[^}]*)}", r"%%{\1}", tmp_) % defines
+                except Exception as exp:
+                    self.logger.error("This string seems strange: %s", tmp_)
+                    return False
 
         sources = []
         for source in raw_sources:
