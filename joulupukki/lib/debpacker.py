@@ -41,7 +41,6 @@ class DebPacker(Packer):
         self.config['name'] = ''
         self.config['source'] = ''
 
-
         deb_info = load_control_file(control_file_path)
         self.config['name'] = deb_info.get("Source")
         self.config['deps'] = parse_depends(deb_info.get('Build-Depends')).names
@@ -57,6 +56,9 @@ class DebPacker(Packer):
 
         version_release = match.group(1)
         self.config['version'], self.config['release'] = version_release.split("-", 1)
+        # Clean version
+        self.config['version'] = self.config['version'].split(":", 1)[-1]
+        # Get source file
         self.config['source'] = self.config['name'] + "_" + self.config['version'] + ".orig.tar.gz"
 
         # Log informations
