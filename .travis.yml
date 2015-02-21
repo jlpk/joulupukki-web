@@ -1,0 +1,8 @@
+language: python
+env:
+    - TOX_ENV=py27
+    - TOX_ENV=docs
+script:
+    - tox -e $TOX_ENV
+notifications:
+    email: false
