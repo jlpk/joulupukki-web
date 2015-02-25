@@ -48,7 +48,7 @@ class Builder(Thread):
         self.build = data
 
         # Create docker client
-        self.cli = Client(base_url='unix://var/run/docker.sock', version=pecan.conf.docker_verion)
+        self.cli = Client(base_url='unix://var/run/docker.sock', version=pecan.conf.docker_version)
         # Set folders
         self.folder = Build.get_folder_path(data.project.user.username,
                                             data.project.name,
@@ -124,7 +124,12 @@ class Builder(Thread):
         # DOCKER
         failed = False
         self.build.set_status('dispatching')
+        # TODO Put all for content a sub thread :)
         for distro_name, build_conf in packer_conf.items():
+            # If forced_distro is set, we launch build only on 
+            # the specified distro
+            if self.build.forced_distro is not None and distro_name != self.build.forced_distro:
+                continue
             # Check yml format
             if not isinstance(build_conf, dict):
                 self.logger.error("Packer yml file seems malformated" )
@@ -169,6 +174,7 @@ class Builder(Thread):
             if os.path.exists(global_packer_conf_file_name):
                 global_packer_conf_stream = file(global_packer_conf_file_name, 'r')
                 global_packer_conf = yaml.load(global_packer_conf_stream)
+                # File with "include" directive
                 if 'include' in global_packer_conf:
                     for packer_file_glob in global_packer_conf.get("include"):
                         for packer_conf_file_name in glob.glob(os.path.join(self.folder_source, packer_file_glob)):
@@ -178,10 +184,10 @@ class Builder(Thread):
                             packer_conf_relative_file_name = packer_conf_file_name.replace(self.folder_source, "").strip("/")
                             root_folder = os.path.dirname(packer_conf_relative_file_name)
                             # Run packer
-                            # TODO Put this function in a sub thread :)
                             self.run_packer(packer_conf, root_folder)
                 else:
-                     self.run_packer(global_packer_conf, ".")
+                    # Standard file
+                    self.run_packer(global_packer_conf, ".")
             else:
                 self.logger.error("File .packer.yml not found")
                 self.build.set_status('failed')

@@ -19,6 +19,7 @@ class APIBuild(types.Base):
     source_type = wsme.wsattr(source_types, mandatory=True, default="git")
     commit = wsme.wsattr(wtypes.text, mandatory=False, default=None)
     branch = wsme.wsattr(wtypes.text, mandatory=False, default=None)
+    forced_distro = wsme.wsattr(wtypes.text, mandatory=False, default=None)
 
 class Build(APIBuild):
     id_ = wsme.wsattr(int, mandatory=False)
