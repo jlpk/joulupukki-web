@@ -78,7 +78,7 @@ class DebPacker(Packer):
         FROM %(distro)s
         RUN apt-get update
         RUN apt-get upgrade -y
-        RUN apt-get install -y devscripts debianutils debhelper build-essential tar
+        RUN apt-get install -y devscripts debianutils debhelper build-essential tar rsync
         ''' % self.config
         f = BytesIO(dockerfile.encode('utf-8'))
 
@@ -104,9 +104,8 @@ class DebPacker(Packer):
         docker_source_root_folder = os.path.join('upstream', self.config['root_folder'])
         commands = [
         """mkdir -p /sources""",
-        """cp -r /%s /sources/%s""" % (docker_source_root_folder, self.config['name']), 
+        """rsync -rlptD --exclude '.git' /%s /sources/%s""" % (docker_source_root_folder, self.config['name']),
         """cd /sources/""",
-        """rm -rf .git""",
         """tar czf /sources/%s %s""" % (self.config['source'], self.config['name']),
         ]
 
