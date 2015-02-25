@@ -20,6 +20,7 @@ class APIBuild(types.Base):
     commit = wsme.wsattr(wtypes.text, mandatory=False, default=None)
     branch = wsme.wsattr(wtypes.text, mandatory=False, default=None)
     forced_distro = wsme.wsattr(wtypes.text, mandatory=False, default=None)
+    snapshot = wsme.wsattr(bool, mandatory=False, default=False)
 
 class Build(APIBuild):
     id_ = wsme.wsattr(int, mandatory=False)

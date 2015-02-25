@@ -101,6 +101,8 @@ class Builder(Thread):
                 return False
         # Build tree
         repo.head.reset(index=True, working_tree=True)
+        if self.build.commit is None:
+            self.build.commit = repo.commit().hexsha
         self.logger.info("Cloned")
         return True
 

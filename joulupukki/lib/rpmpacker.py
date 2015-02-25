@@ -9,6 +9,7 @@ import shutil
 import glob
 from urlparse import urlparse
 from collections import OrderedDict
+from datetime import datetime
 
 from docker import Client
 
@@ -171,6 +172,17 @@ class RpmPacker(Packer):
         if self.config['deps_pip']:
             commands.append("""yum install -y python-setuptools""")
             commands.append("""easy_install %s""" % " ".join(self.config['deps_pip']))
+        # snapshot
+        if self.builder.build.snapshot:
+            version = self.config['version']
+            date = datetime.now().strftime("%Y%m%d%H%M%S")
+            if self.builder.build.commit:
+                commit = self.builder.build.commit[:7]
+                self.config['release'] = date + "~git" + commit
+            else:
+                self.config['release'] = date
+            commands.append(""" sed -i "s/^Release:.*/Release: %s/g" %s """ % (self.config['release'], docker_spec_file))
+
         # Build
         commands.append("""rpmbuild -ba /%s --define "_sourcedir /" """ % docker_spec_file)
         # Finish command preparation

@@ -90,9 +90,9 @@ class BuildsController(rest.RestController):
 
 
 class LaunchBuildController(rest.RestController):
-
     # curl -X POST -H "Content-Type: application/json" -i  -d '{"source_url": "/home/tcohen/projet_communautaire/kaji/meta/packages/shinken", "source_type": "local", "branch": "kaji"}' http://127.0.0.1:8080/v2/titilambert/shinken/build
     # curl -X POST -H "Content-Type: application/json" -i  -d '{"source_url": "/home/tcohen/projet_communautaire/kaji/meta/packages/shinken", "source_type": "local", "branch": "kaji", "forced_distro": "centos_7"}' http://127.0.0.1:8080/v2/titilambert/shinken/build
+    # curl -X POST -H "Content-Type: application/json" -i  -d '{"source_url": "https://github.com/kaji-project/kaji.git", "source_type": "git", "branch": "kaji", "forced_distro": "centos_7", "snapshot": true}' http://127.0.0.1:8080/v2/titilambert/kaji/build
     @wsme_pecan.wsexpose(wtypes.text, body=APIBuild, status_code=201)
     def post(self, build):
         """ launch build """

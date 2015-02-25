@@ -55,6 +55,7 @@ distros = (
            ("ubuntu_12.04", "ubuntu:12.04", "deb"),
            ("ubuntu_14.04", "ubuntu:14.04", "deb"),
            ("debian_7", "debian:7", "deb"),
+           ("debian_8", "debian:8", "deb"),
            ("centos_6", "centos:6", "rpm"),
            ("centos_7", "centos:7", "rpm"),
         )

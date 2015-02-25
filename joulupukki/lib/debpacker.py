@@ -7,6 +7,7 @@ import re
 import logging
 import shutil
 import glob
+from datetime import datetime
 from urlparse import urlparse
 
 from docker import Client
@@ -102,12 +103,13 @@ class DebPacker(Packer):
     def docker_run(self):
         # PREPARE BUILD COMMAND
         docker_source_root_folder = os.path.join('upstream', self.config['root_folder'])
-        commands = [
-        """mkdir -p /sources""",
-        """rsync -rlptD --exclude '.git' /%s /sources/%s""" % (docker_source_root_folder, self.config['name']),
-        """cd /sources/""",
-        """tar czf /sources/%s %s""" % (self.config['source'], self.config['name']),
-        ]
+        commands = []
+        commands.append("""mkdir -p /sources""")
+        commands.append("""rsync -rlptD --exclude '.git' /%s /sources/%s""" % (docker_source_root_folder, self.config['name']))
+        commands.append("""cd /sources/""")
+        commands.append("""tar czf /sources/%s %s""" % (self.config['source'], self.config['name']))
+        commands.append("""apt-get update""")
+        commands.append("""apt-get upgrade -y""")
 
         # Handle build dependencies
         if self.config['deps']:
@@ -117,8 +119,22 @@ class DebPacker(Packer):
             commands.append("""apt-get install -y python-setuptools""")
             commands.append("""easy_install %s""" % " ".join(self.config['deps_pip']))
         # Build
-        commands.append("""cd %s && dpkg-buildpackage -uc -us""" % self.config['name'])
-        commands.append("""cd .. && mkdir /output""")
+        commands.append("""cd %s """ % self.config['name'])
+        if self.builder.build.snapshot:
+            version = self.config['version']
+            date = datetime.now().strftime("%Y%m%d%H%M%S")
+            if self.builder.build.commit:
+                commit = self.builder.build.commit[:7]
+                self.config['release'] = date + "~git" + commit
+            else:
+                self.config['release'] = date
+
+            new_version = "-".join((version, self.config['release']))
+            commands.append("""dch --newversion "%s" "Automatic nightly release" """ % new_version)
+            commands.append("""dch --release --distribution "unstable" debian/changelog""")
+        commands.append("""dpkg-buildpackage -uc -us""")
+        commands.append("""cd .. """)
+        commands.append("""mkdir /output""")
         commands.append("""mv *.orig.tar* *.debian.tar* *deb *changes *dsc /output""")
         # Finish command preparation
         command = "bash -c '%s'" % " && ".join(commands)
