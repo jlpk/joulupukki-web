@@ -7,16 +7,18 @@ import json
 import wsme.types as wtypes
 
 from joulupukki.controllers.v2.datamodel import types
-from joulupukki.controllers.v2.datamodel.project import Project
+#from joulupukki.controllers.v2.datamodel.project import Project
 
 
-class User(types.Base):
+class APIUser(types.Base):
     username = wsme.wsattr(wtypes.text, mandatory=False)
     github = wsme.wsattr(wtypes.text, mandatory=False)
     email = wsme.wsattr(wtypes.text, mandatory=False)
     name = wsme.wsattr(wtypes.text, mandatory=False)
     token = wsme.wsattr(wtypes.text, mandatory=False)
     password = wsme.wsattr(wtypes.text, mandatory=False)
+
+class User(APIUser):
     projects = wsme.wsattr([wtypes.text], mandatory=False)
 
     @staticmethod
@@ -138,13 +140,6 @@ class User(types.Base):
         shutil.rmtree(user_folder_abs)
         return True
 
-
     def get_projects(self):
         for root, folders, files in os.walk(User.get_folder_path(self.username)):
             return folders
-
-    def get_project(self, project_name):
-        return Project.fetch(self, project_name)
-
-    def create_project(self, project_name, project_data):
-        return Project.create(self, project_name, project_data)

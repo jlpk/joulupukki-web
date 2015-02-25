@@ -55,7 +55,7 @@ class UserController(rest.RestController):
                 return "Error creating"
             return "User %s created" % self.username
         else:
-            if not user.update(ser_data):
+            if not user.update(user_data):
                 # Handle error
                 return "Error editing"
             return "User %s edited" % self.username

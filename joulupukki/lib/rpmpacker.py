@@ -203,18 +203,18 @@ class RpmPacker(Packer):
         self.logger.info("Get RPM files")
         rpms_raw = self.cli.copy(self.container['Id'], "/root/rpmbuild/RPMS")
         rpms_tar = tarfile.open(fileobj=BytesIO(rpms_raw.read()))
-        rpms_tar.extractall(self.folder_output_tmp)
+        rpms_tar.extractall(self.job_tmp_folder)
         rpms_tar.close()
         # Get SRPM from the container
         self.logger.info("Get SRPM files")
         srpms_raw = self.cli.copy(self.container['Id'], "/root/rpmbuild/SRPMS")
         srpms_tar = tarfile.open(fileobj=BytesIO(srpms_raw.read()))
-        srpms_tar.extractall(self.folder_output_tmp)
+        srpms_tar.extractall(self.job_tmp_folder)
         srpms_tar.close()
         # move files to folder output
-        for rpm in glob.glob(os.path.join(self.folder_output_tmp, "*/*.rpm")):
+        for rpm in glob.glob(os.path.join(self.job_tmp_folder, "*/*.rpm")):
             shutil.move(rpm, self.folder_output)
-        for rpm in glob.glob(os.path.join(self.folder_output_tmp, "*/*/*.rpm")):
+        for rpm in glob.glob(os.path.join(self.job_tmp_folder, "*/*/*.rpm")):
             shutil.move(rpm, self.folder_output)
         
         self.logger.info("RPM and SRPM files deposed in output folder")

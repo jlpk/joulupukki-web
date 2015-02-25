@@ -11,6 +11,7 @@ from joulupukki.lib.rpmpacker import RpmPacker
 from joulupukki.lib.debpacker import DebPacker
 from joulupukki.lib.distros import supported_distros, distro_templates
 from joulupukki.lib.logger import get_logger, get_logger_docker
+from joulupukki.controllers.v2.datamodel.build import Build
 import json
 
 
@@ -31,51 +32,34 @@ finished
 
 class Builder(Thread):
     def __init__(self, data):
-        Thread.__init__(self, name=data.uuid)
+        thread_name = "__".join((data.user.username,
+                                 data.project.name,
+                                 str(data.id_)))
+        Thread.__init__(self, name=thread_name)
         self.source_url = data.source_url
         self.source_type = data.source_type
         self.branch = data.branch
         self.commit = data.commit
-        self.uuid = data.uuid
+        self.user = data.user
+        self.project = data.project
+        self.id_ = str(data.id_)
+        self.uuid2 = thread_name
         self.created = time.time()
-        self.package_name = None
-        self.package_version = None
-        self.package_release = None
+#        self.package_name = None
+#        self.package_version = None
+#        self.package_release = None
+        self.build = data
 
         # Create docker client
         self.cli = Client(base_url='unix://var/run/docker.sock', version="1.15")
         # Set folders
-        self.folder = os.path.join(pecan.conf.builds_path, self.uuid)
-        self.folder_source = os.path.join(self.folder, 'sources')
-        os.makedirs(self.folder)
+        self.folder = Build.get_folder_path(data.project.user.username,
+                                            data.project.name,
+                                            data.id_)
+        self.folder_source = data.get_source_folder_path()
         # Prepare logger
-        self.logger = get_logger(self.uuid)
-        # Save
-        self.save_to_disk()
+        self.logger = get_logger(self)
 
-    def save_to_disk(self):
-        build_file = os.path.join(self.folder, "build.cfg")
-        data = json.dumps({"source_url": self.source_url,
-                           "source_type": self.source_type,
-                           "branch": self.branch,
-                           "commit": self.commit,
-                           "uuid": self.uuid,
-                           "created": self.created,
-                           "package_name": self.package_name,
-                           "package_version": self.package_version,
-                           "package_release": self.package_release,
-                           })
-
-        with open(build_file, 'w') as f:
-            f.write(data)
-
-    def set_status(self, status, distro=None):
-        if distro is None:
-            status_file = os.path.join(self.folder, "status.txt")
-        else:
-            status_file = os.path.join(self.folder, distro, "status.txt")
-        with open(status_file, 'w') as f:
-            f.write(str(status))
 
     def git_clone(self):
         self.logger.info("Cloning")
@@ -142,17 +126,18 @@ class Builder(Thread):
     def run_packer(self, packer_conf, root_folder):
         # DOCKER
         failed = False
-        self.set_status('dispatching')
+        self.build.set_status('dispatching')
         for distro_name, build_conf in packer_conf.items():
             # Check yml format
             if not isinstance(build_conf, dict):
                 self.logger.error("Packer yml file seems malformated" )
-                self.set_status('bad_yml_file')
+                self.build.set_status('bad_yml_file')
                 continue
             # Check distro name
             if distro_name not in supported_distros:
                 self.logger.error("Distro %s not supported", distro_name)
-                self.set_status('distro_not_supported', distro_name)
+                # FIXME
+                #self.set_status('distro_not_supported', distro_name)
                 continue
             distro_type = distro_templates.get(distro_name)
             # Prepare distro configuration
@@ -163,13 +148,13 @@ class Builder(Thread):
             self.logger.info("Distro %s is an %s distro", distro_name, distro_type)
             packer_class = globals().get(distro_type.capitalize() + 'Packer')
             packer = packer_class(self, build_conf)
-            self.set_status('building', build_conf['distro'])
+            packer.set_status('building')
             self.logger.info("Packaging starting for %s", distro_name)
             if packer.run() is True:
-                self.set_status('succeeded', build_conf['distro'])
+                packer.set_status('succeeded')
                 self.logger.info("Packaging finished for %s", distro_name)
             else:
-                self.set_status('failed', build_conf['distro'])
+                packer.set_status('failed')
                 self.logger.info("Packaging finished for %s", distro_name)
         if failed:
             return False
@@ -178,11 +163,11 @@ class Builder(Thread):
     def run(self):
         # GIT
         self.logger.info("Started")
-        self.set_status('clonning')
+        self.build.set_status('clonning')
         if self.get_sources() is True:
             # YAML
             self.logger.debug("Read .packer.yml")
-            self.set_status('reading')
+            self.build.set_status('reading')
             global_packer_conf_file_name = os.path.join(self.folder_source, ".packer.yml")
             if os.path.exists(global_packer_conf_file_name):
                 global_packer_conf_stream = file(global_packer_conf_file_name, 'r')
@@ -196,14 +181,15 @@ class Builder(Thread):
                             packer_conf_relative_file_name = packer_conf_file_name.replace(self.folder_source, "").strip("/")
                             root_folder = os.path.dirname(packer_conf_relative_file_name)
                             # Run packer
+                            # TODO Put this function in a sub thread :)
                             self.run_packer(packer_conf, root_folder)
                 else:
                      self.run_packer(global_packer_conf, ".")
             else:
                 self.logger.error("File .packer.yml not found")
-                self.set_status('failed')
+                self.build.set_status('failed')
         else:
-            self.set_status('failed')
+            self.build.set_status('failed')
 
         # Delete tmp source folder
         self.logger.info("Tmp folders deleting")

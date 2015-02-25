@@ -34,7 +34,7 @@ class Manager(Thread):
                 logging.debug("Task received")
                 build_task = build_tasks.get()
                 builder = Builder(build_task)
-                self.build_list[builder.uuid] = builder
+                self.build_list[builder.uuid2] = builder
                 builder.start()
                 build_tasks.task_done()
 

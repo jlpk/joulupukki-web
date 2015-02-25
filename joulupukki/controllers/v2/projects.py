@@ -25,7 +25,8 @@ from joulupukki.controllers.v2.datamodel.user import User
 from joulupukki.controllers.v2.datamodel.project import Project
 
 
-from joulupukki.controllers.v2.builds import BuildsSubController
+from joulupukki.controllers.v2.builds import BuildsController
+from joulupukki.controllers.v2.builds import LaunchBuildController
 
 from joulupukki.lib.distros import supported_distros, reverse_supported_distros
 
@@ -44,7 +45,7 @@ class ProjectController(rest.RestController):
     @wsme_pecan.wsexpose(Project)
     def get(self):
         """Returns project"""
-        project = self.user.get_project(self.project_name)
+        project = Project.fetch(self.user, self.project_name)
         return project
 
 
@@ -65,15 +66,25 @@ class ProjectController(rest.RestController):
     @pecan.expose()
     def delete(self):
         """Delete project and project folder"""
-        project = get_project(self.project_name)
+        project = self.user.get_project(self.project_name)
         if project is not None:
-            delete_project(project)
+            project.delete()
             return "Project %s deleted" % self.project_name
         return "Project doesn't exist"
 
     @pecan.expose()
     def _lookup(self, *remainder):
-        return BuildsSubController(), remainder
+        return ProjectSubController(), remainder
+
+
+
+
+
+class ProjectSubController(rest.RestController):
+    builds = BuildsController()
+    build = LaunchBuildController()
+#    jobs = JobsController()
+
 
 
 
