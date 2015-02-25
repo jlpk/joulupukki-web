@@ -133,7 +133,7 @@ class RpmPacker(Packer):
         dockerfile= '''
         FROM %(distro)s
         RUN yum upgrade -y
-        RUN yum install rpm-build tar -y
+        RUN yum install rpm-build tar rsync -y
         ''' % self.config
         f = BytesIO(dockerfile.encode('utf-8'))
 
@@ -157,13 +157,11 @@ class RpmPacker(Packer):
     def docker_run(self):
         # PREPARE BUILD COMMAND
         docker_source_root_folder = os.path.join('upstream', self.config['root_folder'])
-        docker_spec_file = os.path.join(docker_source_root_folder, self.config['spec'])
+        docker_spec_file = os.path.join("/sources/%s" % self.config['source_folder'], self.config['spec'])
         commands = [
         """mkdir -p /sources""",
-        """cd /upstream""",
-        """cp -r /%s /sources/%s""" % (docker_source_root_folder, self.config['source_folder']),
+        """rsync -rlptD --exclude '.git' /%s /sources/%s""" % (docker_source_root_folder, self.config['source_folder']),
         """cd /sources/""",
-        """rm -rf .git""",
         """tar cf /%s %s""" % (self.config['source'], self.config['source_folder']),
         ]
         # Handle build dependencies

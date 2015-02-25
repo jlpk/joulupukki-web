@@ -16,3 +16,7 @@ env
 .testrepository
 *.swp
 tmp/
+
+# ide
+.project
+.pydevproject
