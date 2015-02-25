@@ -51,6 +51,14 @@ logging = {
 #
 # foo = {'bar':'baz'}
 workspace_path = '%(confdir)s/tmp'
+distros = (
+           ("ubuntu_12.04", "ubuntu:12.04", "deb"),
+           ("ubuntu_14.04", "ubuntu:14.04", "deb"),
+           ("debian_7", "debian:7", "deb"),
+           ("centos_6", "centos:6", "rpm"),
+           ("centos_7", "centos:7", "rpm"),
+        )
+docker_version = "1.15"
 #
 # All configurations are accessible at::
 # pecan.conf

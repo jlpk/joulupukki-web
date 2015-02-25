@@ -45,13 +45,10 @@ class Builder(Thread):
         self.id_ = str(data.id_)
         self.uuid2 = thread_name
         self.created = time.time()
-#        self.package_name = None
-#        self.package_version = None
-#        self.package_release = None
         self.build = data
 
         # Create docker client
-        self.cli = Client(base_url='unix://var/run/docker.sock', version="1.15")
+        self.cli = Client(base_url='unix://var/run/docker.sock', version=pecan.conf.docker_verion)
         # Set folders
         self.folder = Build.get_folder_path(data.project.user.username,
                                             data.project.name,
