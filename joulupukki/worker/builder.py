@@ -159,9 +159,13 @@ class Builder(Thread):
                 self.logger.info("Packaging finished for %s", distro_name)
             else:
                 packer.set_status('failed')
+                failed = True
                 self.logger.info("Packaging finished for %s", distro_name)
         if failed:
+            self.build.set_status('failed')
             return False
+
+        self.build.set_status('succeeded')
         self.logger.info("Packaging finished for all distros")
 
     def run(self):
