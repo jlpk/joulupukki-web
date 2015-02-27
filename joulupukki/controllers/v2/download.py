@@ -84,7 +84,7 @@ class DownloadController(rest.RestController):
         if build.package_name is None:
             return
 
-        filename = "%(package_name)s_%(package_version)s-%(package_release)s" % build.as_dict()
+        filename = project_name + "_%(package_version)s-%(package_release)s" % build.as_dict()
         if distro is not None:
             filename = filename + "-" + distro
         else:
