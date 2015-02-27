@@ -52,7 +52,7 @@ class UserController(rest.RestController):
         if user is None:
             if not User.create(self.username, user_data):
                 # Handle error
-                return "Error creating"
+                return "Error creating user %s with data %s" % (self.username, user_data)
             return "User %s created" % self.username
         else:
             if not user.update(user_data):

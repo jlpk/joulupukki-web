@@ -161,7 +161,7 @@ class RpmPacker(Packer):
         docker_spec_file = os.path.join("/sources/%s" % self.config['source_folder'], self.config['spec'])
         commands = [
         """mkdir -p /sources""",
-        """rsync -rlptD --exclude '.git' /%s /sources/%s""" % (docker_source_root_folder, self.config['source_folder']),
+        """rsync -rlptD --exclude '.git' /%s/ /sources/%s""" % (docker_source_root_folder, self.config['source_folder']),
         """cd /sources/""",
         """tar cf /%s %s""" % (self.config['source'], self.config['source_folder']),
         ]

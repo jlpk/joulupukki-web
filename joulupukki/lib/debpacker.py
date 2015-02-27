@@ -105,7 +105,7 @@ class DebPacker(Packer):
         docker_source_root_folder = os.path.join('upstream', self.config['root_folder'])
         commands = []
         commands.append("""mkdir -p /sources""")
-        commands.append("""rsync -rlptD --exclude '.git' /%s /sources/%s""" % (docker_source_root_folder, self.config['name']))
+        commands.append("""rsync -rlptD --exclude '.git' /%s/ /sources/%s""" % (docker_source_root_folder, self.config['name']))
         commands.append("""cd /sources/""")
         commands.append("""tar czf /sources/%s %s""" % (self.config['source'], self.config['name']))
         commands.append("""apt-get update""")

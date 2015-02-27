@@ -57,7 +57,7 @@ class ProjectController(rest.RestController):
         if not projects or self.project_name not in projects:
             if not self.user.create_project(self.project_name, project_data):
                 # Handle error
-                return "Error creating"
+                return "Error creating %s with data %s" %(self.project_name, project_data)
             return "Project %s created" % self.project_name
         else:
             return "Project %s exists" % self.project_name
