@@ -7,6 +7,7 @@ import re
 import logging
 import shutil
 import glob
+import timeit
 from urlparse import urlparse
 from collections import OrderedDict
 from datetime import datetime
@@ -191,6 +192,7 @@ class RpmPacker(Packer):
 
         # RUN
         self.logger.info("RPM Build starting")
+        start_time = timeit.default_timer()
         self.container = self.cli.create_container(self.container_tag, command=command, volumes=["/upstream"])
         local_source_folder = os.path.join(self.folder, "sources")
         self.cli.start(self.container['Id'],
@@ -201,7 +203,8 @@ class RpmPacker(Packer):
             self.logger.info(line.strip())
         # Stop container
         self.cli.stop(self.container['Id'])
-        self.logger.info("RPM Build finished")
+        elapsed = timeit.default_timer() - start_time
+        self.logger.info("RPM Build finished in %ds" % elapsed)
         # Get exit code
         if self.cli.wait(self.container['Id']) != 0:
             return False
