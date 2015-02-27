@@ -7,6 +7,8 @@ import re
 import logging
 import shutil
 import glob
+import pecan
+import timeit
 from datetime import datetime
 from urlparse import urlparse
 
@@ -103,7 +105,23 @@ class DebPacker(Packer):
     def docker_run(self):
         # PREPARE BUILD COMMAND
         docker_source_root_folder = os.path.join('upstream', self.config['root_folder'])
+
         commands = []
+        volumes = ['/upstream']
+        binds = {}
+
+        if pecan.conf.ccache_path is not None:
+            self.logger.info("CCACHE is enabled")
+            ccache_path = os.path.join(pecan.conf.ccache_path, self.builder.build.user.username,
+                self.config['name'], self.config['distro'].replace(":", "_"))
+            if not os.path.exists(ccache_path):
+                os.makedirs(ccache_path)
+            volumes.append('/ccache')
+            binds[ccache_path] = {"bind": "/ccache"}
+            commands.append("""apt-get install -y ccache""")
+            commands.append("""export PATH=/usr/lib/ccache:$PATH""")
+            commands.append("""export CCACHE_DIR=/ccache""")
+
         commands.append("""mkdir -p /sources""")
         commands.append("""rsync -rlptD --exclude '.git' /%s/ /sources/%s""" % (docker_source_root_folder, self.config['name']))
         commands.append("""cd /sources/""")
@@ -142,17 +160,18 @@ class DebPacker(Packer):
 
         # RUN
         self.logger.info("DEB Build starting")
-        self.container = self.cli.create_container(self.container_tag, command=command, volumes=["/upstream"])
+        start_time = timeit.default_timer()
+        self.container = self.cli.create_container(self.container_tag, command=command, volumes=volumes)
         local_source_folder = os.path.join(self.folder, "sources")
-        toto = self.cli.start(self.container['Id'],
-                       binds={local_source_folder: {"bind": "/upstream",
-                                                    "ro": True}})
+        binds[local_source_folder] = {"bind": "/upstream", "ro": True}
+        toto = self.cli.start(self.container['Id'], binds=binds)
 
         for line in self.cli.attach(self.container['Id'], stdout=True, stderr=True, stream=True):
             self.logger.info(line.strip())
         # Stop container
         self.cli.stop(self.container['Id'])
-        self.logger.info("DEB Build finished")
+        elapsed = timeit.default_timer() - start_time
+        self.logger.info("DEB Build finished in %ds" % elapsed)
         # Get exit code
         if self.cli.wait(self.container['Id']) != 0:
             return False

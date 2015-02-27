@@ -7,6 +7,8 @@ import re
 import logging
 import shutil
 import glob
+import pecan
+import timeit
 from urlparse import urlparse
 from collections import OrderedDict
 from datetime import datetime
@@ -159,12 +161,28 @@ class RpmPacker(Packer):
         # PREPARE BUILD COMMAND
         docker_source_root_folder = os.path.join('upstream', self.config['root_folder'])
         docker_spec_file = os.path.join("/sources/%s" % self.config['source_folder'], self.config['spec'])
-        commands = [
-        """mkdir -p /sources""",
-        """rsync -rlptD --exclude '.git' /%s/ /sources/%s""" % (docker_source_root_folder, self.config['source_folder']),
-        """cd /sources/""",
-        """tar cf /%s %s""" % (self.config['source'], self.config['source_folder']),
-        ]
+
+        commands = []
+        volumes = ['/upstream']
+        binds = {}
+
+        if pecan.conf.ccache_path is not None:
+            self.logger.info("CCACHE is enabled")
+            ccache_path = os.path.join(pecan.conf.ccache_path, self.builder.build.user.username,
+                self.config['name'], self.config['distro'].replace(":", "_"))
+            if not os.path.exists(ccache_path):
+                os.makedirs(ccache_path)
+            volumes.append('/ccache')
+            binds[ccache_path] = {"bind": "/ccache"}
+            commands.append("""yum install -y ccache""")
+            commands.append("""export PATH=/usr/lib64/ccache:$PATH""")
+            commands.append("""export CCACHE_DIR=/ccache""")
+
+        commands.append("""mkdir -p /sources""")
+        commands.append("""rsync -rlptD --exclude '.git' /%s/ /sources/%s""" % (docker_source_root_folder, self.config['source_folder']))
+        commands.append("""cd /sources/""")
+        commands.append("""tar cf /%s %s""" % (self.config['source'], self.config['source_folder']))
+
         # Handle build dependencies
         if self.config['deps']:
             commands.append("""yum install -y %s""" % " ".join(self.config['deps']))
@@ -191,17 +209,18 @@ class RpmPacker(Packer):
 
         # RUN
         self.logger.info("RPM Build starting")
-        self.container = self.cli.create_container(self.container_tag, command=command, volumes=["/upstream"])
+        start_time = timeit.default_timer()
+        self.container = self.cli.create_container(self.container_tag, command=command, volumes=volumes)
         local_source_folder = os.path.join(self.folder, "sources")
-        self.cli.start(self.container['Id'],
-                       binds={local_source_folder: {"bind": "/upstream",
-                                                    "ro": True}})
+        binds[local_source_folder] = {"bind": "/upstream", "ro": True}
+        self.cli.start(self.container['Id'], binds=binds)
 
         for line in self.cli.attach(self.container['Id'], stdout=True, stderr=True, stream=True):
             self.logger.info(line.strip())
         # Stop container
         self.cli.stop(self.container['Id'])
-        self.logger.info("RPM Build finished")
+        elapsed = timeit.default_timer() - start_time
+        self.logger.info("RPM Build finished in %ds" % elapsed)
         # Get exit code
         if self.cli.wait(self.container['Id']) != 0:
             return False
