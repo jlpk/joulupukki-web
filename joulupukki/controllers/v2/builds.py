@@ -111,7 +111,7 @@ class LaunchBuildController(rest.RestController):
         build_tasks.put(build)
         # TODO: save build in database ???
         # for now is in build.cfg ...
-        return "Build created"
+        return "Build created: %d" % build.id_
 
 
 
