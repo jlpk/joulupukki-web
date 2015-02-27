@@ -39,6 +39,7 @@ class DebPacker(Packer):
         # Prepare datas
         self.config['deps'] = self.config.get('deps', [])
         self.config['deps_pip'] = self.config.get('deps_pip', [])
+        self.config['ccache'] = self.config.get('ccache', False)
         self.config['version'] = ''
         self.config['release'] = ''
         self.config['name'] = ''
@@ -110,25 +111,30 @@ class DebPacker(Packer):
         volumes = ['/upstream']
         binds = {}
 
-        if pecan.conf.ccache_path is not None:
+        commands.append("""apt-get update""")
+        commands.append("""apt-get upgrade -y""")
+        commands.append("""mkdir -p /sources""")
+        commands.append("""rsync -rlptD --exclude '.git' /%s/ /sources/%s""" % (docker_source_root_folder, self.config['name']))
+        commands.append("""tar -C /sources -czf /sources/%s %s""" % (self.config['source'], self.config['name']))
+
+        # Handle ccache
+        if pecan.conf.ccache_path is not None and self.config.get('ccache', False):
             self.logger.info("CCACHE is enabled")
-            ccache_path = os.path.join(pecan.conf.ccache_path, self.builder.build.user.username,
-                self.config['name'], self.config['distro'].replace(":", "_"))
+            ccache_path = os.path.join(pecan.conf.ccache_path,
+                                       self.builder.build.user.username,
+                                       self.config['name'],
+                                       self.config['distro'].replace(":", "_"))
             if not os.path.exists(ccache_path):
-                os.makedirs(ccache_path)
+                try:
+                    os.makedirs(ccache_path)
+                except Exception as exp:
+                    self.logger.error("CCACHE folder creation error: %s" % exp)
+                    return False
             volumes.append('/ccache')
             binds[ccache_path] = {"bind": "/ccache"}
             commands.append("""apt-get install -y ccache""")
             commands.append("""export PATH=/usr/lib/ccache:$PATH""")
             commands.append("""export CCACHE_DIR=/ccache""")
-
-        commands.append("""mkdir -p /sources""")
-        commands.append("""rsync -rlptD --exclude '.git' /%s/ /sources/%s""" % (docker_source_root_folder, self.config['name']))
-        commands.append("""cd /sources/""")
-        commands.append("""tar czf /sources/%s %s""" % (self.config['source'], self.config['name']))
-        commands.append("""apt-get update""")
-        commands.append("""apt-get upgrade -y""")
-
         # Handle build dependencies
         if self.config['deps']:
             commands.append("""apt-get install -y %s""" % " ".join(self.config['deps']))
@@ -137,7 +143,7 @@ class DebPacker(Packer):
             commands.append("""apt-get install -y python-setuptools""")
             commands.append("""easy_install %s""" % " ".join(self.config['deps_pip']))
         # Build
-        commands.append("""cd %s """ % self.config['name'])
+        commands.append("""cd /sources/%s """ % self.config['name'])
         if self.builder.build.snapshot:
             version = self.config['version']
             date = datetime.now().strftime("%Y%m%d%H%M%S")

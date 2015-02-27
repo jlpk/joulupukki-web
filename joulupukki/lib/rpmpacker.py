@@ -31,6 +31,7 @@ class RpmPacker(Packer):
         # Prepare datas
         self.config['deps'] = self.config.get('deps', [])
         self.config['deps_pip'] = self.config.get('deps_pip', [])
+        self.config['ccache'] = self.config.get('ccache', False)
         self.config['version'] = ''
         self.config['release'] = ''
         self.config['name'] = ''
@@ -166,23 +167,29 @@ class RpmPacker(Packer):
         volumes = ['/upstream']
         binds = {}
 
-        if pecan.conf.ccache_path is not None:
+        commands.append("""yum upgrade -y""")
+        commands.append("""mkdir -p /sources""")
+        commands.append("""rsync -rlptD --exclude '.git' /%s/ /sources/%s""" % (docker_source_root_folder, self.config['source_folder']))
+        commands.append("""tar -C /sources -cf /sources/%s %s""" % (self.config['source'], self.config['source_folder']))
+
+        # Handle ccache
+        if pecan.conf.ccache_path is not None and self.config.get('ccache', False):
             self.logger.info("CCACHE is enabled")
-            ccache_path = os.path.join(pecan.conf.ccache_path, self.builder.build.user.username,
-                self.config['name'], self.config['distro'].replace(":", "_"))
+            ccache_path = os.path.join(pecan.conf.ccache_path,
+                                       self.builder.build.user.username,
+                                       self.config['name'],
+                                       self.config['distro'].replace(":", "_"))
             if not os.path.exists(ccache_path):
-                os.makedirs(ccache_path)
+                try:
+                    os.makedirs(ccache_path)
+                except Exception as exp:
+                    self.logger.error("CCACHE folder creation error: %s" % exp)
+                    return False
             volumes.append('/ccache')
             binds[ccache_path] = {"bind": "/ccache"}
             commands.append("""yum install -y ccache""")
             commands.append("""export PATH=/usr/lib64/ccache:$PATH""")
             commands.append("""export CCACHE_DIR=/ccache""")
-
-        commands.append("""mkdir -p /sources""")
-        commands.append("""rsync -rlptD --exclude '.git' /%s/ /sources/%s""" % (docker_source_root_folder, self.config['source_folder']))
-        commands.append("""cd /sources/""")
-        commands.append("""tar cf /%s %s""" % (self.config['source'], self.config['source_folder']))
-
         # Handle build dependencies
         if self.config['deps']:
             commands.append("""yum install -y %s""" % " ".join(self.config['deps']))
@@ -202,7 +209,7 @@ class RpmPacker(Packer):
             commands.append(""" sed -i "s/^Release:.*/Release: %s/g" %s """ % (self.config['release'], docker_spec_file))
 
         # Build
-        commands.append("""rpmbuild -ba /%s --define "_sourcedir /" """ % docker_spec_file)
+        commands.append("""rpmbuild -ba /%s --define "_sourcedir /sources" """ % docker_spec_file)
         # Finish command preparation
         command = "bash -c '%s'" % " && ".join(commands)
         self.logger.info("Build command: %s", command)

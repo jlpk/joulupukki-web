@@ -60,7 +60,7 @@ distros = (
            ("centos_7", "centos:7", "rpm"),
         )
 docker_version = "1.15"
-ccache_path = None
+ccache_path = '%(confdir)s/ccache'
 #
 # All configurations are accessible at::
 # pecan.conf
