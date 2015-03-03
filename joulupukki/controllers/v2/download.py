@@ -49,6 +49,8 @@ class DownloadController(rest.RestController):
         if build_id in ["latest"]:
             build_id = project.get_latest_build()
         build = Build.fetch(project, build_id, full_data=True)
+        if build is None:
+            return
         # Get options
         archive = pecan.request.GET.get('archive', 'tgz')
         distro = pecan.request.GET.get('distro', None)
