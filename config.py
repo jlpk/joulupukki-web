@@ -52,6 +52,7 @@ logging = {
 # foo = {'bar':'baz'}
 workspace_path = '%(confdir)s/tmp'
 distros = (
+           ("ubuntu_10.04", "ubuntu:10.04", "deb"),
            ("ubuntu_12.04", "ubuntu:12.04", "deb"),
            ("ubuntu_14.04", "ubuntu:14.04", "deb"),
            ("debian_7", "debian:7", "deb"),
