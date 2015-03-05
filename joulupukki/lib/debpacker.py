@@ -114,7 +114,10 @@ class DebPacker(Packer):
         commands.append("""apt-get update""")
         commands.append("""apt-get upgrade -y""")
         commands.append("""mkdir -p /sources""")
-        commands.append("""rsync -rlptD --exclude '.git' /%s/ /sources/%s""" % (docker_source_root_folder, self.config['name']))
+        commands.append("""rsync -rlptD --exclude '.git' --exclude 'debian' /%s/ /sources/%s""" % (docker_source_root_folder, self.config['name']))
+        # Get the correct debian folder
+        commands.append("""rsync -rlptD /%s/%s/ /sources/%s/debian""" % (docker_source_root_folder, self.config['debian'], self.config['name']))
+        # Create original archive
         commands.append("""tar -C /sources -czf /sources/%s %s""" % (self.config['source'], self.config['name']))
 
         # Handle ccache
