@@ -135,6 +135,7 @@ class Build(APIBuild):
                            "package_name": self.package_name,
                            "package_version": self.package_version,
                            "package_release": self.package_release,
+                           "status": self.status,
                            })
 
         with open(build_file, 'w') as f:
