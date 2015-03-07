@@ -39,3 +39,11 @@ Documentation
 =============
 
 You can build the documentation ``tox -edocs``. The HTML documentation will be built in ``docs/build/html``.
+
+
+Dev Env
+=======
+
+apt-get install rpm
+virtualenv --system-site-packages env
+
