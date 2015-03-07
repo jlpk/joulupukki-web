@@ -14,6 +14,7 @@ from collections import OrderedDict
 from datetime import datetime
 
 from docker import Client
+import rpm
 
 from joulupukki.lib.packer import Packer
 
@@ -36,89 +37,32 @@ class RpmPacker(Packer):
         self.config['release'] = ''
         self.config['name'] = ''
         self.config['source'] = ''
+        self.config['sources'] = ''
         self.config['source_folder'] = ''
         raw_sources = []
-        # Prepare patterns
-        define_pattern = re.compile("^%define *([^ ]*) *([^ ]*)", re.IGNORECASE)
-        deps_pattern = re.compile("^buildrequires *:(.*)", re.IGNORECASE)
-        version_pattern = re.compile("^version *:(.*)", re.IGNORECASE)
-        name_pattern = re.compile("^name *:(.*)", re.IGNORECASE)
-        release_pattern = re.compile("^release *:(.*)", re.IGNORECASE)
-        sources_pattern = re.compile("^source[0-9]* *:(.*)", re.IGNORECASE)
-        source_folder_pattern = re.compile("^%setup [^n]*n ([^ ]*) ?.*")
-        if not os.path.isfile(spec_file_path):
-            self.logger.info("Spec file not found: %s", self.config['spec'])
-            return False
-
-
-        raw_defines = OrderedDict()
-        for line in open(spec_file_path, 'r'):
-            # Get defines
-            match = define_pattern.match(line)
-            if match:
-                raw_defines[match.group(1)] = match.group(2).strip()
-            # Get rpm dependencies
-            match = deps_pattern.match(line)
-            if match:
-                self.config['deps'].append(match.group(1).strip())
-            # Get rpm sources names
-            match = sources_pattern.match(line)
-            if match:
-                raw_sources.append(match.group(1).strip())
-            # Get version
-            match = version_pattern.match(line)
-            if match:
-                self.config['version'] = match.group(1).strip()
-            # Get release
-            match = release_pattern.match(line)
-            if match:
-                self.config['release'] = match.group(1).strip()
-            # Get name
-            match = name_pattern.match(line)
-            if match:
-                self.config['name'] = match.group(1).strip()
-            # get source name
-            match = source_folder_pattern.match(line)
-            if match:
-                self.config['source_folder'] = match.group(1).strip()
-
-        # Replace all defines
-        defines = {}
-        for define_name, define_value in raw_defines.items():
-            defines[define_name] = re.sub(r"%{([^?}]*)}", r"%(\1)s", define_value) % defines
-
-        for conf_name, config_value in self.config.items()[:]:
-            if isinstance(config_value, str):
-                tmp_ = re.sub(r"%{([^?}]*)}", r"%(\1)s", config_value)
-                try:
-                   self.config[conf_name] = re.sub(r"%{(\?[^}]*)}", r"%%{\1}", tmp_) % defines
-                except Exception as exp:
-                    self.logger.error("This string seems strange: %s", tmp_)
-                    return False
-
-        sources = []
-        for source in raw_sources:
-            source_p = urlparse(source)
-            source = source_p.path.rsplit('/', 1)[-1]
-            source = source.replace("%{release}", self.config['release'])
-            source = source.replace("%{version}", self.config['version'])
-            source = source.replace("%{name}", self.config['name'])
-            sources.append(source)
-
-        # TODO Impossible to get more than one source ??
-        if len(sources) != 1:
-            # BAD number of source
-            return False
-        self.config['source'] = sources[0]
+        # Prepare spec datas
+        mapping = {1000: 'name',
+                   1001: 'version',
+                   1002: 'release',
+                   1049: 'deps',
+                   1018: 'sources',
+                  }
+        spec = rpm.ts().parseSpec(spec_file_path)
+        # Get spec data
+        for id_, attr_name in mapping.items():
+            if isinstance(self.config.get(attr_name), list):
+                self.config[attr_name] += spec.sourceHeader[id_]
+            else:
+                self.config[attr_name] = spec.sourceHeader[id_]
+        # Get only the first source
+        self.config['source'] = self.config['sources'][0]
         # Try to find the name of the folder which rpmbuild needs to find
         # in the source tarball
-        if self.config['source_folder'] == '':
+        match = re.match(".*\/BUILD\'\nrm -rf '(.*)'", spec.prep)
+        if match:
+            self.config['source_folder'] = match.group(1)
+        else:
             self.config['source_folder'] = self.config['name'] + "-" + self.config['version']
-            #ext_pattern = re.compile(r'^.*?[.](tar\.gz|tar\.bz2|tar\.zx|\w+)$')
-            #match = ext_pattern.match(source)
-            #if match:
-            #    source_ext = match.group(1)
-            #self.config['source_name'] = re.sub("." + source_ext + "$", "", source)
 
         # Log informations
         self.logger.info("Name: %(name)s", self.config)
