@@ -12,7 +12,8 @@ docs/source/_build
 
 # tests
 .tox
-env
+env/
+*/env/
 .testrepository
 *.swp
 tmp/

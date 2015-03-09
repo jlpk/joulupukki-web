@@ -5,7 +5,7 @@ Joulupukki
 
 Joulupukki is a webservice to build linux packages (deb, RPM) using Docker.
 
-LICENCE AGPLv3
+
 
 
 Installation
