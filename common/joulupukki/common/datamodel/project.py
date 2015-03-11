@@ -8,7 +8,7 @@ import wsme.types as wtypes
 
 from joulupukki.common.database import mongo
 from joulupukki.common.datamodel import types
-#from joulupukki.web.controllers.v2.datamodel.build import Build
+from joulupukki.common.datamodel.build import Build
 
 
 class APIProject(types.Base):
@@ -16,13 +16,17 @@ class APIProject(types.Base):
 
 class Project(APIProject):
     username = wsme.wsattr(wtypes.text, mandatory=False)
-    builds = wsme.wsattr([wtypes.text], mandatory=False)
+    builds = wsme.wsattr([Build], mandatory=False)
 
     def __init__(self, data=None):
         if data is None:
             APIProject.__init__(self)
+        elif isinstance(data, APIProject):
+            APIProject.__init__(self, **data.as_dict())
         else:
             APIProject.__init__(self, **data)
+        self.builds = self.get_builds()
+
 
 
     @classmethod
@@ -83,19 +87,28 @@ class Project(APIProject):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
     def get_builds(self):
         """ return all build ids """
+        builds = mongo.builds.find({"project_name": self.name}).sort("id_")
+        return [Build(x) for x in builds]
+
+
+    def get_latest_build(self):
+        build_ids = self.get_builds()
+        if build_ids == []:
+            return None
+        return build_ids[-1]
+
+
+
+
+
+
+
+'''
+
+
+
         project_path = Project.get_folder_path(self.user.username, self.name)
         builds_path = os.path.join(project_path, "builds")
         if not os.path.isdir(builds_path):
@@ -103,11 +116,6 @@ class Project(APIProject):
 
         return sorted([id_ for id_ in os.listdir(builds_path)], key=lambda x: int(x))
 
-    def get_latest_build(self):
-        build_ids = self.get_builds()
-        if build_ids == []:
-            return None
-        return build_ids[-1]
 
     def create_build(self, build_data):
             latest_build = self.get_latest_build()
@@ -125,3 +133,5 @@ class Project(APIProject):
     def get_folder_path(username, project_name):
         """ Return project folder path"""
         return os.path.join(pecan.conf.workspace_path, username, project_name)
+
+'''

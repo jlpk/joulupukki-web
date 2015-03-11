@@ -96,7 +96,7 @@ class LaunchBuildController(rest.RestController):
     # curl -X POST -H "Content-Type: application/json" -i  -d '{"source_url": "/home/tcohen/projet_communautaire/kaji/meta/packages/shinken", "source_type": "local", "branch": "kaji", "forced_distro": "centos_7"}' http://127.0.0.1:8080/v2/titilambert/shinken/build
     # curl -X POST -H "Content-Type: application/json" -i  -d '{"source_url": "https://github.com/kaji-project/kaji.git", "source_type": "git", "branch": "kaji", "forced_distro": "centos_7", "snapshot": true}' http://127.0.0.1:8080/v2/titilambert/kaji/build
     @wsme_pecan.wsexpose(wtypes.text, body=APIBuild, status_code=201)
-    def post(self, build):
+    def post(self, send_build):
         """ launch build """
         project_name = pecan.request.context['project_name']
         user = User.fetch(pecan.request.context['username'])
@@ -107,9 +107,17 @@ class LaunchBuildController(rest.RestController):
             # We have to create it
             # TODO Maybe it's better to force users to create project before
             # they can create builds
-            project = Project.create(user, project_name, {"name": project_name})
+            sent_project = {"name": project_name}
+            project = Project(sent_project.as_dict())
+            project.username = user.username
+            if not project.create():
+                # Handle error
+                return {"result": "Error creating %s project" % project_name}
 
-        build = Build.create(project, build)
+        build = Build(send_build)
+        build.username = user.username
+        build.project_name = project.name
+        build.create()
         if not carrier.send_build(build):
             return None
         # TODO: save build in database ???

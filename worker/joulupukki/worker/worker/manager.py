@@ -38,7 +38,6 @@ class Manager(Thread):
             new_build = self.carrier.get_build()
             if new_build:
                 logging.debug("Task received")
-                new_build = Build.create(new_build.project, new_build)
                 builder = Builder(new_build)
                 self.build_list[builder.uuid2] = builder
                 builder.start()

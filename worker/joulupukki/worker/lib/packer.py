@@ -38,6 +38,7 @@ class Packer(object):
     def __init__(self, builder, config):
 
         self.config = config
+        self.distro = config['distro']
         self.source_url = builder.source_url
         self.source_type = builder.source_type
         self.cli = builder.cli
@@ -46,19 +47,22 @@ class Packer(object):
 
         job_data = {
                     'distro': config['distro'],
-                    'root_folder': config['root_folder'],
+                    'username': self.builder.build.username,
+                    'project_name': self.builder.build.project_name,
+                    'build_id': self.builder.build.id_,
                     }
-        self.job = Job.create(self.builder.build, job_data)
+        self.job = Job(job_data)
+        self.job.create()
         self.folder_output = self.job.get_folder_output()
-        self.job_folder_ = Job.get_folder_path(self.job.user.username, self.job.project.name, self.job.build.id_, self.job.id_)
-        self.job_tmp_folder = os.path.join(self.job_folder_, "tmp")
+        #self.job_folder_ = self.job.get_folder_path()
+        self.job_tmp_folder = self.job.get_folder_tmp()
 
         if not os.path.exists(self.folder_output):
             os.makedirs(self.folder_output)
         if not os.path.exists(self.job_tmp_folder):
             os.makedirs(self.job_tmp_folder)
 
-        self.logger = get_logger_docker(self.job, config['distro'])
+        self.logger = get_logger_docker(self.job)
 
         distro = reverse_supported_distros.get(config['distro'])
         self.container_tag = "joulupukki:" + distro.replace(":", "_")
@@ -86,13 +90,13 @@ class Packer(object):
             # Save package name in build.cfg 
             if self.config.get('name') is not None and self.builder.build.package_name is None:
                 self.builder.build.package_name = self.config.get('name')
-                self.builder.build.save()
+                self.builder.build._save()
             if self.config.get('version') is not None and self.builder.build.package_version is None:
                 self.builder.build.package_version = self.config.get('version')
-                self.builder.build.save()
+                self.builder.build._save()
             if self.config.get('release') is not None and self.builder.build.package_release is None:
                 self.builder.build.package_release = self.config.get('release')
-                self.builder.build.save()
+                self.builder.build._save()
         self.set_status('succeeded')
         return True
 

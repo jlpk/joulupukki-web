@@ -8,8 +8,8 @@ import wsme.types as wtypes
 
 from joulupukki.common.database import mongo
 from joulupukki.common.datamodel import types
-from joulupukki.common.datamodel.user import User
-from joulupukki.common.datamodel.project import Project
+#from joulupukki.common.datamodel.user import User
+#from joulupukki.common.datamodel.project import Project
 from joulupukki.common.distros import supported_distros
 
 source_types = wtypes.Enum(str, 'local', 'git')
@@ -29,14 +29,20 @@ class Build(APIBuild):
     package_version = wsme.wsattr(wtypes.text, mandatory=False, default=None)
     package_release = wsme.wsattr(wtypes.text, mandatory=False, default=None)
     status = wsme.wsattr(wtypes.text, mandatory=False, default=None)
-    # TODO guess which user is...
-    user = wsme.wsattr(User, mandatory=False)
-    project = wsme.wsattr(Project, mandatory=False)
-    jobs = wsme.wsattr([wtypes.text], mandatory=False, default=None)
+    # Link
+    username = wsme.wsattr(wtypes.text, mandatory=False)
+    project_name = wsme.wsattr(wtypes.text, mandatory=False)
+#    jobs = wsme.wsattr([wtypes.text], mandatory=False, default=None)
 
-
-    def __init__(self, **kwarg):
-        APIBuild.__init__(self, **kwarg)
+    def __init__(self, data=None):
+        if data is None:
+            APIBuild.__init__(self)
+        if isinstance(data, APIBuild):
+            APIBuild.__init__(self, **data.as_dict())
+        else:
+            APIBuild.__init__(self, **data)
+        self.user = None
+        self.project = None
 
     @classmethod
     def sample(cls):
@@ -47,28 +53,137 @@ class Build(APIBuild):
         )
 
 
+
+    def create(self):
+        # Check required args
+        required_args = ['source_url',
+                         'source_type',
+                        ]
+        for arg in required_args:
+            if not getattr(self, arg):
+                # TODO handle error
+                return False
+        # Get last ids
+        self.id_ = 1
+        build_ids = [x["id_"] for x in mongo.builds.find({"username": self.username, "project_name": self.project_name}, ["id_"])]
+        if build_ids is not None:
+            self.id_ = max(build_ids) + 1
+        # Set attributes
+        self.created = time.time()
+        self.status = "created"
+
+        # TODO: check password
+        # Write project data
+        try:
+            self._save()
+            return True
+        except Exception as exp:
+            # TODO handle error
+            return False
+
+
+    def _save(self):
+        """ Write project data on disk """
+        data = self.as_dict()
+        mongo.builds.update({"id_": self.id_,
+                             "username": self.username,
+                             "project_name": self.project_name},
+                             data,
+                             upsert=True)
+        return True
+
+
+
+
+
     def dumps(self):
         dump = self.as_dict()
-        dump['user'] = self.user.dumps()
-        dump['project'] = self.project.dumps()
         return dump
 
 
-    @staticmethod
-    def get_folder_path(username, project_name, id_):
+
+    def get_folder_path(self):
         """ Return build folder path"""
-        return os.path.join(pecan.conf.workspace_path, username, project_name, "builds", str(id_))
+        return os.path.join(pecan.conf.workspace_path,
+                            self.username,
+                            self.project_name,
+                            "builds",
+                            str(self.id_))
+
+
+    def get_source_folder_path(self):
+        """ Return project folder path"""
+        return os.path.join(self.get_folder_path(),
+                            "sources")
+
+
+
+
+
+    def set_status(self, status):
+        self.status = status
+        self._save()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def get_jobs(self):
+        """ return all build ids """
+        jobs_ids = [x["id_"] for x in mongo.jobs.find({"username": self.username, "project_name": self.project_name, "build": self.id_}, ["id_"])]
+        return sorted(jobs_ids, key=lambda x: int(x))
+
+
+
+
+    @classmethod
+    def fetch(cls, project, id_, sub_objects=True, full_data=False):
+        build_data = mongo.builds.find_one({"username": project.username,
+                                            "project_name": project.name,
+                                            "id_": int(id_)})
+        build = cls(build_data)
+        return build
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
 
     @staticmethod
     def get_data_file_path(username, project_name, id_):
         """ Return build data file (build.cfg) path"""
         return os.path.join(pecan.conf.workspace_path, username, project_name, "builds", str(id_), "build.cfg")
 
-    def get_source_folder_path(self):
-        """ Return project folder path"""
-        return os.path.join(pecan.conf.workspace_path,
-                            self.__class__.get_folder_path(self.user.username, self.project.name, self.id_),
-                            "sources")
 
     def get_output_folder_path(self, distro=None):
         """ Return project folder path"""
@@ -115,24 +230,17 @@ class Build(APIBuild):
 
 
 
-    @classmethod
-    def create(cls, project, build_data):
-        build_dict = build_data.as_dict()
-        latest_build = project.get_latest_build()
-        build_dict['id_'] = 1
-        if latest_build is not None:
-            build_dict['id_'] = int(latest_build) + 1
-        build_dict['user'] = project.user
-        build_dict['project'] = project
-        build_dict['created'] = time.time()
-        build_dict['status'] = "created"
 
-        # Create folder
-        build = cls(**build_dict)
-        os.makedirs(Build.get_folder_path(project.user.username, project.name, build_dict['id_']))
-        build.save()
-        build.jobs = build.get_jobs()
-        return build
+
+
+
+
+
+
+
+
+
+
 
 
     def save(self):
@@ -158,20 +266,6 @@ class Build(APIBuild):
         return True
 
 
-    def get_jobs(self):
-        """ return all build ids """
-        build_path = self.__class__.get_folder_path(self.user.username, self.project.name, self.id_)
-        jobs_path = os.path.join(build_path, "jobs")
-        if not os.path.isdir(jobs_path):
-            return []
-        jobs_ids = []
-        for id_ in os.listdir(jobs_path):
-            try:
-                jobs_ids.append(id_)
-            except ValueError:
-                continue
-        return sorted(jobs_ids, key=lambda x: int(x))
-
     def get_latest_job(self):
         job_ids = self.get_jobs()
         if job_ids == []:
@@ -179,7 +273,4 @@ class Build(APIBuild):
         return job_ids[-1]
 
 
-    def set_status(self, status):
-        self.status = status
-        self.save()
-
+'''

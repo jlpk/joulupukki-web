@@ -31,29 +31,33 @@ finished
 """
 
 class Builder(Thread):
-    def __init__(self, data):
-        thread_name = "__".join((data.user.username,
-                                 data.project.name,
-                                 str(data.id_)))
+    def __init__(self, build):
+        thread_name = "__".join((build.user.username,
+                                 build.project.name,
+                                 str(build.id_)))
         Thread.__init__(self, name=thread_name)
-        self.source_url = data.source_url
-        self.source_type = data.source_type
-        self.branch = data.branch
-        self.commit = data.commit
-        self.user = data.user
-        self.project = data.project
-        self.id_ = str(data.id_)
+        self.source_url = build.source_url
+        self.source_type = build.source_type
+        self.branch = build.branch
+        self.commit = build.commit
+        self.user = build.user
+        self.project = build.project
+        self.id_ = str(build.id_)
         self.uuid2 = thread_name
         self.created = time.time()
-        self.build = data
+        self.build = build
 
         # Create docker client
         self.cli = Client(base_url='unix://var/run/docker.sock', version=pecan.conf.docker_version)
         # Set folders
-        self.folder = Build.get_folder_path(data.project.user.username,
-                                            data.project.name,
-                                            data.id_)
-        self.folder_source = data.get_source_folder_path()
+        self.folder = build.get_folder_path()
+        self.folder_source = build.get_source_folder_path()
+        # Create folders
+        if not os.path.exists(self.folder):
+            os.makedirs(self.folder)
+        if not os.path.isdir(self.folder):
+        # TODO handle error
+            raise Exception("%s should be a folder" % folder)
         # Prepare logger
         self.logger = get_logger(self)
 

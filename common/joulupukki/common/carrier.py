@@ -45,17 +45,18 @@ class Carrier(object):
             method_frame, header_frame, body = self.channel.basic_get('builds')
             if body is None:
                 return None
-            build = json.loads(body)
+            build_data = json.loads(body)
             self.channel.basic_ack(method_frame.delivery_tag)
         except Exception as exp:
             # TODO
             print exp
             return None
-        if build is not None:
-            build['user'] = User(**build['user'])
-            build['project']['user'] = build['user']
-            build['project'] = Project(**build['project'])
-            build = Build(**build)
-        return build
-
+        if build_data is not None:
+            print build_data
+            build = Build(build_data)
+            print build
+            build.user = User.fetch(build_data['username'])
+            build.project = Project.fetch(build.user, build_data['project_name'])
+            return build
+        return None
 

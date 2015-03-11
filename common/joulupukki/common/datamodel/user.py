@@ -27,6 +27,8 @@ class User(APIUser):
     def __init__(self, data=None):
         if data is None:
             APIUser.__init__(self)
+        if isinstance(data, APIUser):
+            APIUser.__init__(self, **data.as_dict())
         else:
             APIUser.__init__(self, **data)
         self.projects = self.get_projects()
@@ -120,7 +122,3 @@ class User(APIUser):
         projects = mongo.projects.find({"username": self.username})
         return [Project(x) for x in projects]
 
-
-#    @property
-#    def projects(self):
-#        return self.get_projects()
