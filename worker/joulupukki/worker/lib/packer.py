@@ -72,6 +72,9 @@ class Packer(object):
     def set_status(self, status):
         self.job.set_status(status)
 
+    def set_build_time(self, build_time):
+        self.job.set_build_time(build_time)
+
     def run(self):
         steps = (('setup', self.setup),
                  ('preparing', self.parse_specdeb),

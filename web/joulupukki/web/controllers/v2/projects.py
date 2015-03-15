@@ -37,7 +37,7 @@ class ProjectController(rest.RestController):
     def __init__(self, project_name):
         pecan.request.context['project_name'] = project_name
         self.project_name = project_name
-        self.user = User.fetch(pecan.request.context['username'])
+        self.user = User.fetch(pecan.request.context['username'], sub_objects=False)
         if self.user is None:
             raise Exception("User not found")
         

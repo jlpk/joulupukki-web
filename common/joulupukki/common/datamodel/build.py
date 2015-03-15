@@ -10,6 +10,7 @@ from joulupukki.common.database import mongo
 from joulupukki.common.datamodel import types
 #from joulupukki.common.datamodel.user import User
 #from joulupukki.common.datamodel.project import Project
+from joulupukki.common.datamodel.job import Job
 from joulupukki.common.distros import supported_distros
 
 source_types = wtypes.Enum(str, 'local', 'git')
@@ -32,9 +33,9 @@ class Build(APIBuild):
     # Link
     username = wsme.wsattr(wtypes.text, mandatory=False)
     project_name = wsme.wsattr(wtypes.text, mandatory=False)
-#    jobs = wsme.wsattr([wtypes.text], mandatory=False, default=None)
+    jobs = wsme.wsattr([Job], mandatory=False, default=None)
 
-    def __init__(self, data=None):
+    def __init__(self, data=None, subojects=True):
         if data is None:
             APIBuild.__init__(self)
         if isinstance(data, APIBuild):
@@ -43,6 +44,8 @@ class Build(APIBuild):
             APIBuild.__init__(self, **data)
         self.user = None
         self.project = None
+        if self.username and self.project_name:
+            self.jobs = self.get_jobs()
 
     @classmethod
     def sample(cls):
@@ -140,18 +143,22 @@ class Build(APIBuild):
 
     def get_jobs(self):
         """ return all build ids """
-        jobs_ids = [x["id_"] for x in mongo.jobs.find({"username": self.username, "project_name": self.project_name, "build": self.id_}, ["id_"])]
-        return sorted(jobs_ids, key=lambda x: int(x))
+        jobs_ids = [Job(x) for x in mongo.jobs.find({"username": self.username, "project_name": self.project_name, "build_id": int(self.id_)})]
+        if jobs_ids:
+            return sorted(jobs_ids, key=lambda x: x.id_)
+        return []
 
 
 
 
     @classmethod
-    def fetch(cls, project, id_, sub_objects=True, full_data=False):
+    def fetch(cls, project, id_, sub_objects=True):
         build_data = mongo.builds.find_one({"username": project.username,
                                             "project_name": project.name,
                                             "id_": int(id_)})
-        build = cls(build_data)
+        build = cls(build_data, sub_objects)
+        if sub_objects is False:
+            delattr(build, 'jobs')
         return build
 
 

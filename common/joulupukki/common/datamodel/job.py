@@ -8,9 +8,9 @@ import wsme.types as wtypes
 
 from joulupukki.common.database import mongo
 from joulupukki.common.datamodel import types
-from joulupukki.common.datamodel.user import User
-from joulupukki.common.datamodel.project import Project
-from joulupukki.common.datamodel.build import Build
+#from joulupukki.common.datamodel.user import User
+#from joulupukki.common.datamodel.project import Project
+#from joulupukki.common.datamodel.build import Build
 from joulupukki.common.distros import supported_distros, reverse_supported_distros
 
 
@@ -25,6 +25,7 @@ class Job(APIJob):
     created = wsme.wsattr(float, mandatory=False)
     distro = wsme.wsattr(wtypes.text, mandatory=False)
     status = wsme.wsattr(wtypes.text, mandatory=False)
+    build_time = wsme.wsattr(float, mandatory=False)
     # TODO guess which user is...
     # Links
     username = wsme.wsattr(wtypes.text, mandatory=False)
@@ -109,6 +110,7 @@ class Job(APIJob):
                             "builds",
                             str(self.build_id),
                             "output",
+                            str(self.distro),
                             )
 
     def get_folder_path(self):
@@ -129,6 +131,23 @@ class Job(APIJob):
     def set_status(self, status):
         self.status = status
         self._save()
+
+
+    def set_build_time(self, build_time):
+        self.build_time = build_time
+        self._save()
+
+
+    @classmethod
+    def fetch(cls, build, id_):
+        job_data = mongo.jobs.find_one({"username": build.username,
+                                        "project_name": build.project_name,
+                                        "build_id": build.id_,
+                                        "id_": int(id_)})
+        if job_data is not None:
+            return cls(job_data)
+        return None
+
 
 
 

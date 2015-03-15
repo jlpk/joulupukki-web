@@ -24,14 +24,15 @@ class User(APIUser):
     projects = wsme.wsattr([Project], mandatory=False)
     token = wsme.wsattr(wtypes.text, mandatory=False)
 
-    def __init__(self, data=None):
+    def __init__(self, data=None, sub_objects=True):
         if data is None:
             APIUser.__init__(self)
         if isinstance(data, APIUser):
             APIUser.__init__(self, **data.as_dict())
         else:
             APIUser.__init__(self, **data)
-        self.projects = self.get_projects()
+        if sub_objects:
+            self.projects = self.get_projects()
 
     @classmethod
     def sample(cls):
@@ -42,12 +43,12 @@ class User(APIUser):
         )
 
     @classmethod
-    def fetch(cls, username, with_password=True):
+    def fetch(cls, username, with_password=True, sub_objects=True):
         db_user = mongo.users.find_one({"username": username})
         user = None
         if db_user is not None:
-            user = cls(db_user)
-            if not with_password:
+           user = cls(db_user, sub_objects=sub_objects)
+           if not with_password:
                 delattr(user, 'password')
         return user
 

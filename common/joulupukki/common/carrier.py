@@ -35,7 +35,7 @@ class Carrier(object):
                                       )
         except Exception as exp:
             # TODO
-            print exp
+            print(exp)
             return False
         return True
 
@@ -49,14 +49,12 @@ class Carrier(object):
             self.channel.basic_ack(method_frame.delivery_tag)
         except Exception as exp:
             # TODO
-            print exp
+            print(exp)
             return None
         if build_data is not None:
-            print build_data
             build = Build(build_data)
-            print build
-            build.user = User.fetch(build_data['username'])
-            build.project = Project.fetch(build.user, build_data['project_name'])
+            build.user = User.fetch(build_data['username'], sub_objects=False)
+            build.project = Project.fetch(build.user, build_data['project_name'], sub_objects=False)
             return build
         return None
 

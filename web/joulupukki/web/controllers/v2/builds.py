@@ -44,11 +44,11 @@ class BuildController(rest.RestController):
     def get(self):
         """Returns build status"""
         project_name = pecan.request.context['project_name']
-        user = User.fetch(pecan.request.context['username'])
-        project = Project.fetch(user, project_name)
+        user = User.fetch(pecan.request.context['username'], sub_objects=False)
+        project = Project.fetch(user, project_name, sub_objects=False)
         build_id = self.id_
         if self.id_ in ["latest"]:
-            build_id = project.get_latest_build()
+            build_id = project.get_latest_build_id()
         build = Build.fetch(project, build_id, sub_objects=True)
         if build:
            return build
@@ -80,8 +80,8 @@ class BuildsController(rest.RestController):
     def get_all(self):
         """Returns all builds."""
         project_name = pecan.request.context['project_name']
-        user = User.fetch(pecan.request.context['username'])
-        project = Project.fetch(user, project_name)
+        user = User.fetch(pecan.request.context['username'], sub_objects=False)
+        project = Project.fetch(user, project_name, sub_objects=False)
         builds = [Build.fetch(project, b_id, False) for b_id in project.get_builds()]
         builds = [b for b in builds if b]
         return builds

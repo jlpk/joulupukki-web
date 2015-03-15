@@ -18,14 +18,15 @@ class Project(APIProject):
     username = wsme.wsattr(wtypes.text, mandatory=False)
     builds = wsme.wsattr([Build], mandatory=False)
 
-    def __init__(self, data=None):
+    def __init__(self, data=None, sub_objects=True):
         if data is None:
             APIProject.__init__(self)
         elif isinstance(data, APIProject):
             APIProject.__init__(self, **data.as_dict())
         else:
             APIProject.__init__(self, **data)
-        self.builds = self.get_builds()
+        if sub_objects:
+            self.builds = self.get_builds()
 
 
 
@@ -53,12 +54,12 @@ class Project(APIProject):
             return False
 
     @classmethod
-    def fetch(cls, user, project_name):
+    def fetch(cls, user, project_name, sub_objects=True):
         db_project = mongo.projects.find_one({"name": project_name,
                                               "username": user.username})
         project = None
         if db_project is not None:
-            project = cls(db_project)
+            project = cls(db_project, sub_objects)
         return project
 
     def _save(self):
@@ -89,15 +90,16 @@ class Project(APIProject):
 
     def get_builds(self):
         """ return all build ids """
-        builds = mongo.builds.find({"project_name": self.name}).sort("id_")
+        builds = mongo.builds.find({"username": self.username,
+                                    "project_name": self.name}).sort("id_")
         return [Build(x) for x in builds]
 
 
-    def get_latest_build(self):
-        build_ids = self.get_builds()
+    def get_latest_build_id(self):
+        build_ids = mongo.builds.find_one(sort=[("id_", -1)])
         if build_ids == []:
             return None
-        return build_ids[-1]
+        return build_ids.get('id_', None)
 
 
 

@@ -171,6 +171,7 @@ class RpmPacker(Packer):
         # Stop container
         self.cli.stop(self.container['Id'])
         elapsed = timeit.default_timer() - start_time
+        self.set_build_time(elapsed)
         self.logger.info("RPM Build finished in %ds" % elapsed)
         # Get exit code
         if self.cli.wait(self.container['Id']) != 0:

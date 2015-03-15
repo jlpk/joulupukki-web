@@ -43,13 +43,13 @@ class JobController(rest.RestController):
     def get(self):
         """Returns log of a specific distro."""
         project_name = pecan.request.context['project_name']
-        user = User.fetch(pecan.request.context['username'])
-        project = Project.fetch(user, project_name)
+        user = User.fetch(pecan.request.context['username'], sub_objects=False)
+        project = Project.fetch(user, project_name, sub_objects=False)
         build_id = pecan.request.context['build_id']
         if build_id in ["latest"]:
-            build_id = project.get_latest_build()
-        build = Build.fetch(project, build_id, full_data=True)
-        job = Job.fetch(build, self.id_, False)
+            build_id = project.get_latest_build_id()
+        build = Build.fetch(project, build_id, sub_objects=False)
+        job = Job.fetch(build, self.id_)
         return job
  
     @pecan.expose()
@@ -64,15 +64,12 @@ class JobsController(rest.RestController):
         """Returns log of a specific distro."""
         project_name = pecan.request.context['project_name']
         user = User.fetch(pecan.request.context['username'])
-        project = Project.fetch(user, project_name)
+        project = Project.fetch(user, project_name, sub_objects=False)
         build_id = pecan.request.context['build_id']
         if build_id in ["latest"]:
-            build_id = project.get_latest_build()
-        build = Build.fetch(project, build_id, full_data=True)
-           
-        jobs = [Job.fetch(build, j_id, False) for j_id in build.get_jobs()]
-        jobs = [j for j in jobs if j]
-        return jobs
+            build_id = project.get_latest_build_id()
+        build = Build.fetch(project, build_id, sub_objects=True)
+        return build.jobs
 
 
     @pecan.expose()
@@ -91,7 +88,7 @@ class LogController(rest.RestController):
         project = Project.fetch(user, project_name)
         build_id = pecan.request.context['build_id']
         if build_id in ["latest"]:
-            build_id = project.get_latest_build()
+            build_id = project.get_latest_build_id()
         build = Build.fetch(project, build_id, full_data=True)
         job_id = pecan.request.context['job_id'] 
         job = Job.fetch(build, job_id, full_data=True)
