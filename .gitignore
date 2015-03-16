@@ -16,9 +16,12 @@ env/
 */env/
 .testrepository
 *.swp
-tmp/
-ccache/
 
 # ide
 .project
 .pydevproject
+
+# Project tmp folders
+tmp/
+ccache/
+output

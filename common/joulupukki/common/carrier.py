@@ -15,6 +15,10 @@ from joulupukki.common.datamodel.user import User
 
 class Carrier(object):
     def __init__(self, server, port, exchange):
+        """queues:
+        * builds
+        * logs
+        """
         self.server = server
         self.port = port
         self.exchange = exchange
@@ -23,11 +27,11 @@ class Carrier(object):
                                                     )
         self.connection = pika.BlockingConnection(self.parameters)
         self.channel = self.connection.channel()
-        self.channel.queue_declare(queue='builds')
-        
-    def send_build(self, build):
-        # prepare serialisation
 
+    def declare_builds(self):
+        self.channel.queue_declare(queue='builds')
+
+    def send_build(self, build):
         try:
             self.channel.basic_publish(exchange='',
                                        routing_key='builds',
@@ -58,3 +62,31 @@ class Carrier(object):
             return build
         return None
 
+
+    def declare_logs(self):
+        self.channel.exchange_declare(exchange='logs', exchange_type='fanout')
+        
+    def subscribe_logs(self):
+        result = self.channel.queue_declare(exclusive=True)
+        self.queue_logs = result.method.queue
+        self.channel.queue_bind(exchange='logs',
+                                queue=self.queue_logs)
+
+    def send_log(self, log):
+        try:
+            self.channel.basic_publish(exchange='logs',
+                                       routing_key='',
+                                       body=json.dumps(log)
+                                      )
+        except Exception as exp:
+            # TODO
+            print(exp)
+            return False
+        return True
+
+
+    def get_log(self):
+        method_frame, header_frame, body = self.channel.basic_get(self.queue_logs)
+        if body:
+            return json.loads(body)
+        return body

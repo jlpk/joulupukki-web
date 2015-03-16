@@ -23,7 +23,7 @@ class RpmPacker(Packer):
 
     def parse_specdeb(self):
         # Get spec infos
-        self.logger.info("Find informations from spec file")
+        self.log("info", "Find informations from spec file")
         spec_file_path = os.path.join(self.folder,
                                       'sources',
                                        self.config['root_folder'],
@@ -65,17 +65,17 @@ class RpmPacker(Packer):
             self.config['source_folder'] = self.config['name'] + "-" + self.config['version']
 
         # Log informations
-        self.logger.info("Name: %(name)s", self.config)
-        self.logger.info("Source: %(source)s", self.config)
-        self.logger.info("Source folder: %(source_folder)s", self.config)
-        self.logger.info("Version: %(version)s", self.config)
-        self.logger.info("Release: %(release)s", self.config)
-        self.logger.info("Buildrequires: %s", ", ".join(self.config['deps']))
+        self.log("info", "Name: %(name)s", self.config)
+        self.log("info", "Source: %(source)s", self.config)
+        self.log("info", "Source folder: %(source_folder)s", self.config)
+        self.log("info", "Version: %(version)s", self.config)
+        self.log("info", "Release: %(release)s", self.config)
+        self.log("info", "Buildrequires: %s", ", ".join(self.config['deps']))
         return True
 
 
     def docker_build(self):
-        self.logger.info("Dockerfile preparation")
+        self.log("info", "Dockerfile preparation")
         # DOCKER FILE TEMPLATE
         # Create and user an user "builder"
         dockerfile= '''
@@ -86,19 +86,19 @@ class RpmPacker(Packer):
         f = BytesIO(dockerfile.encode('utf-8'))
 
         # BUILD
-        self.logger.info("Docker Image Building")
+        self.log("info", "Docker Image Building")
         output = self.cli.build(fileobj=f, rm=True, tag=self.container_tag, forcerm=True)
         # log output
         for i in output:
             dict_ = eval(i)
             if "stream" in dict_:
-                self.logger.info(dict_["stream"].strip())
+                self.log("info", dict_["stream"].strip())
             else:
                 if 'error' in dict_:
-                    self.logger.info(dict_['errorDetail']['message'].strip())
+                    self.log("info", dict_['errorDetail']['message'].strip())
                 else:
-                    self.logger.info(str(i))
-        self.logger.info("Docker Image Built")
+                    self.log("info", str(i))
+        self.log("info", "Docker Image Built")
         return True
             
 
@@ -118,7 +118,7 @@ class RpmPacker(Packer):
 
         # Handle ccache
         if pecan.conf.ccache_path is not None and self.config.get('ccache', False):
-            self.logger.info("CCACHE is enabled")
+            self.log("info", "CCACHE is enabled")
             ccache_path = os.path.join(pecan.conf.ccache_path,
                                        self.builder.build.user.username,
                                        self.config['name'],
@@ -127,7 +127,7 @@ class RpmPacker(Packer):
                 try:
                     os.makedirs(ccache_path)
                 except Exception as exp:
-                    self.logger.error("CCACHE folder creation error: %s" % exp)
+                    self.log("error", "CCACHE folder creation error: %s", exp)
                     return False
             volumes.append('/ccache')
             binds[ccache_path] = {"bind": "/ccache"}
@@ -156,10 +156,10 @@ class RpmPacker(Packer):
         commands.append("""rpmbuild -ba /%s --define "_sourcedir /sources" """ % docker_spec_file)
         # Finish command preparation
         command = "bash -c '%s'" % " && ".join(commands)
-        self.logger.info("Build command: %s", command)
+        self.log("info", "Build command: %s", command)
 
         # RUN
-        self.logger.info("RPM Build starting")
+        self.log("info", "RPM Build starting")
         start_time = timeit.default_timer()
         self.container = self.cli.create_container(self.container_tag, command=command, volumes=volumes)
         local_source_folder = os.path.join(self.folder, "sources")
@@ -167,12 +167,12 @@ class RpmPacker(Packer):
         self.cli.start(self.container['Id'], binds=binds)
 
         for line in self.cli.attach(self.container['Id'], stdout=True, stderr=True, stream=True):
-            self.logger.info(line.strip())
+            self.log("info", line.strip())
         # Stop container
         self.cli.stop(self.container['Id'])
         elapsed = timeit.default_timer() - start_time
         self.set_build_time(elapsed)
-        self.logger.info("RPM Build finished in %ds" % elapsed)
+        self.log("info", "RPM Build finished in %ds", elapsed)
         # Get exit code
         if self.cli.wait(self.container['Id']) != 0:
             return False
@@ -181,13 +181,13 @@ class RpmPacker(Packer):
 
     def get_output(self):
         # Get RPMS from the container
-        self.logger.info("Get RPM files")
+        self.log("info", "Get RPM files")
         rpms_raw = self.cli.copy(self.container['Id'], "/root/rpmbuild/RPMS")
         rpms_tar = tarfile.open(fileobj=BytesIO(rpms_raw.read()))
         rpms_tar.extractall(self.job_tmp_folder)
         rpms_tar.close()
         # Get SRPM from the container
-        self.logger.info("Get SRPM files")
+        self.log("info", "Get SRPM files")
         srpms_raw = self.cli.copy(self.container['Id'], "/root/rpmbuild/SRPMS")
         srpms_tar = tarfile.open(fileobj=BytesIO(srpms_raw.read()))
         srpms_tar.extractall(self.job_tmp_folder)
@@ -198,5 +198,5 @@ class RpmPacker(Packer):
         for rpm in glob.glob(os.path.join(self.job_tmp_folder, "*/*/*.rpm")):
             shutil.move(rpm, self.folder_output)
         
-        self.logger.info("RPM and SRPM files deposed in output folder")
+        self.log("info", "RPM and SRPM files deposed in output folder")
         return True

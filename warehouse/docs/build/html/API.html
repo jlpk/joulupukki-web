@@ -1,0 +1,282 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>V1 Web API &mdash; joulupukki  documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="_static/toggle.css" type="text/css" />
+  
+    <link rel="top" title="joulupukki  documentation" href="index.html"/>
+        <link rel="prev" title="Joulupukki" href="introduction.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> joulupukki</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Joulupukki</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#run-it">Run it</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#how-to-use-it">How to use it</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#testing">Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#documentation">Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">V1 Web API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#builds">Builds</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">joulupukki</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>V1 Web API</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/API.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="v1-web-api">
+<h1>V1 Web API<a class="headerlink" href="#v1-web-api" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="builds">
+<h2>Builds<a class="headerlink" href="#builds" title="Permalink to this headline">¶</a></h2>
+<dl class="get">
+<dt id="get--v1-builds">
+<tt class="descname">GET </tt><tt class="descname">/v1/builds</tt><a class="headerlink" href="#get--v1-builds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all builds.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list(<a class="reference internal" href="#Build" title="Build"><tt class="xref py py-class docutils literal"><span class="pre">Build</span></tt></a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="post">
+<dt id="post--v1-builds">
+<tt class="descname">POST </tt><tt class="descname">/v1/builds</tt><a class="headerlink" href="#post--v1-builds" title="Permalink to this definition">¶</a></dt>
+<dd><p>launch build 
+:type build: <a class="reference internal" href="#Build" title="Build"><tt class="xref py py-class docutils literal"><span class="pre">Build</span></tt></a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">unicode</span></tt></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="get">
+<dt id="get--v1-builds-(build)-log">
+<tt class="descname">GET </tt><tt class="descname">/v1/builds/</tt><big>(</big><em>build</em><big>)</big><tt class="descname">/log</tt><a class="headerlink" href="#get--v1-builds-(build)-log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns log of a build.</p>
+</dd></dl>
+
+<dl class="get">
+<dt id="get--v1-builds-(build)-distro">
+<tt class="descname">GET </tt><tt class="descname">/v1/builds/</tt><big>(</big><em>build</em><big>)</big><tt class="descname">/distro</tt><a class="headerlink" href="#get--v1-builds-(build)-distro" title="Permalink to this definition">¶</a></dt>
+<dd><p>List distros of a build</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list(<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="get">
+<dt id="get--v1-builds-(build)-distro-(distro)-(distro_name)">
+<tt class="descname">GET </tt><tt class="descname">/v1/builds/</tt><big>(</big><em>build</em><big>)</big><tt class="descname">/distro/</tt><big>(</big><em>distro</em><big>)</big><tt class="descname">/</tt><big>(</big><em>distro_name</em><big>)</big><a class="headerlink" href="#get--v1-builds-(build)-distro-(distro)-(distro_name)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a specific distro.</p>
+</dd></dl>
+
+<dl class="get">
+<dt id="get--v1-builds-(build)-distro-(distro)-log">
+<tt class="descname">GET </tt><tt class="descname">/v1/builds/</tt><big>(</big><em>build</em><big>)</big><tt class="descname">/distro/</tt><big>(</big><em>distro</em><big>)</big><tt class="descname">/log</tt><a class="headerlink" href="#get--v1-builds-(build)-distro-(distro)-log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns log of a specific distro.</p>
+</dd></dl>
+
+<dl class="get">
+<dt id="get--v1-builds-(build)-distro-(distro)-download">
+<tt class="descname">GET </tt><tt class="descname">/v1/builds/</tt><big>(</big><em>build</em><big>)</big><tt class="descname">/distro/</tt><big>(</big><em>distro</em><big>)</big><tt class="descname">/download</tt><a class="headerlink" href="#get--v1-builds-(build)-distro-(distro)-download" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns log of a specific distro.</p>
+</dd></dl>
+
+<dl class="type">
+<dt id="Build">
+<em class="property">type </em><tt class="descname">Build</tt><a class="headerlink" href="#Build" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data samples:</p>
+<dl class="toggle docutils">
+<dt>Json</dt>
+<dd><div class="first last highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s2">&quot;branch&quot;</span><span class="o">:</span> <span class="s2">&quot;master&quot;</span><span class="p">,</span> 
+    <span class="s2">&quot;commit&quot;</span><span class="o">:</span> <span class="kc">null</span><span class="p">,</span> 
+    <span class="s2">&quot;created&quot;</span><span class="o">:</span> <span class="kc">null</span><span class="p">,</span> 
+    <span class="s2">&quot;package_name&quot;</span><span class="o">:</span> <span class="kc">null</span><span class="p">,</span> 
+    <span class="s2">&quot;package_release&quot;</span><span class="o">:</span> <span class="kc">null</span><span class="p">,</span> 
+    <span class="s2">&quot;package_version&quot;</span><span class="o">:</span> <span class="kc">null</span><span class="p">,</span> 
+    <span class="s2">&quot;source_type&quot;</span><span class="o">:</span> <span class="s2">&quot;git&quot;</span><span class="p">,</span> 
+    <span class="s2">&quot;source_url&quot;</span><span class="o">:</span> <span class="s2">&quot;https://github.com/kaji-project/shinken.git&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+<dt>XML</dt>
+<dd><div class="first last highlight-xml"><div class="highlight"><pre><span class="nt">&lt;value&gt;</span>
+  <span class="nt">&lt;source_url&gt;</span>https://github.com/kaji-project/shinken.git<span class="nt">&lt;/source_url&gt;</span>
+  <span class="nt">&lt;source_type&gt;</span>git<span class="nt">&lt;/source_type&gt;</span>
+  <span class="nt">&lt;commit</span> <span class="na">nil=</span><span class="s">&quot;true&quot;</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;branch&gt;</span>master<span class="nt">&lt;/branch&gt;</span>
+  <span class="nt">&lt;created</span> <span class="na">nil=</span><span class="s">&quot;true&quot;</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;package_name</span> <span class="na">nil=</span><span class="s">&quot;true&quot;</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;package_version</span> <span class="na">nil=</span><span class="s">&quot;true&quot;</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;package_release</span> <span class="na">nil=</span><span class="s">&quot;true&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/value&gt;</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="introduction.html" class="btn btn-neutral" title="Joulupukki"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, joulupukki contributors.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/toggle.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

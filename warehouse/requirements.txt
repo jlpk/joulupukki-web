@@ -1,0 +1,7 @@
+docker-py==0.7.1
+GitPython==0.3.6
+pecan==0.8.3
+WSME==0.6.4
+PyYAML==3.11
+deb-pkg-tools==1.29.3
+joulupukki.common

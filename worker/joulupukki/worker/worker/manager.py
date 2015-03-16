@@ -17,6 +17,7 @@ from joulupukki.common.carrier import Carrier
 
 
 
+
 class Manager(Thread):
     def __init__(self, app):
         Thread.__init__(self)
@@ -24,6 +25,9 @@ class Manager(Thread):
         self.app = app
         self.build_list = {}
         self.carrier = Carrier(pecan.conf.rabbit_server, pecan.conf.rabbit_port, pecan.conf.rabbit_db)
+        self.carrier.declare_builds()
+
+
 
     def shutdown(self):
         logging.debug("Stopping Manager")

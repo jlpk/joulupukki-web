@@ -148,6 +148,22 @@ class Job(APIJob):
             return cls(job_data)
         return None
 
+    @classmethod
+    def fetch_from_dict(job_dict):
+        job_data = mongo.jobs.find_one({"username": job_dict['username'],
+                                        "project_name": job_dict['project_name'],
+                                        "build_id": job_dict['id_'],
+                                        "id_": int(id_)})
+        if job_data is not None:
+            return cls(job_data)
+        return None
+
+
+
+    def dumps(self):
+        dump = self.as_dict()
+        return dump
+
 
 
 
@@ -278,6 +294,5 @@ class Job(APIJob):
     def set_status(self, status):
         self.status = status
         self.save()
-
 
 '''

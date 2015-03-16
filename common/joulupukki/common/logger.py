@@ -51,3 +51,23 @@ def get_logger_docker(job):
     logger.addHandler(ch)
     # return logger
     return logger
+
+
+def get_logger_job(job):
+    job_folder = job.get_folder_path()
+    log_file = os.path.join(job_folder,
+                            "log.txt")
+    logger = logging.getLogger("#".join(("Job", str(job.build_id), str(job.id_), job.distro)))
+    # create logger
+    logger.setLevel(logging.DEBUG)
+    # create file handler and set level to debug
+    ch = logging.FileHandler(log_file)
+    ch.setLevel(logging.DEBUG)
+    # create formatter
+    #formatter = logging.Formatter('[%(asctime)s] %(message)s')
+    formatter = logging.Formatter('%(message)s')
+    # add formatter to ch
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+    # return logger
+    return logger

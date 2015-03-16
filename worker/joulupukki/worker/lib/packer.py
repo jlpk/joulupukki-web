@@ -10,6 +10,7 @@ import glob
 from urlparse import urlparse
 from datetime import datetime
 
+import pecan
 from docker import Client
 
 from deb_pkg_tools.control import parse_depends
@@ -17,6 +18,8 @@ from deb_pkg_tools.control import load_control_file
 from joulupukki.common.logger import get_logger, get_logger_docker
 from joulupukki.common.distros import reverse_supported_distros
 from joulupukki.common.datamodel.job import Job
+from joulupukki.common.carrier import Carrier
+
 
 
 
@@ -56,13 +59,17 @@ class Packer(object):
         self.folder_output = self.job.get_folder_output()
         #self.job_folder_ = self.job.get_folder_path()
         self.job_tmp_folder = self.job.get_folder_tmp()
+        self.carrier = Carrier(pecan.conf.rabbit_server, pecan.conf.rabbit_port, pecan.conf.rabbit_db)
+        self.carrier.declare_logs()
+
 
         if not os.path.exists(self.folder_output):
             os.makedirs(self.folder_output)
         if not os.path.exists(self.job_tmp_folder):
             os.makedirs(self.job_tmp_folder)
 
-        self.logger = get_logger_docker(self.job)
+        
+#        self.logger = get_logger_docker(self.job)
 
         distro = reverse_supported_distros.get(config['distro'])
         self.container_tag = "joulupukki:" + distro.replace(":", "_")
@@ -87,7 +94,7 @@ class Packer(object):
         for step_name, step_function in steps:
             self.set_status(step_name)
             if step_function() is not True:
-                self.logger.debug("Task failed during step: %s", step_name)
+                self.log("debug", "Task failed during step: %s", step_name)
                 self.set_status('failed')
                 return False
             # Save package name in build.cfg 
@@ -125,19 +132,40 @@ class Packer(object):
                 creation_date = datetime.fromtimestamp(image.get('Created'))
                 delta_time = datetime.now() - creation_date
                 if delta_time.days >= 1:
-                    self.logger.debug('Deleting docker image: %s', image['Id'])
+                    self.log("debug", 'Deleting docker image: %s', image['Id'])
                     self.cli.remove_image(image['Id'])
             except Exception as error:
-                self.logger.debug('Cannot deleting docker image: %s'
+                self.log("debug", 'Cannot deleting docker image: %s'
                                   ' - Error: %s', image['Id'], error)
         return True
 
     def clean_up(self):
         # Delete container
-        self.logger.debug('Deleting docker container: %s', self.container['Id'])
+        self.log("debug", 'Deleting docker container: %s', self.container['Id'])
         self.cli.remove_container(self.container['Id'])
         if os.path.isdir(self.job_tmp_folder):
             shutil.rmtree(self.job_tmp_folder)
 
 
         return True
+
+    def log(self, level, log, *args):
+        if level not in ('debug', 'info', 'warning', 'error'):
+            # TODO handle !!!
+#            self.logger.error("Bad logger level: %s" % level)
+            raise Exception("Bad logger level: %s" % level)
+#        if args:
+#            ret = getattr(self.logger, level)(log, args)
+#        else:
+#            ret = getattr(self.logger, level)(log)
+        if level in ('info', 'warning', 'error'):
+            log = {"level": level,
+                   "log": log,
+                   "job": self.job.dumps(),
+                   "args": args,
+                  }
+            i = 0
+            ret = False
+            while ret is False and i < 5:
+                ret = self.carrier.send_log(log)
+                i += 1
