@@ -29,7 +29,6 @@ from joulupukki.web import carrier
 
 
 
-from joulupukki.web.lib.queues import build_tasks
 from joulupukki.common.distros import supported_distros, reverse_supported_distros
 
 
@@ -43,9 +42,13 @@ class BuildController(rest.RestController):
     @wsme_pecan.wsexpose(Build)
     def get(self):
         """Returns build status"""
-        project_name = pecan.request.context['project_name']
         user = User.fetch(pecan.request.context['username'], sub_objects=False)
+        if user is None:
+            return None
+        project_name = pecan.request.context['project_name']
         project = Project.fetch(user, project_name, sub_objects=False)
+        if project is None:
+            return None
         build_id = self.id_
         if self.id_ in ["latest"]:
             build_id = project.get_latest_build_id()
@@ -81,10 +84,12 @@ class BuildsController(rest.RestController):
         """Returns all builds."""
         project_name = pecan.request.context['project_name']
         user = User.fetch(pecan.request.context['username'], sub_objects=False)
+        if user is None:
+            return user
         project = Project.fetch(user, project_name, sub_objects=False)
-        builds = [Build.fetch(project, b_id, False) for b_id in project.get_builds()]
-        builds = [b for b in builds if b]
-        return builds
+        if project is None:
+            return None
+        return project.get_builds()
 
     @pecan.expose()
     def _lookup(self, build_id, *remainder):

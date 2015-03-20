@@ -114,6 +114,28 @@ class Build(APIBuild):
                             str(self.id_))
 
 
+    def get_output_folder_path(self, distro=None):
+        """ Return build folder path"""
+        if distro is None:
+            path = os.path.join(pecan.conf.workspace_path,
+                                self.username,
+                                self.project_name,
+                                "builds",
+                                str(self.id_),
+                                "output")
+        else:
+            path = os.path.join(pecan.conf.workspace_path,
+                                self.username,
+                                self.project_name,
+                                "builds",
+                                str(self.id_),
+                                "output",
+                                distro)
+        return path
+
+
+
+
     def get_source_folder_path(self):
         """ Return project folder path"""
         return os.path.join(self.get_folder_path(),

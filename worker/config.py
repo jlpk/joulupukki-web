@@ -50,7 +50,7 @@ logging = {
 # Custom Configurations must be in Python dictionary format::
 #
 # foo = {'bar':'baz'}
-workspace_path = '%(confdir)s/../tmp'
+workspace_path = '%(confdir)s/../output'
 
 rabbit_server = "127.0.0.1"
 rabbit_port = 5672

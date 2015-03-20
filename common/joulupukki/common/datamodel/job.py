@@ -104,13 +104,14 @@ class Job(APIJob):
 
     def get_folder_output(self):
         """ Return build folder path"""
+        distro = reverse_supported_distros.get(self.distro, self.distro)
         return os.path.join(pecan.conf.workspace_path,
                             self.username,
                             self.project_name,
                             "builds",
                             str(self.build_id),
                             "output",
-                            str(self.distro),
+                            distro,
                             )
 
     def get_folder_path(self):
@@ -165,6 +166,17 @@ class Job(APIJob):
         return dump
 
 
+
+    def get_log(self):
+        log_file = os.path.join(self.get_folder_path(), "log.txt")
+        log = ""
+        # Read status_file
+        with open(log_file, 'r') as f:
+            try:
+                log = f.read()
+            except Exception as exp:
+                return
+        return log
 
 
 

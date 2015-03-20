@@ -2,7 +2,7 @@ import pecan
 from pecan import rest
 
 
-class HelloController(rest.RestController):
+class StatsController(rest.RestController):
 
     @pecan.expose()
     def get(self):

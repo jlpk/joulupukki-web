@@ -24,7 +24,7 @@ class DebPacker(Packer):
 
     def parse_specdeb(self):
         # Get debian infos
-        self.log("info", "Find informations from spec file")
+        self.logger.info("Find informations from spec file")
 
         control_file_path = os.path.join(self.folder,
                                          'sources',
@@ -66,16 +66,16 @@ class DebPacker(Packer):
         self.config['source'] = self.config['name'] + "_" + self.config['version'] + ".orig.tar.gz"
 
         # Log informations
-        self.log("info", "Name: %(name)s", self.config)
-        self.log("info", "Source: %(source)s", self.config)
-        self.log("info", "Version: %(version)s", self.config)
-        self.log("info", "Release: %(release)s", self.config)
-        self.log("info", "Builddepends: %s", ", ".join(self.config['deps']))
+        self.logger.info("Name: %(name)s", self.config)
+        self.logger.info("Source: %(source)s", self.config)
+        self.logger.info("Version: %(version)s", self.config)
+        self.logger.info("Release: %(release)s", self.config)
+        self.logger.info("Builddepends: %s", ", ".join(self.config['deps']))
         return True
 
 
     def docker_build(self):
-        self.log("info", "Dockerfile preparation")
+        self.logger.info("Dockerfile preparation")
         # DOCKER FILE TEMPLATE
         # Create and user an user "builder"
         dockerfile = '''
@@ -87,19 +87,19 @@ class DebPacker(Packer):
         f = BytesIO(dockerfile.encode('utf-8'))
 
         # BUILD
-        self.log("info", "Docker Image Building")
+        self.logger.info("Docker Image Building")
         output = self.cli.build(fileobj=f, rm=True, tag=self.container_tag, forcerm=True)
         # log output
         for i in output:
             dict_ = eval(i)
             if "stream" in dict_:
-                self.log("info", dict_["stream"].strip())
+                self.logger.info(dict_["stream"].strip())
             else:
                 if 'error' in dict_:
-                    self.log("info", dict_['errorDetail']['message'].strip())
+                    self.logger.info(dict_['errorDetail']['message'].strip())
                 else:
-                    self.log("info", str(i))
-        self.log("info", "Docker Image Built")
+                    self.logger.info(str(i))
+        self.logger.info("Docker Image Built")
         return True
             
 
@@ -122,7 +122,7 @@ class DebPacker(Packer):
 
         # Handle ccache
         if pecan.conf.ccache_path is not None and self.config.get('ccache', False):
-            self.log("info", "CCACHE is enabled")
+            self.logger.info("CCACHE is enabled")
             ccache_path = os.path.join(pecan.conf.ccache_path,
                                        self.builder.build.user.username,
                                        self.config['name'],
@@ -131,7 +131,7 @@ class DebPacker(Packer):
                 try:
                     os.makedirs(ccache_path)
                 except Exception as exp:
-                    self.log("error", "CCACHE folder creation error: %s", exp)
+                    self.logger.error("CCACHE folder creation error: %s", exp)
                     return False
             volumes.append('/ccache')
             binds[ccache_path] = {"bind": "/ccache"}
@@ -165,10 +165,10 @@ class DebPacker(Packer):
         commands.append("""mv *.orig.tar* *.debian.tar* *deb *changes *dsc /output""")
         # Finish command preparation
         command = "bash -c '%s'" % " && ".join(commands)
-        self.log("info", "Build command: %s", command)
+        self.logger.info("Build command: %s", command)
 
         # RUN
-        self.log("info", "DEB Build starting")
+        self.logger.info("DEB Build starting")
         start_time = timeit.default_timer()
         self.container = self.cli.create_container(self.container_tag, command=command, volumes=volumes)
         local_source_folder = os.path.join(self.folder, "sources")
@@ -176,12 +176,12 @@ class DebPacker(Packer):
         toto = self.cli.start(self.container['Id'], binds=binds)
 
         for line in self.cli.attach(self.container['Id'], stdout=True, stderr=True, stream=True):
-            self.log("info", line.strip())
+            self.logger.info(line.strip())
         # Stop container
         self.cli.stop(self.container['Id'])
         elapsed = timeit.default_timer() - start_time
         self.set_build_time(elapsed)
-        self.log("info", "DEB Build finished in %ds", elapsed)
+        self.logger.info("DEB Build finished in %ds", elapsed)
         # Get exit code
         if self.cli.wait(self.container['Id']) != 0:
             return False
@@ -200,5 +200,5 @@ class DebPacker(Packer):
             shutil.move(file_, self.folder_output)
 
         
-        self.log("info", "DEBS files deposed in output folder")
+        self.logger.info("DEBS files deposed in output folder")
         return True

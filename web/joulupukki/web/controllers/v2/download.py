@@ -26,7 +26,6 @@ from joulupukki.common.datamodel.job import Job
 from joulupukki.web.controllers.v2.jobs import JobsController
 
 
-from joulupukki.web.lib.queues import build_tasks
 from joulupukki.common.distros import supported_distros, reverse_supported_distros
 
 
@@ -42,13 +41,17 @@ class DownloadController(rest.RestController):
     @pecan.expose()
     def get(self):
         """Returns log of a specific distro."""
+        user = User.fetch(pecan.request.context['username'], sub_objects=False)
+        if user is None:
+            return None
         project_name = pecan.request.context['project_name']
-        user = User.fetch(pecan.request.context['username'])
-        project = Project.fetch(user, project_name)
+        project = Project.fetch(user, project_name, sub_objects=False)
+        if project is None:
+            return None
         build_id = pecan.request.context['build_id']
         if build_id in ["latest"]:
-            build_id = project.get_latest_build()
-        build = Build.fetch(project, build_id, full_data=True)
+            build_id = project.get_latest_build_id()
+        build = Build.fetch(project, build_id, sub_objects=False)
         if build is None:
             return
         # Get options
@@ -95,5 +98,4 @@ class DownloadController(rest.RestController):
         headers.add("Content-Disposition", str("attachment;filename=%s" % filename))
         # returns
         return f.getvalue()
-
 

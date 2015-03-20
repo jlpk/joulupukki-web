@@ -12,7 +12,6 @@ from joulupukki.worker.worker.builder import Builder
 from joulupukki.common.datamodel.build import Build
 
 
-from joulupukki.worker.lib.queues import build_tasks
 from joulupukki.common.carrier import Carrier
 
 

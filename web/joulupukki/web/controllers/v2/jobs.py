@@ -25,7 +25,6 @@ from joulupukki.common.datamodel.project import Project
 from joulupukki.common.datamodel.job import Job
 
 
-from joulupukki.web.lib.queues import build_tasks
 from joulupukki.common.distros import supported_distros, reverse_supported_distros
 
 
@@ -85,13 +84,17 @@ class LogController(rest.RestController):
         """Returns log of a specific job."""
         project_name = pecan.request.context['project_name']
         user = User.fetch(pecan.request.context['username'])
+        if user is None:
+            return None
         project = Project.fetch(user, project_name)
+        if project is None:
+            return None
         build_id = pecan.request.context['build_id']
         if build_id in ["latest"]:
             build_id = project.get_latest_build_id()
-        build = Build.fetch(project, build_id, full_data=True)
+        build = Build.fetch(project, build_id, False)
         job_id = pecan.request.context['job_id'] 
-        job = Job.fetch(build, job_id, full_data=True)
+        job = Job.fetch(build, job_id)
         return job.get_log()
 
 

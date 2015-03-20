@@ -61,32 +61,3 @@ class Carrier(object):
             build.project = Project.fetch(build.user, build_data['project_name'], sub_objects=False)
             return build
         return None
-
-
-    def declare_logs(self):
-        self.channel.exchange_declare(exchange='logs', exchange_type='fanout')
-        
-    def subscribe_logs(self):
-        result = self.channel.queue_declare(exclusive=True)
-        self.queue_logs = result.method.queue
-        self.channel.queue_bind(exchange='logs',
-                                queue=self.queue_logs)
-
-    def send_log(self, log):
-        try:
-            self.channel.basic_publish(exchange='logs',
-                                       routing_key='',
-                                       body=json.dumps(log)
-                                      )
-        except Exception as exp:
-            # TODO
-            print(exp)
-            return False
-        return True
-
-
-    def get_log(self):
-        method_frame, header_frame, body = self.channel.basic_get(self.queue_logs)
-        if body:
-            return json.loads(body)
-        return body
