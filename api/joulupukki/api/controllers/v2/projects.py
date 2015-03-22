@@ -26,8 +26,8 @@ from joulupukki.common.datamodel.result import APIResult
 from joulupukki.common.datamodel.project import Project, APIProject
 
 
-from joulupukki.web.controllers.v2.builds import BuildsController
-from joulupukki.web.controllers.v2.builds import LaunchBuildController
+from joulupukki.api.controllers.v2.builds import BuildsController
+from joulupukki.api.controllers.v2.builds import LaunchBuildController
 
 from joulupukki.common.distros import supported_distros, reverse_supported_distros
 

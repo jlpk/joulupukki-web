@@ -23,9 +23,9 @@ from joulupukki.common.datamodel.build import Build, APIBuild
 from joulupukki.common.datamodel.user import User
 from joulupukki.common.datamodel.project import Project
 from joulupukki.common.datamodel.job import Job
-from joulupukki.web.controllers.v2.jobs import JobsController
-from joulupukki.web.controllers.v2.download import DownloadController
-from joulupukki.web import carrier
+from joulupukki.api.controllers.v2.jobs import JobsController
+from joulupukki.api.controllers.v2.download import DownloadController
+from joulupukki.api import carrier
 
 
 

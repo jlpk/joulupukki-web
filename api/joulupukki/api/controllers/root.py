@@ -1,11 +1,8 @@
 from pecan import expose, redirect
 
-from webob.exc import status_map
-
-
 from joulupukki.worker.controllers.stats import StatsController
 
-from joulupukki.web.controllers.v2 import v2
+rom joulupukki.api.controllers.v2 import v2
 
 
 class RootController(object):

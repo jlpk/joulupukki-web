@@ -6,8 +6,8 @@ server = {
 
 # Pecan Application Configurations
 app = {
-    'root': 'joulupukki.web.controllers.root.RootController',
-    'modules': ['joulupukki.web'],
+    'root': 'joulupukki.api.controllers.root.RootController',
+    'modules': ['joulupukki.api'],
     'static_root': '%(confdir)s/public',
     'template_path': '%(confdir)s/joulupukki/templates',
     'debug': True,

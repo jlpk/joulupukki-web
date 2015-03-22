@@ -1,5 +1,5 @@
 import pecan
-from joulupukki.web.controllers.v2.users import UserController
+from joulupukki.api.controllers.v2.users import UserController
 
 
 class V2Controller(object):

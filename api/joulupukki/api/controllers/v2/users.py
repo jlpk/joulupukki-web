@@ -22,7 +22,7 @@ from io import BytesIO
 from joulupukki.common.datamodel.user import User, APIUser
 
 
-from joulupukki.web.controllers.v2.projects import ProjectController
+from joulupukki.api.controllers.v2.projects import ProjectController
 
 
 
