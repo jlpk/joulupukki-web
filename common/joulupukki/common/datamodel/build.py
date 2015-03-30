@@ -69,7 +69,7 @@ class Build(APIBuild):
         # Get last ids
         self.id_ = 1
         build_ids = [x["id_"] for x in mongo.builds.find({"username": self.username, "project_name": self.project_name}, ["id_"])]
-        if build_ids is not None:
+        if build_ids is not None and build_ids != []:
             self.id_ = max(build_ids) + 1
         # Set attributes
         self.created = time.time()

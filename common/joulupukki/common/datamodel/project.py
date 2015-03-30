@@ -6,7 +6,7 @@ import wsme
 import json
 import wsme.types as wtypes
 
-from joulupukki.common.database import mongo
+from joulupukki.common.database import mongo, DESCENDING
 from joulupukki.common.datamodel import types
 from joulupukki.common.datamodel.build import Build
 
@@ -54,12 +54,14 @@ class Project(APIProject):
             return False
 
     @classmethod
-    def fetch(cls, user, project_name, sub_objects=True):
+    def fetch(cls, user, project_name, sub_objects=True, get_last_build=False):
         db_project = mongo.projects.find_one({"name": project_name,
                                               "username": user.username})
         project = None
         if db_project is not None:
             project = cls(db_project, sub_objects)
+            if sub_objects and get_last_build:
+                project.builds = [project.builds[0]]
         return project
 
     def _save(self):
@@ -91,18 +93,44 @@ class Project(APIProject):
     def get_builds(self):
         """ return all build ids """
         builds = mongo.builds.find({"username": self.username,
-                                    "project_name": self.name}).sort("id_")
+                                    "project_name": self.name}).sort("id_", DESCENDING)
         return [Build(x) for x in builds]
 
 
+    def get_latest_build(self):
+        build = mongo.builds.find_one({"username": self.username,
+                                       "project_name": self.name},
+                                       sort=[("id_", -1)])
+        if build:
+            return Build(build)
+        return None
+
+
     def get_latest_build_id(self):
-        build_ids = mongo.builds.find_one(sort=[("id_", -1)])
-        if build_ids == []:
-            return None
-        return build_ids.get('id_', None)
+        build = self.get_latest_build
+        if build is not None:
+            return build.id_
+        return None
 
 
+    @classmethod
+    def search(cls, name=None, username=None, limit=30, offset=0, get_last_build=False):
+        filter_ = {}
+        if username is not None:
+            filter_['username'] = username
+        if name is not None:
+            filter_['name'] = name
+        if limit > 100:
+            limit = 100
+        db_projects = mongo.projects.find(filter_, limit=limit, skip=offset)
+        projects = []
+        if db_projects is not None:
+            projects = [cls(db_project, sub_objects=False) for db_project in db_projects]
+            if get_last_build:
+                for p in projects:
+                    p.builds = [p.get_latest_build()]
 
+        return projects
 
 
 

@@ -26,11 +26,24 @@ from joulupukki.common.datamodel.result import APIResult
 from joulupukki.common.datamodel.project import Project, APIProject
 
 
-from joulupukki.api.controllers.v2.builds import BuildsController
-from joulupukki.api.controllers.v2.builds import LaunchBuildController
+from joulupukki.api.controllers.v3.builds import BuildsController
+from joulupukki.api.controllers.v3.builds import LaunchBuildController
 
 from joulupukki.common.distros import supported_distros, reverse_supported_distros
 
+
+
+class ProjectsController(rest.RestController):
+
+    @wsme_pecan.wsexpose([Project], unicode, unicode, int, int, bool)
+    def get(self, name=None, username=None, limit=30, offset=0, get_last_build=False):
+        """Returns project"""
+        projects = Project.search(name=name,
+                                  username=username,
+                                  limit=limit,
+                                  offset=offset,
+                                  get_last_build=get_last_build)
+        return projects
 
 
 class ProjectController(rest.RestController):
@@ -42,14 +55,14 @@ class ProjectController(rest.RestController):
             raise Exception("User not found")
         
 
-    # curl -X GET http://127.0.0.1:8080/v2/joulupukki/myproject
-    @wsme_pecan.wsexpose(Project)
-    def get(self):
+    # curl -X GET http://127.0.0.1:8080/v3/joulupukki/myproject
+    @wsme_pecan.wsexpose(Project, bool)
+    def get(self, get_last_build=False):
         """Returns project"""
-        project = Project.fetch(self.user, self.project_name)
+        project = Project.fetch(self.user, self.project_name, get_last_build=get_last_build)
         return project
 
-    # curl -X POST -H "Content-Type: application/json" -i  -d '{"name": "project"}' http://127.0.0.1:8081/v2/titilambert/myproject
+    # curl -X POST -H "Content-Type: application/json" -i  -d '{"name": "project"}' http://127.0.0.1:8081/v3/titilambert/myproject
     @wsme_pecan.wsexpose(wtypes.text, body=APIProject, status_code=201)
     def post(self, sent_project):
         """Create project"""
@@ -65,7 +78,7 @@ class ProjectController(rest.RestController):
         else:
             return {"result": "Project %s exists" % self.project_name}
 
-    # curl -X DELETE http://127.0.0.1:8081/v2/titilambert/myproject
+    # curl -X DELETE http://127.0.0.1:8081/v3/titilambert/myproject
     @wsme_pecan.wsexpose(APIResult)
     def delete(self):
         """Delete project""" 

@@ -23,8 +23,8 @@ from joulupukki.common.datamodel.build import Build, APIBuild
 from joulupukki.common.datamodel.user import User
 from joulupukki.common.datamodel.project import Project
 from joulupukki.common.datamodel.job import Job
-from joulupukki.api.controllers.v2.jobs import JobsController
-from joulupukki.api.controllers.v2.download import DownloadController
+from joulupukki.api.controllers.v3.jobs import JobsController
+from joulupukki.api.controllers.v3.download import DownloadController, OutputController
 from joulupukki.api import carrier
 
 
@@ -78,7 +78,7 @@ class BuildController(rest.RestController):
 
 class BuildsController(rest.RestController):
 
-    #curl -X GET  http://127.0.0.1:8080/v2/titilambert/myproject/builds/
+    #curl -X GET  http://127.0.0.1:8080/v3/titilambert/myproject/builds/
     @wsme_pecan.wsexpose([Build])
     def get_all(self):
         """Returns all builds."""
@@ -97,9 +97,9 @@ class BuildsController(rest.RestController):
 
 
 class LaunchBuildController(rest.RestController):
-    # curl -X POST -H "Content-Type: application/json" -i  -d '{"source_url": "/home/tcohen/projet_communautaire/kaji/meta/packages/shinken", "source_type": "local", "branch": "kaji"}' http://127.0.0.1:8080/v2/titilambert/shinken/build
-    # curl -X POST -H "Content-Type: application/json" -i  -d '{"source_url": "/home/tcohen/projet_communautaire/kaji/meta/packages/shinken", "source_type": "local", "branch": "kaji", "forced_distro": "centos_7"}' http://127.0.0.1:8080/v2/titilambert/shinken/build
-    # curl -X POST -H "Content-Type: application/json" -i  -d '{"source_url": "https://github.com/kaji-project/kaji.git", "source_type": "git", "branch": "kaji", "forced_distro": "centos_7", "snapshot": true}' http://127.0.0.1:8080/v2/titilambert/kaji/build
+    # curl -X POST -H "Content-Type: application/json" -i  -d '{"source_url": "/home/tcohen/projet_communautaire/kaji/meta/packages/shinken", "source_type": "local", "branch": "kaji"}' http://127.0.0.1:8080/v3/titilambert/shinken/build
+    # curl -X POST -H "Content-Type: application/json" -i  -d '{"source_url": "/home/tcohen/projet_communautaire/kaji/meta/packages/shinken", "source_type": "local", "branch": "kaji", "forced_distro": "centos_7"}' http://127.0.0.1:8080/v3/titilambert/shinken/build
+    # curl -X POST -H "Content-Type: application/json" -i  -d '{"source_url": "https://github.com/kaji-project/kaji.git", "source_type": "git", "branch": "kaji", "forced_distro": "centos_7", "snapshot": true}' http://127.0.0.1:8080/v3/titilambert/kaji/build
     @wsme_pecan.wsexpose(wtypes.text, body=APIBuild, status_code=201)
     def post(self, send_build):
         """ launch build """
@@ -112,9 +112,8 @@ class LaunchBuildController(rest.RestController):
             # We have to create it
             # TODO Maybe it's better to force users to create project before
             # they can create builds
-            sent_project = {"name": project_name}
-            project = Project(sent_project.as_dict())
-            project.username = user.username
+            sent_project = {"name": project_name, "username": user.username}
+            project = Project(sent_project, sub_objects=False)
             if not project.create():
                 # Handle error
                 return {"result": "Error creating %s project" % project_name}
@@ -134,4 +133,5 @@ class LaunchBuildController(rest.RestController):
 class BuildSubController(rest.RestController):
     download = DownloadController()
     jobs = JobsController()
+    output = OutputController()
 

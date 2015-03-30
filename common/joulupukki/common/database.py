@@ -1,7 +1,7 @@
 import sys
 import pecan
 
-from pymongo import MongoClient
+from pymongo import MongoClient, DESCENDING
 
 
 try:

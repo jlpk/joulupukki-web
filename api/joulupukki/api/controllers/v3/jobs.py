@@ -78,7 +78,7 @@ class JobsController(rest.RestController):
 
 class LogController(rest.RestController):
 
-    # curl -X GET http://127.0.0.1:8080/v2/titilambert/kaji/builds/8/jobs/1/log
+    # curl -X GET http://127.0.0.1:8080/v3/titilambert/kaji/builds/8/jobs/1/log
     @expose(content_type='text/plain')
     def get(self):
         """Returns log of a specific job."""
