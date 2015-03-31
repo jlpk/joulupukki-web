@@ -213,3 +213,5 @@ class Builder(Thread):
         if os.path.exists(self.folder_source):
             shutil.rmtree(self.folder_source)
         self.logger.info("Tmp folders deleted")
+        # Set end time
+        self.build.finishing()

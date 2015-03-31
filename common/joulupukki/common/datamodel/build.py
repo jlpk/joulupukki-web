@@ -26,6 +26,7 @@ class APIBuild(types.Base):
 class Build(APIBuild):
     id_ = wsme.wsattr(int, mandatory=False)
     created = wsme.wsattr(float, mandatory=False, default=None)
+    finished = wsme.wsattr(float, mandatory=False, default=None)
     package_name = wsme.wsattr(wtypes.text, mandatory=False, default=None)
     package_version = wsme.wsattr(wtypes.text, mandatory=False, default=None)
     package_release = wsme.wsattr(wtypes.text, mandatory=False, default=None)
@@ -73,6 +74,7 @@ class Build(APIBuild):
             self.id_ = max(build_ids) + 1
         # Set attributes
         self.created = time.time()
+        self.finished = None
         self.status = "created"
 
         # TODO: check password
@@ -187,6 +189,10 @@ class Build(APIBuild):
 
 
 
+    def finishing(self):
+        self.finished = time.time()
+        self._save()
+
 
 
 
@@ -280,6 +286,7 @@ class Build(APIBuild):
                            "commit": self.commit,
                            "id_": self.id_,
                            "created": self.created,
+                           "finished": self.finished,
                            "package_name": self.package_name,
                            "package_version": self.package_version,
                            "package_release": self.package_release,

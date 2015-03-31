@@ -11,13 +11,13 @@ import ast
 from joulupukki.common.datamodel.build import Build
 from joulupukki.common.datamodel.project import Project
 from joulupukki.common.datamodel.user import User
+import logging
 
 
 class Carrier(object):
     def __init__(self, server, port, exchange):
         """queues:
         * builds
-        * logs
         """
         self.server = server
         self.port = port
@@ -39,6 +39,7 @@ class Carrier(object):
                                       )
         except Exception as exp:
             # TODO
+            logging.error(exp)
             print(exp)
             return False
         return True
