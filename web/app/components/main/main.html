@@ -1,0 +1,132 @@
+<div class="data-main" ng-controller="MainCtrl">
+
+  <header>
+    <h1>{{ selected_project.username }}/{{ selected_project.name }}</h1>
+  </header>
+
+  <section>
+    <ul class="nav nav-tabs">
+      <li role="presentation" ng-class="{ 'active': selected_tab == 'project' }">
+        <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/">
+          Current
+        </a>
+      </li>
+      <li role="presentation" ng-class="{ 'active': selected_tab == 'history' }">
+        <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds">
+          Builds
+        </a>
+      </li>
+      <li ng-if="build.id_" role="presentation" ng-class="{ 'active': selected_tab == 'build' }">
+        <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}">Build {{ build.id_ }}
+        </a>
+      </li>
+      <li ng-if="build.id_" role="presentation" ng-class="{ 'active': selected_tab == 'download' }">
+        <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/output">Download
+        </a>
+      </li>
+    </ul>
+
+    <section class="tile tile-build container-fluid" ng-if="selected_tab == 'build' || selected_tab == 'project'">
+      <div class="row">
+        <div class="col-xs-1 col-md-1 tile-status tile-status-{{ build.status }}">
+          {{ build.status }}
+        </div>
+        <div class="col-xs-11 col-md-10">
+          {{ build.package_name }}
+          {{ build.package_version }}-{{ build.package_release }}
+        </div>
+        <div class="col-xs-offset-1 col-xs-11 col-md-1">
+          <ul>
+            <li>
+              {{ build.forced_distro }}
+            </li>
+            <li>
+          {{ build.build_time }}
+            </li>
+            <li>
+          {{ build.created }}
+            </li>
+        </div>
+      </div>
+    </section>
+
+
+    <section ng-if="selected_tab == 'history'">
+        <div>
+          <li ng-repeat="build in selected_project.builds" class="build {{ build.status }}">
+                <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}">{{ build.id_ }}</a>
+          </li>
+    </section>
+  </section>
+
+  <section id="output" ng-if="selected_tab == 'output'" class="output">
+    <h2>Build Output</h2>
+    <h3 ng-if="! output">No output</h3>
+    <ul ng-if="output">
+      <li>
+        Download all: 
+        <a href="/v3/users/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/download/archive?type=tgz">(tgz)</a>
+        <a href="/v3/users/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/download/archive?type=zip">(zip)</a>
+      </li>
+      <li ng-repeat="(folder, files) in output" >
+        {{ folder }}
+        <a href="/v3/users/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/download/archive?distro={{ folder }}&type=tgz">(tgz)</a>
+        <a href="/v3/users/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/download/archive?distro={{ folder }}&type=zip">(zip)</a>
+        <ul>
+          <li ng-repeat="file in files">
+            <a href="/v3/users/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/download/file?distro={{ folder }}&filename={{ file }}">{{ file }}</a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </section>
+
+
+  <section id="log-container" ng-if="selected_tab == 'job'" class="joblog log">
+    <h2>Build Job {{job.build_id}}.{{ job.id_ }} log</h2>
+    <menu class="log-header">
+<!--      <a href="#" class="button button-grey open-popup" data-ember-action="1469"><span class="icon icon-removeLog"></span> Remove Log</a> -->
+      <a class="button button--grey" href="#/home/{{selected_project.username}}/{{ selected_project.name }}/builds/{{ job.build_id }}/jobs/{{ job.id_ }}/log" data-bindattr-1465="1465">
+            <span class="icon icon--downloadLog"></span> Download Log
+      </a>
+    </menu>
+    <div class="log-body">
+      <pre id="log" class="ansi">
+        {{ joblog }}
+      </pre>
+      <a href="" class="to-top" data-ember-action="1703" style="bottom: 4195px;">Top</a>
+    </div>        
+  </section>
+
+  <section ng-if="selected_tab == 'build' || selected_tab == 'project'" class="jobs">
+    <h2>Build Jobs</h2>
+    <ul>
+      <li ng-repeat="job in build.jobs" class="job {{ job.status }}">
+        <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/jobs/{{ job.id_}}">
+          <div class="tile-status tile-status--job">
+            <span class="icon icon--job errored" data-bindattr-1410="1410"></span>
+          </div>
+          <p class="job-id jobs-item build-status">
+            <span class="icon icon--hash-dark"></span>
+            {{ build.id_ }}.{{ job.id_ }}
+          </p>
+          <p class="job-os jobs-item build-os linux" data-bindattr-1412="1412">
+            <span class="icon linux" data-bindattr-1413="1413"></span>
+          </p>
+
+          <div class="job-anchor jobs-item">
+            <p class="job-env jobs-item build-env">
+              <span class="icon icon--env"></span>
+              {{ job.distro }}
+            </p>
+            <p class="job-duration jobs-item" title="2015-03-27T15:20:37Z" data-bindattr-1414="1414">
+            <span class="icon icon--clock-dark"></span>
+              {{ job.build_time }}
+            </p>
+          </div>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+</div>

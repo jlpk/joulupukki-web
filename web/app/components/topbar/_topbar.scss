@@ -1,0 +1,226 @@
+//----------------------------------*\
+// TOPBAR MODULE
+//----------------------------------*/
+
+#topbar {
+    margin-bottom: 0px;
+}
+
+/*
+.topbar-wrapper {
+    @extend %colorBkgTopbar;
+    @extend %colorBorderThin;
+    border-bottom:1px solid;
+}
+
+.topbar a {@extend %colorLink;}
+
+.topbar__list {display:block;}
+
+.topbar__item {
+    @extend %colorBorderThin;
+    border:0 solid;
+    display:inline-block;
+    position:relative;
+
+    .topbar__list--left & {
+        border-right-width:1px;
+        float:left;
+    }
+    .topbar__list--right & {
+        border-left-width:1px;
+        float:right;
+    }
+
+    %topbar__panel {
+        @extend %colorBkgPanel;
+        width:320px;
+        position:absolute;
+        top:100%;
+        z-index:999999;
+    }
+
+    .topbar__panel--fromleft {
+        @extend %topbar__panel;
+        left:-81px;
+
+        @include medium-and-up-screen {
+            left:-1px;
+            width:485px;
+        }
+    }
+
+    .topbar__panel--fromright {
+        @extend %topbar__panel;
+        right:0;
+
+        @include medium-and-up-screen {
+            width:190px;
+        }
+    }
+
+    .topbar__panel__content {padding:$_space $_space_narrow 0;}
+}
+
+.topbar__button {
+    @extend %button-reset;
+    @extend %colorBkgTopbarButton;
+    @extend %colorLink;
+    height:80px;
+    position:relative;
+    width:79px;
+
+    &[aria-expanded="true"] {color:$_color_omega;}
+
+    [class^="ico-"],
+    [class*=" ico-"] {
+        bottom:30px;
+        display:block;
+        font-size:em(20, $_base_font_size);
+        height:1em;
+        left:0;
+        line-height:1em;
+        margin:0 auto;
+        position:absolute;
+        right:0;
+        text-align:center;
+        top:auto;
+        width:1em;
+
+        &:before {margin:0;}
+    }
+}
+
+.topbar__toggle-sidebar {
+
+    /* .topbar__button {         */
+    /*     &:hover { */
+    /*         .color-scheme--dark & { */
+    /*             background:$_color_dark_alpha; */
+    /*         } */
+
+    /*         .color-scheme--light & { */
+    /*             background:$_color_light_alpha; */
+    /*         } */
+    /*     } */
+    /* } */
+/*
+    .ico-menu {
+
+        &:after {
+            @extend %ico;
+            bottom:0;
+            display:inline-block;
+            font-size:10px;
+            margin:auto 0;
+            position:absolute;
+            top:0;
+        }
+    }
+
+    [aria-expanded="false"] .ico-menu:after {
+        content:'\e808';
+        right:-7px;
+    }
+
+    [aria-expanded="true"] .ico-menu:after {
+        content:'\e807';
+        left:-7px;
+    }
+}
+
+.topbar__notifications {
+    .topbar__button {
+        &[aria-expanded="true"],
+        &:hover {
+            .color-scheme--dark & {
+                background:$_color_dark_alpha;
+            }
+
+            .color-scheme--light & {
+                background:$_color_light_alpha;
+            }
+        }
+    }
+
+    .ico-bell-alt {
+        &:after {
+            background:$_color_error;
+            border-radius:100%;
+            color:$_color_omega;
+            content:attr(data-notifications);
+            font-size:10px;
+            font-style:normal;
+            height:18px;
+            left:7px;
+            line-height:18px;
+            position:absolute;
+            text-align:center;
+            top:-9px;
+            width:18px;
+        }
+    }
+}
+
+.topbar__search {
+
+    .topbar__button {float:left;}
+
+    .topbar__searchfield {
+        background:transparent;
+        border:0;
+        display:none;
+        float:right;
+        font-size:1em;
+        height:14px;
+        margin:36px $_space 0 0;
+        vertical-align:baseline;
+
+        @include large-xlarge-screen {
+            display:inline-block;
+        }
+    }
+}
+
+.topbar__settings {
+    .topbar__button {
+        &[aria-expanded="true"],
+        &:hover {
+            .color-scheme--dark & {
+                background:$_color_dark_alpha;
+            }
+
+            .color-scheme--light & {
+                background:$_color_light_alpha;
+            }
+        }
+    }
+
+    .ico-sliders:before {
+        @include vendor(transform, rotate(90deg));
+    }
+}
+
+.topbar__settings__category {
+    @extend %typo-title;
+    display:block;
+    margin-bottom:$_space;
+
+    .color-scheme--dark & {
+        color:$_color_dark_gamma;
+    }
+
+    .color-scheme--light & {
+        color:$_color_light_gamma;
+    }
+}
+
+.topbar__settings__item,
+.topbar__settings__subitem {display:block;}
+
+.topbar__settings__subitem {
+    @extend %typo-menu;
+    margin-bottom:$_space;
+
+    a {display:block;}
+}*/

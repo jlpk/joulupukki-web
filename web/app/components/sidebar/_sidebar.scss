@@ -1,0 +1,155 @@
+//----------------------------------*\
+// SIDEBAR
+//----------------------------------*/
+
+
+span.hash::before  {
+    font-size: 18px;
+    font-weight: bold;
+    padding: 0 0.2em 0 0.2em;
+    vertical-align: middle;
+    content: "#";
+}
+
+a.succeeded,
+.succeeded {
+    color: #3FA75F;
+}
+
+a.created,
+.created,
+a.dispatching,
+.dispatching {
+    color: #D2C93B;
+}
+
+/////////////////
+
+
+#sidebar {
+    padding-left: 0px;
+    border-right: 2px solid #f2f2f2;
+}
+
+.sidebar ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-bottom: .46rem solid #FAF9F7;
+    background-color: #FAF9F7;
+//  display: block;
+  list-style-type: disc;
+color: #A6ADAD;
+list-style: none;
+}
+
+
+
+.sidebar .project {
+    font-size: 16px;
+    color: #A6ADAD;
+}
+
+
+
+// tile
+
+.sidebar div.tile-succeeded {
+    border-color: #3FA75F;
+}
+
+
+.sidebar div.tile-created,
+.sidebar div.tile-dispatching {
+    border-color: #D2C93B;
+}
+
+
+.sidebar .tile--sidebar {
+//    display: block;
+    overflow: hidden;
+//    position: relative;
+    height: auto;
+    padding-top: 0.4em;
+    padding-bottom: 0.4em;
+//    padding: .6em .5em;
+    margin-bottom: .46rem;
+    background-color: #fff;
+    border-radius: 0;
+    border-left: 8px solid;
+}
+
+
+.sidebar .tile h2 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 400;
+    margin-bottom: 1.3em;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/*
+.sidebar p.tile-title {
+    width: 17%;
+}
+*/
+
+.sidebar .tile p {
+    line-height: 18px;
+    font-size: 14px;
+    margin: 0 0 0.4em 0;
+}
+
+
+
+.sidebar .tile i.fa {
+    font-size: 16px;
+    margin-right: .3em;
+}
+
+
+
+
+// search
+
+.search--sidebar {
+    position: relative;
+    height: 7.6em;
+}
+
+.search--sidebar .search-inner {
+position: absolute;
+top: 0;
+right: 0;
+left: 0;
+bottom: 0;
+margin: auto;
+    width: 90%;
+    height: 33px;
+}
+
+.search--sidebar .search-inner input {
+display: inline-block;
+width: 70%;
+padding: .5em;
+margin-left: 1em;
+color: #a6adad;
+font-size: 14px;
+border: 1px solid #f2f2f2;
+border-radius: 4px;
+background-repeat: no-repeat;
+background-position: 98% 6px;
+background-size: 17px 17px;
+}
+
+.search--sidebar .search-inner i{
+margin-left: 0.5em;
+display: inline-block;
+width: 10%;
+color: #a6adad;
+font-size: 20px;
+text-align: center;
+}
+
+
