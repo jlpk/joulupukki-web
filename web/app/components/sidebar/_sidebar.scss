@@ -9,11 +9,17 @@ span.hash::before  {
     padding: 0 0.2em 0 0.2em;
     vertical-align: middle;
     content: "#";
+    color: #A6ADAD;
 }
 
 a.succeeded,
 .succeeded {
     color: #3FA75F;
+}
+
+a.failed,
+.failed {
+    color: #DB423C;
 }
 
 a.created,
@@ -58,6 +64,9 @@ list-style: none;
     border-color: #3FA75F;
 }
 
+.sidebar div.tile-failed {
+    border-color: #DB423C;
+}
 
 .sidebar div.tile-created,
 .sidebar div.tile-dispatching {

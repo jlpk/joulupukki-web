@@ -1,33 +1,155 @@
 
-/* build */
-
-
-section.build-tile {
-    
-}
-
-section.tile-build .tile-status {
-position: absolute;
-top: 0;
-bottom: 0;
-left: 0;
-width: 2.5em;
-height: 100%;
-border-top-left-radius: 4px;
-border-bottom-left-radius: 4px;
+div.data-main{
+    padding: 20px 0px 80px;
 }
 
 
-section.tile {
+div.data-main div.spacer {
+    max-width: 50px;
+}
+
+div.data-main header {
+    margin: 1rem 0 2.4rem;
+}
+
+div.data-main header h1 {
+  color: gray;
+}
+
+
+
+/* build/job tile */
+section.tile-job,
+section.tile-build {
     border-radius: 4px;
     overflow: hidden;
     position: relative;
     padding: .8rem .8rem .8rem 3rem;
-    background-color: #FAFAF8;
-      height: 145px;
-}
-  
-section.tile-build .tile-status-succeeded {
-    background-color: #3FA75F;
 }
 
+section.tile-job div.tile,
+section.tile-build div.tile {
+    background-color: #FAFAF8;
+    height: 165px;
+
+}
+
+
+section.tile-job div.tile .tile-status,
+section.tile-build div.tile .tile-status {
+#position: absolute;
+#top: 0;
+#bottom: 0;
+#left: 0;
+width: 2.5em;
+height: 100%;
+border-top-left-radius: 4px;
+border-bottom-left-radius: 4px;
+    text-align: center;
+padding: 10px 0px;
+}
+
+
+section.tile-job div.tile .tile-status-failed,
+section.tile-build div.tile .tile-status-failed {
+    background-color: #DB423C !important;
+}
+
+section.tile-job div.tile .tile-status-succeeded,
+section.tile-build div.tile .tile-status-succeeded {
+    background-color: #3FA75F !important;
+}
+
+section.tile-job div.tile .tile-status,
+section.tile-build div.tile .tile-status {
+    background-color: #D2C93B;
+}
+
+
+section.tile-job div.tile .tile-status i,
+section.tile-build div.tile .tile-status i {
+    color: #ffffff;
+    font-size: 16px;
+    text-align: center;
+}
+
+
+
+section.tile-job div.tile .tile-info,
+section.tile-build div.tile .tile-info {
+    color: #A6ADAD;
+    line-height: 30px;
+    font-size: 16px;
+    vertical-align: middle;
+    padding: 15px 0px;
+}
+
+
+
+section.tile-job div.tile .tile-info,
+section.tile-build div.tile .tile-info {
+    color: #A6ADAD;
+    line-height: 30px;
+    font-size: 16px;
+    vertical-align: middle;
+    padding-top: 10px;
+}
+
+section.tile-job div.tile .tile-info ul,
+section.tile-build div.tile .tile-info ul {
+    list-style-type: none;
+}
+
+section.tile-job div.tile .tile-info i,
+section.tile-build div.tile .tile-info i {
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+
+
+
+/* Build Jobs list */
+
+section.jobs {
+   color: #969496; 
+}
+
+section.jobs h2 {
+    margin-top: 2.5rem;
+    color: #A6ADAD;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+section.jobs ul {
+    list-style-type: none;
+    padding-left: 0px;
+}
+
+
+section.jobs ul li {
+    background-color: #FAFAF8;
+    padding: .5em .4em .5em 3.5rem;
+    margin-bottom: .35rem;
+    line-height: 20px;
+   height: 36px;
+}
+
+section.jobs ul li a div {
+    padding: 0;
+    color: #969496;
+}
+
+section.jobs ul li.failed:hover {
+    background-color: #fbebe6;
+}
+
+
+section.jobs ul li.succeeded:hover {
+    background-color: #e5efe4;
+}
+
+section.jobs ul li:hover {
+    background-color: #f4efd8;
+}
