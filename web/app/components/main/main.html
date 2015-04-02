@@ -89,11 +89,61 @@
     </section>
 
 
-    <section ng-if="selected_tab == 'history'">
-        <div>
-          <li ng-repeat="build in selected_project.builds" class="build {{ build.status }}">
-                <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}">{{ build.id_ }}</a>
-          </li>
+    <section class="history" ng-if="selected_tab == 'history'">
+      <ul>
+      <li ng-repeat="build in selected_project.builds" class="build {{ build.status }}">
+        <div class="tile">
+          <div class="tile-status tile-status-{{ build.status }}">
+            <i ng-if="build.status == 'succeeded'" class="fa fa-check-circle {{ build.status }}"></i>
+            <i ng-if="build.status == 'failed'" class="fa fa-exclamation-circle {{ build.status }}"></i>
+            <i ng-if="build.status != 'failed' && build.status != 'succeeded'" class="fa fa-ellipsis-h {{ build.status }}"></i>
+          </div>
+          <div class="row tile-info">
+            <div class="col-xs-10 col-sm-7 tile-subinfo">
+              <p>
+                <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}">
+                Source package name: {{ build.package_name }}
+                </a>
+              </p>
+              <p>
+                Version: {{ build.package_version }}-{{ build.package_release }}
+              </p>
+            </div>
+            <div class="col-xs-10 col-sm-4 row">
+              <div class="col-xs-6">
+                <p>
+                  <span class="hash"></span>
+                  <a class="{{ build.status }}" href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}">
+                    {{ build.id_ }}
+                  </a>
+                </p>
+                <p>
+                </p>
+              </div>
+              <div class="col-xs-6">
+                <p>
+                  <i class="fa fa-clock-o"></i>
+                  <abbr class="duration" title="{{ build.created }}">
+                     {{ build.created | timeElapsed: build.finished }}
+                  </abbr>
+                </p>
+                <p>
+                  <i class="fa fa-calendar"></i>
+                  <abbr class="finished_at timeago">
+                    <span ng-if="build.finished">
+                      {{ build.finished | timeElapsed }}
+                    </span>
+                    <span ng-if="! build.finished">
+                      -
+                    </span>
+                  </abbr>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+      </ul>
     </section>
   </section>
 
@@ -143,7 +193,9 @@
             <ul>
               <li>
                 <span class="hash"></span>
-                <a class="{{ job.status }}" href="#/home/{{ job.username }}/{{ job.project_name }}/builds/{{ build.id_ }}/jobs/{{ job.id_ }}">{{ build.id_ }}.{{ job.id_ }}  {{ job.status }}</a>
+                <a class="{{ job.status }}" href="#/home/{{ job.username }}/{{ job.project_name }}/builds/{{ build.id_ }}/jobs/{{ job.id_ }}">
+                  {{ build.id_ }}.{{ job.id_ }} {{ job.status }}
+                </a>
               </li>
               <li >
                 <i class="fa fa-linux"></i>

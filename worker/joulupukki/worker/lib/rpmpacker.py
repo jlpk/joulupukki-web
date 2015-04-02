@@ -87,7 +87,11 @@ class RpmPacker(Packer):
 
         # BUILD
         self.logger.info("Docker Image Building")
-        output = self.cli.build(fileobj=f, rm=True, tag=self.container_tag, forcerm=True)
+        try:
+            output = self.cli.build(fileobj=f, rm=True, tag=self.container_tag, forcerm=True)
+        except Exception as exp:
+            self.logger.error("Error launching docker container: %s", exp)
+            return False
         # log output
         for i in output:
             dict_ = eval(i)

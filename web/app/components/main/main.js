@@ -14,7 +14,11 @@ angular.module('joulupukki.main', ['joulupukki.live'
             var $build_id = $routeParams.build;
             var $job_id = $routeParams.job;
             var $controller_name = $route.current.controllerAs;
+            if (! $controller_name){
+                $controller_name = 'project';
+            }
             $scope.selected_tab = $controller_name;
+            
 
             $scope.$on('update_main', function() {
                 if ( $username && $project_name ){

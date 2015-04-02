@@ -38,14 +38,14 @@ class UserController(rest.RestController):
         pecan.request.context['username'] = username
         self.username = username
 
-    # curl -X GET http://127.0.0.1:8080/v3/joulupukki
+    # curl -X GET http://127.0.0.1:8080/v3/users/joulupukki
     @wsme_pecan.wsexpose(User)
     def get(self):
         """Returns user"""
         user = User.fetch(self.username, with_password=False)
         return user
 
-    # curl -X POST -H "Content-Type: application/json" -i  -d '{"username": "titilambert", "email": "titilambert@localhost.local", "password": "titilambert", "name": "Thibault Cohen"}' http://127.0.0.1:8081/v3/titilambert
+    # curl -X POST -H "Content-Type: application/json" -i  -d '{"username": "titilambert", "email": "titilambert@localhost.local", "password": "titilambert", "name": "Thibault Cohen"}' http://127.0.0.1:8081/v3/users/titilambert
     @wsme_pecan.wsexpose(wtypes.text, body=APIUser, status_code=201)
     def post(self, sent_user):
         """Create/Edit user"""

@@ -2,7 +2,8 @@
 
 angular.module("joulupukki.main", [ "joulupukki.live" ]).controller("MainCtrl", [ "$scope", "$rootScope", "$route", "$routeParams", "$interval", "getProject", "getBuild", "getJob", "getJobLog", "getBuildOutput", function($scope, $rootScope, $route, $routeParams, $interval, getProject, getBuild, getJob, getJobLog, getBuildOutput) {
     var $username = $routeParams.user, $project_name = $routeParams.project, $build_id = $routeParams.build, $job_id = $routeParams.job, $controller_name = $route.current.controllerAs;
-    $scope.selected_tab = $controller_name, $scope.$on("update_main", function() {
+    $controller_name || ($controller_name = "project"), $scope.selected_tab = $controller_name, 
+    $scope.$on("update_main", function() {
         $username && $project_name && ("history" == $controller_name ? getProject($username, $project_name, !1).success(function(data) {
             $scope.selected_project = data;
         }) : getProject($username, $project_name).success(function(data) {
