@@ -44,60 +44,8 @@ angular.module('joulupukki.view.home', ['ngRoute',
         })
     }])
 
-    .controller('HomeCtrl', ['$scope', '$routeParams', 'dashboardConfig', 'getLatestProjects',
-        function ($scope, $routeParams, dashboardConfig, getLatestProjects) {
-
-            //console.log($routeParams.user);
-
-            /*$scope.$on('set_project', function(event, args) {
-                console.log("DDDDDDDDDDDDD");
-                console.log(event);
-                console.log(args);
-            });
-
-/*
-            var fields = ['state'],
-                filters = {'isnot' : { 'state' : ['0'] }},
-                apiName = 'hosts',
-                components = [],
-                component,
-                config,
-                viewName,
-                i = 0;
-
-            tableConfig.index = 0;
-
-            if (!!$routeParams.view) {
-                viewName = $routeParams.view;
-            } else {
-                throw new Error("ERROR : 'view' GET parameter must be the custom view name");
-            }
-
-            $scope.dashboardTitle = dashboardConfig[viewName].title;
-            $scope.dashboardTemplate = dashboardConfig[viewName].template;
-            $scope.dashboardRefreshInterval = dashboardConfig[viewName].refreshInterval;
-
-            $scope.dashboardTactical = [];
-            $scope.dashboardTables = [];
-
-            components = dashboardConfig[viewName].components;
-
-            for (i = 0; i < components.length; i += 1) {
-                component = components[i];
-                config = component.config;
-
-                if (component.type === 'table') {
-                    $scope.dashboardTables.push(new TableConfigObj(config));
-                } else if (component.type === 'tactical') {
-                    $scope.dashboardTactical.push(new TacticalConfigObj(config));
-                }
-            }
-
-            getLatestProjects()
-                .success(function (data) {
-                    $scope.projects = data;
-                });
-*/
+    .controller('HomeCtrl', ['$scope', '$rootScope', '$routeParams', 'dashboardConfig', 'getLatestProjects',
+        function ($scope, $rootScope, $routeParams, dashboardConfig, getLatestProjects) {
         }])
     .run(['readConfig', 'dashboardConfig', function (readConfig, dashboardConfig) {
         var viewsConfig = readConfig.data;

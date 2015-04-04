@@ -28,7 +28,7 @@ angular.module("joulupukki.view.home", [ "ngRoute", "joulupukki.main", "joulupuk
         controller: "HomeCtrl",
         controllerAs: "job"
     });
-} ]).controller("HomeCtrl", [ "$scope", "$routeParams", "dashboardConfig", "getLatestProjects", function() {} ]).run([ "readConfig", "dashboardConfig", function(readConfig, dashboardConfig) {
+} ]).controller("HomeCtrl", [ "$scope", "$rootScope", "$routeParams", "dashboardConfig", "getLatestProjects", function() {} ]).run([ "readConfig", "dashboardConfig", function(readConfig, dashboardConfig) {
     var viewsConfig = readConfig.data;
     angular.forEach(viewsConfig, function(config, view) {
         "dashboard" === config.template && (dashboardConfig[view] = config);

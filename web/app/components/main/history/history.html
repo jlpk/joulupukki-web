@@ -1,0 +1,71 @@
+<section ng-controller="MainHistoryCtrl" class="history" ng-if="selected_tab == 'history'">
+  <ul>
+    <li ng-repeat="build in selected_project.builds" class="build {{ build.status }}">
+      <div class="tile">
+        <div class="tile-status tile-status-{{ build.status }}">
+          <p class="status">
+            <i ng-if="build.status == 'succeeded'" class="fa fa-check-circle {{ build.status }}"></i>
+            <i ng-if="build.status == 'failed'" class="fa fa-exclamation-circle {{ build.status }}"></i>
+            <i ng-if="build.status != 'failed' && build.status != 'succeeded'" class="fa fa-ellipsis-h {{ build.status }}"></i>
+          </p>
+          <p ng-if="build.commit">
+            <i class="fa fa-code-fork"></i>
+          </p>
+        </div>
+        <div class="row tile-main">
+          <div class="col-xs-10 col-sm-7 tile-subinfo">
+            <h2>
+              <span class="branch">{{ build.branch }}</span>
+              <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}">
+                {{ build.message }}
+              </a>
+            </h2>
+            <p>
+              <i class="fa fa-gift"></i>
+              <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}">
+                {{ build.package_name }}
+                {{ build.package_version }}-{{ build.package_release }}
+              </a>
+            </p>
+          </div>
+          <div class="col-xs-10 col-sm-4 row tile-info">
+            <div class="col-xs-6">
+              <p>
+                <span class="hash"></span>
+                <a class="{{ build.status }}" href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}">
+                  {{ build.id_ }} {{ build.status }}
+                </a>
+              </p>
+              <p ng-if="build.commit">
+                <i class="fa fa-code-fork"></i>
+                <abbr>
+                  {{ build.commit | limitTo: 7 }}
+                </abbr>
+              </p>
+            </div>
+            <div class="col-xs-6">
+              <p>
+                <i class="fa fa-clock-o"></i>
+                <abbr class="duration" title="{{ build.created }}">
+                   {{ build.created | timeElapsed: build.finished }}
+                </abbr>
+              </p>
+              <p>
+                <i class="fa fa-calendar"></i>
+                <abbr class="finished_at timeago">
+                  <span ng-if="build.finished">
+                    {{ build.finished | timeElapsed }}
+                  </span>
+                  <span ng-if="! build.finished">
+                    -
+                  </span>
+                </abbr>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+  </ul>
+</section>
+

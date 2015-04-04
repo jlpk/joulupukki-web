@@ -6,7 +6,7 @@ angular.element(document).ready(function() {
             readConfigProvider.loadJSON(data);
         } ]), angular.bootstrap(document, [ "adagios" ]);
     }, "json");
-}), angular.module("adagios", [ "ngRoute", "joulupukki.sidebar", "joulupukki.topbar", "adagios.config", "joulupukki.view.home", "adagios.view.singleTable" ]).config([ "$routeProvider", function($routeProvider) {
+}), angular.module("adagios", [ "ngRoute", "joulupukki.sidebar", "joulupukki.topbar", "adagios.config", "joulupukki.view.home" ]).config([ "$routeProvider", function($routeProvider) {
     $routeProvider.otherwise({
         redirectTo: "/"
     });

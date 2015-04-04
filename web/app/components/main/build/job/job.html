@@ -1,0 +1,71 @@
+<section ng-controller="MainBuildJobCtrl" id="log-container" ng-if="selected_tab == 'job'" class="tile-job container-fluid">
+  <div class="row tile">
+    <div class="col-xs-1 col-sm-1 col-md-1 tile-status tile-status-{{ job.status }}">
+      <p class="status">
+        <i ng-if="job.status == 'succeeded'" class="fa fa-check-circle {{ job.status }}"></i>
+        <i ng-if="job.status == 'failed'" class="fa fa-exclamation-circle {{ job.status }}"></i>
+        <i ng-if="job.status != 'failed' && job.status != 'succeeded'" class="fa fa-ellipsis-h {{ job.status }}"></i>
+      </p>
+      <p ng-if="build.commit">
+        <i class="fa fa-code-fork"></i>
+      </p>
+    </div>
+    <div class="row col-xs-11 col-sm-11 col-md-11">
+      <div class="col-xs-12 col-sm-12 col-md-9 tile-main">
+        <h2>
+          <span class="branch">{{ build.branch }}</span>
+          {{ build.message }}
+        </h2>
+        <p>
+          <i class="fa fa-gift"></i>
+          {{ build.package_name }}
+        </p>
+        <p>
+          <i class="fa fa-tag"></i>
+          {{ build.package_version }}-{{ build.package_release }}
+        </p>
+        <p>
+          <i class="fa fa-user"></i>
+          {{ build.committer_name }}
+        </p>
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-3 tile-info">
+        <p>
+          <span class="hash"></span>
+          <a class="{{ job.status }}" href="#/home/{{ job.username }}/{{ job.project_name }}/builds/{{ build.id_ }}/jobs/{{ job.id_ }}">
+            {{ build.id_ }}.{{ job.id_ }} {{ job.status }}
+          </a>
+        </p>
+        <p ng-if="build.commit">
+          <i class="fa fa-code-fork"></i>
+          <abbr>
+            {{ build.commit | limitTo: 7 }}
+          </abbr>
+        </p>
+        <p>
+          <i class="fa fa-linux"></i>
+          {{ job.distro }}
+        </p>
+        <p>
+          <i class="fa fa-clock-o"></i>
+          <abbr class="duration" title="{{ build.created }}">
+            Run for {{ job.created | timeElapsed: job.finished }}
+          </abbr>
+        </p>
+        <p>
+          <i class="fa fa-calendar"></i>
+          <abbr class="finished_at timeago">
+            <span ng-if="job.finished">
+              {{ job.finished | timeElapsed }}
+            </span>
+            <span ng-if="! job.finished">
+              -
+            </span>
+          </abbr>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<jlpk-main-build-job-log></jlpk-main-build-job-log>

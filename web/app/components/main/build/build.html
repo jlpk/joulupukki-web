@@ -1,0 +1,83 @@
+
+<div ng-controller="MainBuildCtrl">
+
+<section class="tile-build container-fluid" ng-if="selected_tab == 'build' || selected_tab == 'project'">
+  <div class="row tile">
+    <div class="col-xs-1 col-sm-1 col-md-1 tile-status tile-status-{{ build.status }}">
+      <p class="status">
+        <i ng-if="build.status == 'succeeded'" class="fa fa-check-circle {{ build.status }}"></i>
+        <i ng-if="build.status == 'failed'" class="fa fa-exclamation-circle {{ build.status }}"></i>
+        <i ng-if="build.status != 'failed' && build.status != 'succeeded'" class="fa fa-ellipsis-h {{ build.status }}"></i>
+      </p>
+      <p ng-if="build.commit">
+        <i class="fa fa-code-fork"></i>
+      </p>
+    </div>
+    <div class="row col-xs-11 col-sm-11 col-md-11">
+      <div class="col-xs-12 col-sm-12 col-md-9 tile-main">
+        <h2>
+          <div class="restart" ng-click="restart();">
+            <i class="fa fa-repeat"></i>
+          </div>
+          <span class="branch">{{ build.branch }}</span>
+          {{ build.message }}
+        </h2>
+        <p>
+          <i class="fa fa-gift"></i>
+          {{ build.package_name }}
+        </p>
+        <p>
+          <i class="fa fa-tag"></i>
+          {{ build.package_version }}-{{ build.package_release }}
+        </p>
+        <p>
+          <i class="fa fa-user"></i>
+          {{ build.committer_name }}
+        </p>
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-3 tile-info">
+        <ul>
+          <li>
+            <span class="hash"></span>
+            <a class="{{ build.status }}" href="#/home/{{ build.username }}/{{ build.project_name }}/builds/{{ build.id_ }}">{{ build.id_ }} {{ build.status }}</a>
+          </li>
+          <li ng-if="build.forced_distro" >
+            <i class="fa fa-linux"></i>
+            {{ build.forced_distro }} (forced)
+          </li>
+          <li ng-if"build.commit" >
+            <i class="fa fa-code-fork"></i>
+            <abbr>
+            {{ build.commit | limitTo: 7 }}
+            </abbr>
+          </li>
+          <li>
+            <i class="fa fa-clock-o"></i>
+            <abbr class="duration" title="{{ build.created }}">
+              Run for {{ build.created | timeElapsed: build.finished }}
+            </abbr>
+          </li>
+          <li>
+            <i class="fa fa-calendar"></i>
+            <abbr class="finished_at timeago">
+              <span ng-if="build.finished">
+                {{ build.finished | timeElapsed }}
+              </span>
+              <span ng-if="! build.finished">
+                -
+              </span>
+            </abbr>
+          </li>
+        </ul>
+      </div>
+  </div>
+</section>
+
+
+<jlpk-main-build-jobs></jlpk-main-build-jobs>
+
+<jlpk-main-build-output></jlpk-main-build-output>
+
+<jlpk-main-build-job></jlpk-main-build-job>
+
+</div>

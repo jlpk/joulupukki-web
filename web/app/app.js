@@ -19,7 +19,6 @@ angular.module('adagios', [
     'joulupukki.topbar',
     'adagios.config',
     'joulupukki.view.home',
-    'adagios.view.singleTable'
 ])
 
     .config(['$routeProvider', function ($routeProvider) {

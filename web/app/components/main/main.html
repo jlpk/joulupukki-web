@@ -1,369 +1,50 @@
 <div class="data-main row" ng-controller="MainCtrl">
 
-<div class="spacer col-xs-0 col-md-1">
-</div>
-
-
-<div class="col-xs-12 col-md-11">
-
-  <header>
-    <h1>{{ selected_project.username }}/{{ selected_project.name }}</h1>
-  </header>
-
-  <section class="tabs">
-    <ul class="nav nav-tabs">
-      <li role="presentation" ng-class="{ 'active': selected_tab == 'project' }">
-        <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/">
-          Current
-        </a>
-      </li>
-      <li role="presentation" ng-class="{ 'active': selected_tab == 'history' }">
-        <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds">
-          Build History
-        </a>
-      </li>
-      <li id="tab_spacer" ng-if="build.id_">
-        <a>
-          <i class="fa fa-chevron-right"></i>
-        </a>
-      </li>
-      <li ng-if="build.id_" role="presentation" id="tab_build" ng-class="{ 'active': selected_tab == 'build' }">
-        <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}">Build #{{ build.id_ }}
-        </a>
-      </li>
-      <li ng-if="build.id_ && ! job.id_" role="presentation" ng-class="{ 'active': selected_tab == 'output' }">
-        <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/output">Output
-        </a>
-      </li>
-      <li ng-if="job.id_" role="presentation" ng-class="{ 'active': selected_tab == 'job' }">
-        <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/jobs/{{ job.id_ }}">Job #{{ build.id_ }}.{{ job.id_ }}
-        </a>
-      </li>
-    </ul>
- </section>
-
-
-
-
-
-    <section class="tile-build container-fluid" ng-if="selected_tab == 'build' || selected_tab == 'project'">
-      <div class="row tile">
-        <div class="col-xs-1 col-sm-1 col-md-1 tile-status tile-status-{{ build.status }}">
-          <p class="status">
-            <i ng-if="build.status == 'succeeded'" class="fa fa-check-circle {{ build.status }}"></i>
-            <i ng-if="build.status == 'failed'" class="fa fa-exclamation-circle {{ build.status }}"></i>
-            <i ng-if="build.status != 'failed' && build.status != 'succeeded'" class="fa fa-ellipsis-h {{ build.status }}"></i>
-          </p>
-          <p ng-if="build.commit">
-            <i class="fa fa-code-fork"></i>
-          </p>
-        </div>
-        <div class="row col-xs-11 col-sm-11 col-md-11">
-          <div class="col-xs-12 col-sm-12 col-md-9 tile-main">
-            <h2>
-              <div class="restart" ng-click="restart();">
-                <i class="fa fa-repeat"></i>
-              </div>
-              <span class="branch">{{ build.branch }}</span>
-              {{ build.message }}
-            </h2>
-            <p>
-              <i class="fa fa-gift"></i>
-              {{ build.package_name }}
-            </p>
-            <p>
-              <i class="fa fa-tag"></i>
-              {{ build.package_version }}-{{ build.package_release }}
-            </p>
-            <p>
-              <i class="fa fa-user"></i>
-              {{ build.committer_name }}
-            </p>
-          </div>
-          <div class="col-xs-12 col-sm-12 col-md-3 tile-info">
-            <ul>
-              <li>
-                <span class="hash"></span>
-                <a class="{{ build.status }}" href="#/home/{{ project.username }}/{{ project.name }}/builds/{{ build.id_ }}">{{ build.id_ }} {{ build.status }}</a>
-              </li>
-              <li ng-if="build.forced_distro" >
-                <i class="fa fa-linux"></i>
-                {{ build.forced_distro }} (forced)
-              </li>
-              <li ng-if"build.commit" >
-                <i class="fa fa-code-fork"></i>
-                <abbr>
-                {{ build.commit | limitTo: 7 }}
-                </abbr>
-              </li>
-              <li>
-                <i class="fa fa-clock-o"></i>
-                <abbr class="duration" title="{{ build.created }}">
-                  Run for {{ build.created | timeElapsed: build.finished }}
-                </abbr>
-              </li>
-              <li>
-                <i class="fa fa-calendar"></i>
-                <abbr class="finished_at timeago">
-                  <span ng-if="build.finished">
-                    {{ build.finished | timeElapsed }}
-                  </span>
-                  <span ng-if="! build.finished">
-                    -
-                  </span>
-                </abbr>
-              </li>
-            </ul>
-          </div>
-      </div>
-    </section>
-
-
-    <section class="history" ng-if="selected_tab == 'history'">
-      <ul>
-      <li ng-repeat="build in selected_project.builds" class="build {{ build.status }}">
-        <div class="tile">
-          <div class="tile-status tile-status-{{ build.status }}">
-            <p class="status">
-              <i ng-if="build.status == 'succeeded'" class="fa fa-check-circle {{ build.status }}"></i>
-              <i ng-if="build.status == 'failed'" class="fa fa-exclamation-circle {{ build.status }}"></i>
-              <i ng-if="build.status != 'failed' && build.status != 'succeeded'" class="fa fa-ellipsis-h {{ build.status }}"></i>
-            </p>
-            <p ng-if="build.commit">
-              <i class="fa fa-code-fork"></i>
-            </p>
-          </div>
-          <div class="row tile-main">
-            <div class="col-xs-10 col-sm-7 tile-subinfo">
-              <h2>
-                <span class="branch">{{ build.branch }}</span>
-                <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}">
-                  {{ build.message }}
-                </a>
-              </h2>
-              <p>
-                <i class="fa fa-gift"></i>
-                <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}">
-                  {{ build.package_name }}
-                  {{ build.package_version }}-{{ build.package_release }}
-                </a>
-              </p>
-            </div>
-            <div class="col-xs-10 col-sm-4 row tile-info">
-              <div class="col-xs-6">
-                <p>
-                  <span class="hash"></span>
-                  <a class="{{ build.status }}" href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}">
-                    {{ build.id_ }} {{ build.status }}
-                  </a>
-                </p>
-                <p ng-if="build.commit">
-                  <i class="fa fa-code-fork"></i>
-                  <abbr>
-                    {{ build.commit | limitTo: 7 }}
-                  </abbr>
-                </p>
-              </div>
-              <div class="col-xs-6">
-                <p>
-                  <i class="fa fa-clock-o"></i>
-                  <abbr class="duration" title="{{ build.created }}">
-                     {{ build.created | timeElapsed: build.finished }}
-                  </abbr>
-                </p>
-                <p>
-                  <i class="fa fa-calendar"></i>
-                  <abbr class="finished_at timeago">
-                    <span ng-if="build.finished">
-                      {{ build.finished | timeElapsed }}
-                    </span>
-                    <span ng-if="! build.finished">
-                      -
-                    </span>
-                  </abbr>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </li>
+  <div class="col-xs-12 col-md-11">
+  
+    <header>
+      <h1>{{ selected_project.username }}/{{ selected_project.name }}</h1>
+    </header>
+  
+    <section class="tabs">
+      <ul class="nav nav-tabs">
+        <li role="presentation" ng-class="{ 'active': selected_tab == 'project' }">
+          <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/">
+            Current
+          </a>
+        </li>
+        <li role="presentation" ng-class="{ 'active': selected_tab == 'history' }">
+          <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds">
+            Build History
+          </a>
+        </li>
+        <li id="tab_spacer" ng-if="['build', 'output', 'job'].indexOf(selected_tab) != -1">
+          <a>
+            <i class="fa fa-chevron-right"></i>
+          </a>
+        </li>
+        <li ng-if="['build', 'output', 'job'].indexOf(selected_tab) != -1" role="presentation" id="tab_build" ng-class="{ 'active': selected_tab == 'build' }">
+          <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}">
+            Build #{{ build.id_ }}
+          </a>
+        </li>
+        <li ng-if="['build', 'output'].indexOf(selected_tab) != -1" role="presentation" ng-class="{ 'active': selected_tab == 'output' }">
+          <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/output">
+            Output
+          </a>
+        </li>
+        <li ng-if="['job'].indexOf(selected_tab) != -1" role="presentation" ng-class="{ 'active': selected_tab == 'job' }">
+          <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/jobs/{{ job.id_ }}">
+            Job #{{ build.id_ }}.{{ job.id_ }}
+          </a>
+        </li>
       </ul>
     </section>
-  </section>
+  
+    <jlpk-main-build></jlpk-main-build>
+  
+    <jlpk-history></jlpk-history>
+  
+  </div>
 
-  <section id="output" ng-if="selected_tab == 'output'" class="output">
-    <h2>
-      Build Output &ndash; 
-      <span class="hash"></span>
-      <span class="status {{ build.status }}">
-        {{ build.id_}} {{ build.status }}
-      </span>
-    </h2>
-    <h3 ng-if="! output">No output</h3>
-    <div class="all_files">
-        Download all: 
-        <a href="/v3/users/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/download/archive?type=tgz">(tgz)</a>
-        <a href="/v3/users/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/download/archive?type=zip">(zip)</a>
-    </div>
-    <ul class="files" ng-if="output">
-      <li class="distro" ng-if="files" ng-repeat="(folder, files) in output" >
-        {{ folder }} &ndash;
-        <a href="/v3/users/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/download/archive?distro={{ folder }}&type=tgz">
-          (tgz)
-        </a>
-        - 
-        <a href="/v3/users/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/download/archive?distro={{ folder }}&type=zip">
-          (zip)
-        </a>
-        <ul>
-          <li class="file" ng-class="{ 'package': (file.endsWith('.rpm') && ! file.endsWith('.src.rpm') )|| file.endsWith('.deb') }" ng-repeat="file in files">
-            <a href="/v3/users/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/download/file?distro={{ folder }}&filename={{ file }}">{{ file }}</a>
-            <i ng-if="(file.endsWith('.rpm') && ! file.endsWith('.src.rpm') )|| file.endsWith('.deb')" class="fa fa-gift"></i>
-          </li>
-        </ul>
-      </li>
-    </ul>
-  </section>
-
-
-  <section id="log-container" ng-if="selected_tab == 'job'" class="tile-job container-fluid">
-    <div class="row tile">
-      <div class="col-xs-1 col-sm-1 col-md-1 tile-status tile-status-{{ job.status }}">
-        <p class="status">
-          <i ng-if="job.status == 'succeeded'" class="fa fa-check-circle {{ job.status }}"></i>
-          <i ng-if="job.status == 'failed'" class="fa fa-exclamation-circle {{ job.status }}"></i>
-          <i ng-if="job.status != 'failed' && job.status != 'succeeded'" class="fa fa-ellipsis-h {{ job.status }}"></i>
-        </p>
-        <p ng-if="build.commit">
-          <i class="fa fa-code-fork"></i>
-        </p>
-      </div>
-      <div class="row col-xs-11 col-sm-11 col-md-11">
-        <div class="col-xs-12 col-sm-12 col-md-9 tile-main">
-          <h2>
-            <span class="branch">{{ build.branch }}</span>
-            {{ build.message }}
-          </h2>
-          <p>
-            <i class="fa fa-gift"></i>
-            {{ build.package_name }}
-          </p>
-          <p>
-            <i class="fa fa-tag"></i>
-            {{ build.package_version }}-{{ build.package_release }}
-          </p>
-          <p>
-            <i class="fa fa-user"></i>
-            {{ build.committer_name }}
-          </p>
-        </div>
-        <div class="col-xs-12 col-sm-12 col-md-3 tile-info">
-          <p>
-            <span class="hash"></span>
-            <a class="{{ job.status }}" href="#/home/{{ job.username }}/{{ job.project_name }}/builds/{{ build.id_ }}/jobs/{{ job.id_ }}">
-              {{ build.id_ }}.{{ job.id_ }} {{ job.status }}
-            </a>
-          </p>
-          <p ng-if="build.commit">
-            <i class="fa fa-code-fork"></i>
-            <abbr>
-              {{ build.commit | limitTo: 7 }}
-            </abbr>
-          </p>
-          <p>
-            <i class="fa fa-linux"></i>
-            {{ job.distro }}
-          </p>
-          <p>
-            <i class="fa fa-clock-o"></i>
-            <abbr class="duration" title="{{ build.created }}">
-              Run for {{ job.created | timeElapsed: job.finished }}
-            </abbr>
-          </p>
-          <p>
-            <i class="fa fa-calendar"></i>
-            <abbr class="finished_at timeago">
-              <span ng-if="job.finished">
-                {{ job.finished | timeElapsed }}
-              </span>
-              <span ng-if="! job.finished">
-                -
-              </span>
-            </abbr>
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="log row">
-      <menu class="log-header">
-        <a class="btn btn-primary btn-xs" href="/v3/users//{{selected_project.username}}/{{ selected_project.name }}/builds/{{ job.build_id }}/jobs/{{ job.id_ }}/log"> 
-          <i class="fa fa-download"></i>
-          Download Log
-        </a>
-        <a class="btn btn-primary btn-xs" ng-click="gotoBot()" >
-          <i class="fa fa-angle-double-down"></i>
-          Scroll to end of log
-        </a>
-      </menu>
-      <div class="log-body">
-        <a ng-click="gotoBot()" id="to-bot" class="to-bot" >
-          <i class="fa fa-angle-double-down"></i>
-        </a>
-        <pre id="prelog" ng-bind-html="joblog"></pre>
-        <a ng-click="gotoTop()" id="to-top" class="to-top" >
-          <i class="fa fa-angle-double-up"></i>
-        </a>
-        <div id="logbottom"></div>
-      </div>        
-    </div>        
-  </section>
-
-
-
-
-  <section ng-if="selected_tab == 'build' || selected_tab == 'project'" class="jobs">
-    <h2>Build Jobs</h2>
-    <ul>
-      <li ng-repeat="job in build.jobs" class="job row {{ job.status }}">
-        <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/jobs/{{ job.id_}}" >
-        <div class= "col-md-4 row">
-          <div class="col-md-1">
-            <p class="status">
-              <i ng-if="job.status == 'succeeded'" class="fa fa-check {{ job.status }}"></i>
-              <i ng-if="job.status == 'failed'" class="fa fa-exclamation {{ job.status }}"></i>
-              <i ng-if="job.status != 'failed' && job.status != 'succeeded'" class="fa fa-ellipsis-h {{ job.status }}"></i>
-            </p>
-          </div>
-          <div class="col-md-10 job_id">
-            <span class="hash"></span>
-            <span class="{{ job.status }}" >
-              {{ build.id_ }}.{{ job.id_ }}
-            </span>
-          </div>
-        </div>
-
-        <div class="col-md-3 row">
-          <div class="col-md-1">
-             <i class="fa fa-linux"></i>
-          </div>
-          <div class="col-md-10">
-                {{ job.distro }}
-          </div>
-        </div>
-         
-        <div class="col-md-3 row">
-          <div class="col-md-1">
-            <i class="fa fa-clock-o"></i>
-          </div>
-          <div class="col-md-10">
-              {{ job.build_time | timeElapsed : 0}}
-          </div>
-        </div>
-      </a>
-      </li>
-    </ul>
-  </section>
-
-
-</div>
 </div>

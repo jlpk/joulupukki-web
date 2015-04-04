@@ -1,0 +1,42 @@
+<section ng-controller="MainBuildJobsCtrl" ng-if="selected_tab == 'build' || selected_tab == 'project'" class="jobs">
+  <h2>Build Jobs</h2>
+  <ul>
+    <li ng-repeat="job in build.jobs" class="job row {{ job.status }}">
+      <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/jobs/{{ job.id_}}" >
+      <div class= "col-md-4 row">
+        <div class="col-md-1">
+          <p class="status">
+            <i ng-if="job.status == 'succeeded'" class="fa fa-check {{ job.status }}"></i>
+            <i ng-if="job.status == 'failed'" class="fa fa-exclamation {{ job.status }}"></i>
+            <i ng-if="job.status != 'failed' && job.status != 'succeeded'" class="fa fa-ellipsis-h {{ job.status }}"></i>
+          </p>
+        </div>
+        <div class="col-md-10 job_id">
+          <span class="hash"></span>
+          <span class="{{ job.status }}" >
+            {{ build.id_ }}.{{ job.id_ }}
+          </span>
+        </div>
+      </div>
+
+      <div class="col-md-3 row">
+        <div class="col-md-1">
+           <i class="fa fa-linux"></i>
+        </div>
+        <div class="col-md-10">
+              {{ job.distro }}
+        </div>
+      </div>
+       
+      <div class="col-md-3 row">
+        <div class="col-md-1">
+          <i class="fa fa-clock-o"></i>
+        </div>
+        <div class="col-md-10">
+            {{ job.build_time | timeElapsed : 0}}
+        </div>
+      </div>
+    </a>
+    </li>
+  </ul>
+</section>

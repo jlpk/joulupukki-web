@@ -1,7 +1,11 @@
 'use strict';
 
-angular.module('joulupukki.main', ['joulupukki.live'
+angular.module('joulupukki.main', ['joulupukki.filters',
+                                   'joulupukki.live',
+                                   'joulupukki.main.build',
+                                   'joulupukki.history'
                                 ])
+
 
 
     .controller('MainCtrl', ['$scope', '$rootScope', '$route', '$routeParams', '$sce',
@@ -27,6 +31,7 @@ angular.module('joulupukki.main', ['joulupukki.live'
             };
             
 
+            // TODO split this in each controller
             $scope.$on('update_main', function() {
                 if ( $username && $project_name ){
                     // history
@@ -94,7 +99,6 @@ angular.module('joulupukki.main', ['joulupukki.live'
                                 } else {
                                     link.href = 'assets/images/jlpk_logo.png';
                                 }
-                                console.log("DDD");
                                 document.getElementsByTagName('head')[0].appendChild(link);
                             });
                       getJobLog($username, $project_name, $build_id, $job_id)
@@ -122,8 +126,8 @@ angular.module('joulupukki.main', ['joulupukki.live'
                                     var yoffset = window.pageYOffset;
                                     var $top_btn = angular.element(document.querySelector('#to-top'))
                                     var $bot_btn = angular.element(document.querySelector('#to-bot'))
-                                    if (yoffset > winheight - 475){
-                                        var new_height =  logheight - winheight - yoffset + 475;
+                                    if (yoffset > winheight - 500){
+                                        var new_height =  logheight - winheight - yoffset + 500;
                                         if (new_height < 15) {
                                             new_height = 15;
                                         }
@@ -167,6 +171,8 @@ angular.module('joulupukki.main', ['joulupukki.live'
             else{
                 $scope.$emit('update_main')
             }
+
+
         }])
 
     .directive('jlpkMain', ['$http', '$compile', function ($http, $compile) {
