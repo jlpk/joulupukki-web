@@ -31,6 +31,9 @@ class Build(APIBuild):
     package_version = wsme.wsattr(wtypes.text, mandatory=False, default=None)
     package_release = wsme.wsattr(wtypes.text, mandatory=False, default=None)
     status = wsme.wsattr(wtypes.text, mandatory=False, default=None)
+    committer_name = wsme.wsattr(wtypes.text, mandatory=False, default=None)
+    committer_email = wsme.wsattr(wtypes.text, mandatory=False, default=None)
+    message = wsme.wsattr(wtypes.text, mandatory=False, default=None)
     # Link
     username = wsme.wsattr(wtypes.text, mandatory=False)
     project_name = wsme.wsattr(wtypes.text, mandatory=False)

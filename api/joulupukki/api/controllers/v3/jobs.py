@@ -95,9 +95,12 @@ class LogController(rest.RestController):
         build = Build.fetch(project, build_id, False)
         job_id = pecan.request.context['job_id'] 
         job = Job.fetch(build, job_id)
-        return job.get_log()
-
-
+        log = job.get_log().strip().decode('unicode-escape')
+        html = pecan.request.GET.get('html', False)
+        print html
+        if html:
+            log = "<p><a></a><span>" + log.replace("\n", "</span></p><p><a></a>") + "</p>"
+        return log
 
 
 

@@ -12,6 +12,11 @@ span.hash::before  {
     color: #A6ADAD;
 }
 
+span.hash {
+    width: 25px;
+    text-align: center;
+}
+
 a.succeeded,
 .succeeded {
     color: #3FA75F;
@@ -22,11 +27,18 @@ a.failed,
     color: #DB423C;
 }
 
+a.clonning,
+.clonning,
 a.created,
 .created,
+a.packaging,
+.packaging,
+a.cleaning,
+.cleaning,
 a.dispatching,
 .dispatching {
-    color: #D2C93B;
+//    color: #D2C93B;
+    color: #CDBC2C;
 }
 
 /////////////////
@@ -44,9 +56,9 @@ a.dispatching,
     border-bottom: .46rem solid #FAF9F7;
     background-color: #FAF9F7;
 //  display: block;
-  list-style-type: disc;
-color: #A6ADAD;
-list-style: none;
+    list-style-type: disc;
+    color: #A6ADAD;
+    list-style: none;
 }
 
 
@@ -69,6 +81,8 @@ list-style: none;
 }
 
 .sidebar div.tile-created,
+.sidebar div.tile-clonning,
+.sidebar div.tile-cleaning,
 .sidebar div.tile-dispatching {
     border-color: #D2C93B;
 }
@@ -98,19 +112,11 @@ list-style: none;
     overflow: hidden;
 }
 
-/*
-.sidebar p.tile-title {
-    width: 17%;
-}
-*/
-
 .sidebar .tile p {
     line-height: 18px;
     font-size: 14px;
     margin: 0 0 0.4em 0;
 }
-
-
 
 .sidebar .tile i.fa {
     font-size: 16px;
@@ -128,37 +134,36 @@ list-style: none;
 }
 
 .search--sidebar .search-inner {
-position: absolute;
-top: 0;
-right: 0;
-left: 0;
-bottom: 0;
-margin: auto;
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    margin: auto;
     width: 90%;
     height: 33px;
 }
 
 .search--sidebar .search-inner input {
-display: inline-block;
-width: 70%;
-padding: .5em;
-margin-left: 1em;
-color: #a6adad;
-font-size: 14px;
-border: 1px solid #f2f2f2;
-border-radius: 4px;
-background-repeat: no-repeat;
-background-position: 98% 6px;
-background-size: 17px 17px;
+    display: inline-block;
+    width: 80%;
+    padding: .5em;
+    margin-left: 1em;
+    color: #a6adad;
+    font-size: 14px;
+    border: 1px solid #f2f2f2;
+    border-radius: 4px;
+    background-repeat: no-repeat;
+    background-position: 98% 6px;
+    background-size: 17px 17px;
 }
 
-.search--sidebar .search-inner i{
-margin-left: 0.5em;
-display: inline-block;
-width: 10%;
-color: #a6adad;
-font-size: 20px;
-text-align: center;
+.search--sidebar .search-inner i {
+    margin-left: 0.5em;
+    display: inline-block;
+    width: 5%;
+    color: #a6adad;
+    font-size: 20px;
+    text-align: center;
 }
-
 

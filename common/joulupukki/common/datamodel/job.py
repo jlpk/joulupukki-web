@@ -25,7 +25,8 @@ class Job(APIJob):
     created = wsme.wsattr(float, mandatory=False)
     distro = wsme.wsattr(wtypes.text, mandatory=False)
     status = wsme.wsattr(wtypes.text, mandatory=False)
-    build_time = wsme.wsattr(float, mandatory=False)
+#    build_time = wsme.wsattr(float, mandatory=False)
+    finished = wsme.wsattr(float, mandatory=False, default=None)
     # TODO guess which user is...
     # Links
     username = wsme.wsattr(wtypes.text, mandatory=False)
@@ -136,6 +137,11 @@ class Job(APIJob):
 
     def set_build_time(self, build_time):
         self.build_time = build_time
+        self._save()
+
+
+    def set_end_time(self, end_time):
+        self.finished = end_time
         self._save()
 
 

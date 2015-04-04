@@ -35,14 +35,15 @@ from joulupukki.common.distros import supported_distros, reverse_supported_distr
 
 class ProjectsController(rest.RestController):
 
-    @wsme_pecan.wsexpose([Project], unicode, unicode, int, int, bool)
-    def get(self, name=None, username=None, limit=30, offset=0, get_last_build=False):
+    @wsme_pecan.wsexpose([Project], unicode, unicode, int, int, bool, unicode)
+    def get(self, name=None, username=None, limit=30, offset=0, get_last_build=False, pattern=''):
         """Returns project"""
         projects = Project.search(name=name,
                                   username=username,
                                   limit=limit,
                                   offset=offset,
-                                  get_last_build=get_last_build)
+                                  get_last_build=get_last_build,
+                                  pattern=pattern)
         return projects
 
 

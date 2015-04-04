@@ -18,4 +18,13 @@ angular.module("joulupukki.live").service("getBuild", [ "$http", function($http)
             throw new Error("getBuildOutput : GET Request failed");
         });
     };
+} ]).service("postBuild", [ "$http", function($http) {
+    return function($build) {
+        var $data = {}, $username = $build.username, $project_name = $build.project_name;
+        return $data.source_url = $build.source_url, $data.source_type = $build.source_type, 
+        $build.branch && ($data.branch = $build.branch), $build.commit && ($data.commit = $build.commit), 
+        $build.forced_distro && ($data.forced_distro = $build.forced_distro), $http.post("/v3/users/" + $username + "/" + $project_name + "/build", $data).error(function() {
+            throw new Error("getBuild: GET Request failed");
+        });
+    };
 } ]);

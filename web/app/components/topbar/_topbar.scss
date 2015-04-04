@@ -6,6 +6,12 @@
     margin-bottom: 0px;
 }
 
+#topbar .navbar-brand img {
+    position: relative;
+    width: 32px;
+    top: -5px;
+}
+
 /*
 .topbar-wrapper {
     @extend %colorBkgTopbar;

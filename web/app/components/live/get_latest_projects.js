@@ -3,6 +3,7 @@
 angular.module('joulupukki.live')
 
  
+/*
     .service('getLatestProjects', ['$http',
         function ($http) {
             return function () {
@@ -12,3 +13,4 @@ angular.module('joulupukki.live')
                     });
             };
         }]);
+*/

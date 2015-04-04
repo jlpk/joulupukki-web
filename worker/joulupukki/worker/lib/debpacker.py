@@ -203,6 +203,5 @@ class DebPacker(Packer):
         for file_ in glob.glob(os.path.join(self.job_tmp_folder, "output/*")):
             shutil.move(file_, self.folder_output)
 
-        
         self.logger.info("DEBS files deposed in output folder")
         return True

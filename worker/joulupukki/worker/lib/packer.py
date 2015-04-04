@@ -7,6 +7,7 @@ import re
 import logging
 import shutil
 import glob
+import time
 from urlparse import urlparse
 from datetime import datetime
 
@@ -136,6 +137,8 @@ class Packer(object):
         return True
 
     def clean_up(self):
+        # Set end time
+        self.job.set_end_time(time.time())
         # Delete container
         self.logger.debug('Deleting docker container: %s', self.container['Id'])
         self.cli.remove_container(self.container['Id'])

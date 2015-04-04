@@ -107,6 +107,12 @@ class Builder(Thread):
         repo.head.reset(index=True, working_tree=True)
         if self.build.commit is None:
             self.build.commit = repo.commit().hexsha
+        if self.build.commit:
+            self.build.committer_email = repo.commit().committer.email
+            self.build.committer_name = repo.commit().committer.name
+            self.build.message = repo.commit().message
+            if not self.build.branch:
+                self.build.branch = repo.head.ref.name
         self.logger.info("Cloned")
         return True
 

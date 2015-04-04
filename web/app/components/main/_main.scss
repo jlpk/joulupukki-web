@@ -69,15 +69,75 @@ section.tile-build div.tile .tile-status {
 }
 
 
-section.history div.tile .tile-status i,
-section.tile-job div.tile .tile-status i,
-section.tile-build div.tile .tile-status i {
+section.history div.tile .tile-status p.status i,
+section.tile-job div.tile .tile-status p.status i,
+section.tile-build div.tile .tile-status p.status i {
     color: #ffffff;
     font-size: 16px;
     text-align: center;
 }
 
+section.history div.tile .tile-status i.fa-code-fork,
+section.tile-job div.tile .tile-status i.fa-code-fork,
+section.tile-build div.tile .tile-status i.fa-code-fork {
+    font-size: 20px;
+    color: #ffffff;
+}
 
+
+section.history div.tile .tile-main,
+section.tile-job div.tile .tile-main,
+section.tile-build div.tile .tile-main {
+    font-size: 16px;
+    color: gray;
+}
+
+section.history div.tile .tile-main h2,
+section.tile-job div.tile .tile-main h2,
+section.tile-build div.tile .tile-main h2 {
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+section.tile-job div.tile .tile-main h2,
+section.tile-build div.tile .tile-main h2 {
+    margin-bottom: 25px;
+}
+
+section.history div.tile .tile-main h2 span.branch,
+section.tile-job div.tile .tile-main h2 span.branch,
+section.tile-build div.tile .tile-main h2 span.branch{
+    font-weight: 600;
+    margin-right: 15px;
+}
+
+section.history div.tile .tile-main i,
+section.tile-job div.tile .tile-main i,
+section.tile-build div.tile .tile-main i {
+    padding-right: 10px;
+    font-size: 20px;
+}
+
+section.history div.tile .tile-main div.restart i,
+section.tile-job div.tile .tile-main div.restart i,
+section.tile-build div.tile .tile-main div.restart i {
+    background-color: #A6ADAD;
+    font-size: 20px;
+    text-align: center;
+    width: 36px;
+    height: 36px;
+    padding: 8px;
+    border-radius: 100%;
+    color: #ffffff;
+    float: right;
+}
+
+section.history div.tile .tile-main div.restart i:hover,
+section.tile-job div.tile .tile-main div.restart i:hover,
+section.tile-build div.tile .tile-main div.restart i:hover{
+    background-color: #8B9595;
+    cursor: pointer;
+}
 
 section.tile-job div.tile .tile-info,
 section.tile-build div.tile .tile-info {
@@ -88,8 +148,6 @@ section.tile-build div.tile .tile-info {
     padding: 15px 0px;
 }
 
-
-
 section.tile-job div.tile .tile-info,
 section.tile-build div.tile .tile-info {
     color: #A6ADAD;
@@ -99,19 +157,111 @@ section.tile-build div.tile .tile-info {
     padding-top: 10px;
 }
 
-section.tile-job div.tile .tile-info ul,
-section.tile-build div.tile .tile-info ul {
-    list-style-type: none;
+section.tile-job div.tile .tile-info p,
+section.tile-build div.tile .tile-info p {
+    line-height: 16px;
 }
 
 section.tile-job div.tile .tile-info i,
 section.tile-build div.tile .tile-info i {
     font-size: 20px;
     margin-right: 10px;
+    width: 25px;
+    text-align: center;
 }
 
 
+/* Log */
 
+section.tile-job div.log {
+    margin-top: 35px;
+}
+
+section.tile-job div.log menu.log-header {
+    height: 44px;
+    margin: 0;
+    padding: .7em .8em .6em;
+    text-align: right;
+    background-color: #444;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    width: 99%;
+    margin-bottom: 0;
+}
+
+section.tile-job div.log pre {
+    clear: left;
+    min-height: 42px;
+    padding: 15px 0;
+    width: 99%;
+    color: #F1F1F1;
+    font-family: monospace;
+    font-size: 12px;
+    line-height: 19px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    background-color: #2a2a2a;
+    counter-reset: line-numbering;
+    margin-top: 0;    
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border: 0px solid #ccc;
+}
+
+section.tile-job div.log pre p {
+    margin: 0px;
+    position: relative;
+    padding: 0 15px 0 55px;
+    margin: 0;
+    min-height: 16px;
+}
+
+section.tile-job div.log pre a {
+    display: inline-block;
+    text-align: right;
+    min-width: 40px;
+    margin-left: -33px;
+    cursor: pointer;
+    text-decoration: none;
+    color: #666;
+}
+
+section.tile-job div.log pre a::before {
+    content: counter(line-numbering);
+    counter-increment: line-numbering;
+    padding-right: 1em;
+}
+
+section.tile-job div.log a.to-bot {
+    z-index: 99;
+    position: relative;
+    height: 0px;
+    float: right; 
+    color: #999;
+    cursor: pointer;
+    font-size: 46px;
+    margin-right: 2px;
+    padding-right: 16px;
+    text-align: right;
+    right: 10px;
+    visibility: hidden;
+}
+
+section.tile-job div.log a.to-top {
+    z-index: 99;
+    position: absolute;
+    bottom: 15px;
+    right: 10px;
+    margin-right: 2px;
+    padding-right: 16px;
+    text-align: right;
+    color: #999;
+    cursor: pointer;
+    font-size: 46px;
+    visibility: hidden;
+}
 
 /* Build Jobs list */
 
@@ -149,13 +299,22 @@ section.jobs ul li.failed:hover {
     background-color: #fbebe6;
 }
 
-
 section.jobs ul li.succeeded:hover {
     background-color: #e5efe4;
 }
 
 section.jobs ul li:hover {
     background-color: #f4efd8;
+}
+
+section.jobs ul li p.status {
+//    color: #D2C93B;
+    color: #CDBC2C;
+}
+
+section.jobs ul li div.job_id {
+//    color: #D2C93B;
+    color: #CDBC2C;
 }
 
 
@@ -180,7 +339,7 @@ section.history li {
 
 section.history div.tile {
     background-color: #FAFAF8;
-    height: 70px;
+    height: 75px;
 }
 
 section.history div.tile div.tile-status {
@@ -195,6 +354,148 @@ section.history div.tile div.tile-info {
 
 section.history div.tile div.tile-subinfo,
 section.history div.tile div.tile-subinfo a {
-    color: #666;
+    color: gray;
 }
 
+
+/* tabs */
+
+section.tabs .nav-tabs {
+    border-bottom: solid #e9eaea 2px;
+    margin-bottom: 10px;
+}
+
+
+section.tabs .nav-tabs > li {
+    margin-bottom: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    font-size: 14px;
+}
+
+section.tabs .nav-tabs > li > a:hover:after,
+section.tabs .nav-tabs > li.active > a:after,
+section.tabs .nav-tabs > li.active > a:hover:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 2px;
+    background-color: #63A4A3;
+}
+
+section.tabs .nav-tabs > li.active > a {
+    cursor: default;
+    border: none;
+    font-weight: 600;
+    color: #63A4A3;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+section.tabs .nav-tabs > li > a:hover,
+section.tabs .nav-tabs > li.active > a:hover {
+    color: #63A4A3;
+    background-color: #ffffff;
+    border: none;
+}
+
+section.tabs .nav-tabs > li > a {
+    color: #969496;
+    background-color: #ffffff;
+    border: none;
+    padding-left: 0px;
+    padding-right: 0px;
+    margin-right: 30px;
+}
+
+section.tabs #tab_build {
+}
+
+section.tabs #tab_spacer a:after,
+section.tabs #tab_spacer a:hover:after,
+section.tabs #tab_spacer a {
+    color: #969496;
+    background-color: transparent;
+    font-size: 20px;
+    height: 20px;
+}
+
+/* Output */
+
+section.output {
+    color: gray;
+}
+
+section.output a {
+    color: #63A4A3;
+    font-weight: 400;
+}
+
+section.output li.package a {
+    color: #63A4A3;
+    font-weight: 600;
+}
+
+
+section.output a:hover {
+    color: #63A4A3;
+}
+
+
+
+section.output h2{
+    margin: 30px 0px;
+    color: gray;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+section.output h2 .status {
+    font-weight: normal;
+    font-size: 16px;
+}
+
+section.output div.all_files{
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+section.output div.all_files a{
+    font-weight: 600;
+}
+
+
+section.output ul{
+    list-style-type: none;
+}
+
+
+section.output > ul{
+    padding-left: 0px;
+    list-style-type: none;
+}
+
+
+
+
+section.output ul li.distro{
+    font-size: 14px;
+    font-weight: 600;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+section.output ul li.distro:before{
+    font-family: FontAwesome;
+    content: "\f17c";
+    font-size: 22px;
+    font-weight: normal;
+}
+
+
+
+section.output ul li.distro ul li.file{
+    margin-top: 3px;
+}

@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 
 import pecan
@@ -114,7 +115,7 @@ class Project(APIProject):
 
 
     @classmethod
-    def search(cls, name=None, username=None, limit=30, offset=0, get_last_build=False):
+    def search(cls, name=None, username=None, limit=30, offset=0, get_last_build=False, pattern=''):
         filter_ = {}
         if username is not None:
             filter_['username'] = username
@@ -122,6 +123,11 @@ class Project(APIProject):
             filter_['name'] = name
         if limit > 100:
             limit = 100
+        if pattern:
+            regx = re.compile(pattern, re.IGNORECASE)
+            filter_= {"$or": []}
+            filter_["$or"].append({"name": regx})
+            filter_["$or"].append({"username": regx})
         db_projects = mongo.projects.find(filter_, limit=limit, skip=offset)
         projects = []
         if db_projects is not None:
@@ -129,7 +135,7 @@ class Project(APIProject):
             if get_last_build:
                 for p in projects:
                     p.builds = [p.get_latest_build()]
-
+                projects.sort(key=lambda p: p.builds[0].created, reverse=True)
         return projects
 
 
