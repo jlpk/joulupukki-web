@@ -4,20 +4,20 @@ angular.element(document).ready(function () {
 
     $.get('components/config/config.json', function (data) {
 
-        angular.module('adagios.config').config(['readConfigProvider', function (readConfigProvider) {
+        angular.module('joulupukki.config').config(['readConfigProvider', function (readConfigProvider) {
             readConfigProvider.loadJSON(data);
         }]);
 
-        angular.bootstrap(document, ['adagios']);
+        angular.bootstrap(document, ['joulupukki']);
     }, "json");
 
 });
 
-angular.module('adagios', [
+angular.module('joulupukki', [
     'ngRoute',
     'joulupukki.sidebar',
     'joulupukki.topbar',
-    'adagios.config',
+    'joulupukki.config',
     'joulupukki.view.home',
 ])
 

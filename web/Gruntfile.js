@@ -82,11 +82,11 @@ module.exports = function (grunt) {
             }
         },
 
-        // Minify and concatenate adagios in one file
+        // Minify and concatenate joulupukki in one file
         uglify: {
             compress: {
                 files: [{
-                    '<%= project.build %>/js/adagios.min.js' : [
+                    '<%= project.build %>/js/joulupukki.min.js' : [
                         '<%= project.app %>/app.js',
                         '<%= project.app %>/components/config/config.js',
                         '<%= project.app %>/components/live/live.js',
@@ -132,7 +132,7 @@ module.exports = function (grunt) {
                         '<%= project.build %>/home/home.js': '<%= project.app %>/home/home.js',
                     },
                     {
-                        '<%= project.build %>/js/adagios.min.js' : [
+                        '<%= project.build %>/js/joulupukki.min.js' : [
                             '<%= project.build %>/app.js',
                             '<%= project.build %>/components/config/config.js',
                             '<%= project.build %>/components/live/live.js',

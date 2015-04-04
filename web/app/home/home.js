@@ -1,7 +1,6 @@
 'use strict';
 
 angular.module('joulupukki.view.home', ['ngRoute',
-//                                          'adagios.tactical',
                                           'joulupukki.main',
                                           'joulupukki.live'
                                          ])

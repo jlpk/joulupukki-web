@@ -1,11 +1,11 @@
 'use strict';
 
 
-function AdagiosConfig(data) {
+function JoulupukkiConfig(data) {
     this.data = data;
 }
 
-angular.module('adagios.config', [])
+angular.module('joulupukki.config', [])
 
     .provider('readConfig', function ReadConfigProvider() {
 
@@ -16,6 +16,6 @@ angular.module('adagios.config', [])
         };
 
         this.$get = [function getConfigFactory() {
-            return new AdagiosConfig(data);
+            return new JoulupukkiConfig(data);
         }];
     });
