@@ -9,12 +9,12 @@
     <section class="tabs">
       <ul class="nav nav-tabs">
         <li role="presentation" ng-class="{ 'active': selected_tab == 'project' }">
-          <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/">
+          <a href="#/repositories/{{ selected_project.username }}/{{ selected_project.name }}/">
             Current
           </a>
         </li>
         <li role="presentation" ng-class="{ 'active': selected_tab == 'history' }">
-          <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds">
+          <a href="#/repositories/{{ selected_project.username }}/{{ selected_project.name }}/builds">
             Build History
           </a>
         </li>
@@ -24,17 +24,17 @@
           </a>
         </li>
         <li ng-if="['build', 'output', 'job'].indexOf(selected_tab) != -1" role="presentation" id="tab_build" ng-class="{ 'active': selected_tab == 'build' }">
-          <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}">
+          <a href="#/repositories/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}">
             Build #{{ build.id_ }}
           </a>
         </li>
         <li ng-if="['build', 'output'].indexOf(selected_tab) != -1" role="presentation" ng-class="{ 'active': selected_tab == 'output' }">
-          <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/output">
+          <a href="#/repositories/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/output">
             Output
           </a>
         </li>
         <li ng-if="['job'].indexOf(selected_tab) != -1" role="presentation" ng-class="{ 'active': selected_tab == 'job' }">
-          <a href="#/home/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/jobs/{{ job.id_ }}">
+          <a href="#/repositories/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/jobs/{{ job.id_ }}">
             Job #{{ build.id_ }}.{{ job.id_ }}
           </a>
         </li>

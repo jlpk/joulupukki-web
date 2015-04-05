@@ -39,7 +39,7 @@
         <ul>
           <li>
             <span class="hash"></span>
-            <a class="{{ build.status }}" href="#/home/{{ build.username }}/{{ build.project_name }}/builds/{{ build.id_ }}">{{ build.id_ }} {{ build.status }}</a>
+            <a class="{{ build.status }}" href="#/repositories/{{ build.username }}/{{ build.project_name }}/builds/{{ build.id_ }}">{{ build.id_ }} {{ build.status }}</a>
           </li>
           <li ng-if="build.forced_distro" >
             <i class="fa fa-linux"></i>

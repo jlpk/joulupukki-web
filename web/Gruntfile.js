@@ -103,7 +103,8 @@ module.exports = function (grunt) {
                         '<%= project.app %>/components/main/build/output/output.js',
                         '<%= project.app %>/components/main/build/job/job.js',
                         '<%= project.app %>/components/main/build/job/joblog/joblog.js',
-                        '<%= project.app %>/home/home.js',
+                        '<%= project.app %>/repositories/repositories.js',
+                        '<%= project.app %>/404/404.js',
                     ]
                 }],
                 options: {
@@ -129,7 +130,8 @@ module.exports = function (grunt) {
                         '<%= project.build %>/components/main/build/output/output.js': '<%= project.app %>/components/main/build/output/output.js',
                         '<%= project.build %>/components/main/build/job/job.js': '<%= project.app %>/components/main/build/job/job.js',
                         '<%= project.build %>/components/main/build/job/joblog/joblog.js': '<%= project.app %>/components/main/build/job/joblog/joblog.js',
-                        '<%= project.build %>/home/home.js': '<%= project.app %>/home/home.js',
+                        '<%= project.build %>/repositories/repositories.js': '<%= project.app %>/repositories/repositories.js',
+                        '<%= project.build %>/404/404.js': '<%= project.app %>/404/404.js',
                     },
                     {
                         '<%= project.build %>/js/joulupukki.min.js' : [
@@ -149,7 +151,8 @@ module.exports = function (grunt) {
                             '<%= project.build %>/components/main/build/output/output.js',
                             '<%= project.build %>/components/main/build/job/job.js',
                             '<%= project.build %>/components/main/build/job/joblog/joblog.js',
-                            '<%= project.build %>/home/home.js',
+                            '<%= project.build %>/repositories/repositories.js',
+                            '<%= project.build %>/404/404.js',
                         ]
                     }
                 ],

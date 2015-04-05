@@ -15,12 +15,12 @@ angular.element(document).ready(function () {
 
 angular.module('joulupukki', [
     'ngRoute',
-    'joulupukki.sidebar',
     'joulupukki.topbar',
     'joulupukki.config',
-    'joulupukki.view.home',
+    'joulupukki.view.repositories',
+    'joulupukki.view.404',
 ])
 
     .config(['$routeProvider', function ($routeProvider) {
-        $routeProvider.otherwise({redirectTo: '/'});
+        $routeProvider.otherwise({redirectTo: '/404'});
     }]);

@@ -15,10 +15,10 @@
         <i ng-if="project.builds[0].status == 'succeeded'" class="fa fa-check {{ project.builds[0].status }}"></i>
         <i ng-if="project.builds[0].status == 'failed'" class="fa fa-exclamation {{ project.builds[0].status }}"></i>
         <i ng-if="project.builds[0].status != 'failed' && project.builds[0].status != 'succeeded'" class="fa fa-ellipsis-h {{ project.builds[0].status }}"></i>
-        <a id="" class="{{ project.builds[0].status }}"  href="#/home/{{ project.username }}/{{ project.name }}">{{ project.username }}/{{ project.name }}</a>
+        <a id="" class="{{ project.builds[0].status }}"  href="#/repositories/{{ project.username }}/{{ project.name }}">{{ project.username }}/{{ project.name }}</a>
     </h2>
         <p class="tile-title col-xs-3">
-          <span class="hash"></span><a class="last_build {{ project.builds[0].status }}" href="#/home/{{ project.username }}/{{ project.name }}/builds/{{ project.builds[0].id_ }}">{{ project.builds[0].id_ }}</a>
+          <span class="hash"></span><a class="last_build {{ project.builds[0].status }}" href="#/repositories/{{ project.username }}/{{ project.name }}/builds/{{ project.builds[0].id_ }}">{{ project.builds[0].id_ }}</a>
         </p>
 
     </div>
