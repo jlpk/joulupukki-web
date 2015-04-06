@@ -168,7 +168,12 @@ class RpmPacker(Packer):
         self.logger.debug(self.container_tag)
         self.logger.debug(command)
         self.logger.debug(volumes)
-        self.container = self.cli.create_container(self.container_tag, command=command, volumes=volumes)
+        try:
+            self.container = self.cli.create_container(self.container_tag, command=command, volumes=volumes)
+        except Exception as exp:
+            self.logger.error("Error launching docker container: %s", exp)
+            return False
+
         local_source_folder = os.path.join(self.folder, "sources")
         binds[local_source_folder] = {"bind": "/upstream", "ro": True}
         self.cli.start(self.container['Id'], binds=binds)
