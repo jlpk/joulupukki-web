@@ -19,8 +19,13 @@ angular.module('joulupukki', [
     'joulupukki.config',
     'joulupukki.view.repositories',
     'joulupukki.view.404',
+    'joulupukki.view.login',
 ])
 
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider.otherwise({redirectTo: '/404'});
-    }]);
+
+    }])
+
+
+
