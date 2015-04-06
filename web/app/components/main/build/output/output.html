@@ -1,0 +1,39 @@
+  <section ng-controller="MainBuildOutputCtrl" id="output" ng-if="selected_tab == 'output'" class="output">
+    <h2>
+      Build Output &ndash; 
+      <span class="hash"></span>
+      <span class="status {{ build.status }}">
+        {{ build.id_}} {{ build.status }}
+      </span>
+    </h2>
+    <h3 ng-if="! output">No output</h3>
+    <div class="all_files">
+      Download all &ndash;
+      <a href="/v3/users/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/download/archive?type=tgz">
+        (tgz)
+      </a>
+      -
+      <a href="/v3/users/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/download/archive?type=zip">
+        (zip)
+      </a>
+    </div>
+    <ul class="files" ng-if="output">
+      <li class="distro" ng-if="files" ng-repeat="(folder, files) in output" >
+        {{ folder }} &ndash;
+        <a href="/v3/users/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/download/archive?distro={{ folder }}&type=tgz">
+          (tgz)
+        </a>
+        - 
+        <a href="/v3/users/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/download/archive?distro={{ folder }}&type=zip">
+          (zip)
+        </a>
+        <ul>
+          <li class="file" ng-class="{ 'package': (file.endsWith('.rpm') && ! file.endsWith('.src.rpm') )|| file.endsWith('.deb') }" ng-repeat="file in files">
+            <a href="/v3/users/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/download/file?distro={{ folder }}&filename={{ file }}">{{ file }}</a>
+            <i ng-if="(file.endsWith('.rpm') && ! file.endsWith('.src.rpm') )|| file.endsWith('.deb')" class="fa fa-gift"></i>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </section>
+

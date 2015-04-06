@@ -22,9 +22,9 @@ env/
 .pydevproject
 
 # Project tmp folders
-tmp/
-ccache/
-output
+/tmp/
+/ccache/
+/output/
 
 
 
