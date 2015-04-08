@@ -47,7 +47,7 @@ class DebPacker(Packer):
 
         deb_info = load_control_file(control_file_path)
         self.config['name'] = deb_info.get("Source")
-        self.config['deps'] = parse_depends(deb_info.get('Build-Depends')).names
+        self.config['deps'] += parse_depends(deb_info.get('Build-Depends')).names
 
         version_release_pattern = re.compile("[^ ]* \(([^ ]*)\) .*")
         with open(changelog_file_path, 'r') as f:
