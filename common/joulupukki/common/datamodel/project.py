@@ -108,7 +108,7 @@ class Project(APIProject):
 
 
     def get_latest_build_id(self):
-        build = self.get_latest_build
+        build = self.get_latest_build()
         if build is not None:
             return build.id_
         return None
