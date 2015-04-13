@@ -197,11 +197,12 @@ class DebPacker(Packer):
         # Get debs from the container
         debs_raw = self.cli.copy(self.container['Id'], "/output")
         debs_tar = tarfile.open(fileobj=BytesIO(debs_raw.read()))
-        debs_tar.extractall(self.job_tmp_folder)
+        try:
+            # move files to folder output
+            debs_tar.extractall(self.folder_output)
+        except:
+            debs_tar.close()
+            return False
         debs_tar.close()
-        # move files to folder output
-        for file_ in glob.glob(os.path.join(self.job_tmp_folder, "output/*")):
-            shutil.move(file_, self.folder_output)
-
         self.logger.info("DEBS files deposed in output folder")
         return True

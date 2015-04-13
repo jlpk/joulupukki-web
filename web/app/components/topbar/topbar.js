@@ -5,16 +5,38 @@ angular.module('joulupukki.topbar', ['joulupukki.live',
                                     ])
 
 
-    .controller('TopBarCtrl', ['$scope', '$routeParams', 'getUserInfo',
-                function ($scope, $routeParams, getUserInfo) {
-            var username = $routeParams.user;
-            var username = 'titilambert'
-            getUserInfo(username)
-                .success(function(data) {
-                        console.log(data)
-                        $scope.username = data.login
-                    })
-            }])
+    .controller('TopBarCtrl', ['$scope', '$cookies', '$rootScope', 'getCurrentUserInfo',
+        function ($scope, $cookies, $rootScope, getCurrentUserInfo) {
+
+            $rootScope.$on('token_changed', function(){
+                //console.log('token_changed')
+                var $getuserinfo = getCurrentUserInfo()
+                if($getuserinfo){
+                    $getuserinfo.success(function(data) {
+                        if (data){
+                           $scope.username = data.login
+                           $cookies.username = data.login
+                        }
+                        else {
+                           delete $scope.username
+                           delete $cookies.username
+                        }
+                       })
+                }
+                else {
+                    delete $scope.username
+                    delete $cookies.username
+                }
+            })
+
+            if ($cookies.username) {
+                $scope.username = $cookies.username
+            }
+            else {
+                $rootScope.$emit('token_changed')
+            }
+
+        }])
 
     .directive('jlpkTopbar', function () {
         return {

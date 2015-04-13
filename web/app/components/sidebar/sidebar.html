@@ -7,44 +7,50 @@
   </div>
 </div>
 
+
+
 <ul>
-<li ng-repeat="project in projects" class="project">
-  <div class="container-fluid tile tile--sidebar tile-{{ project.builds[0].status }}">
-    <div class="row">
-    <h2 class="tile-title col-xs-9">
-        <i ng-if="project.builds[0].status == 'succeeded'" class="fa fa-check {{ project.builds[0].status }}"></i>
-        <i ng-if="project.builds[0].status == 'failed'" class="fa fa-exclamation {{ project.builds[0].status }}"></i>
-        <i ng-if="project.builds[0].status != 'failed' && project.builds[0].status != 'succeeded'" class="fa fa-ellipsis-h {{ project.builds[0].status }}"></i>
-        <a id="" class="{{ project.builds[0].status }}"  href="#/repositories/{{ project.username }}/{{ project.name }}">{{ project.username }}/{{ project.name }}</a>
-    </h2>
+  <li ng-repeat="project in projects" class="project">
+    <div class="container-fluid tile tile--sidebar tile-{{ project.builds[0].status }}">
+      <div class="row">
+        <h2 class="tile-title col-xs-9">
+          <i ng-if="project.builds[0].status == 'succeeded'" class="fa fa-check {{ project.builds[0].status }}"></i>
+          <i ng-if="project.builds[0].status == 'failed'" class="fa fa-exclamation {{ project.builds[0].status }}"></i>
+          <i ng-if="project.builds[0].status != 'failed' && project.builds[0].status != 'succeeded'" class="fa fa-ellipsis-h {{ project.builds[0].status }}"></i>
+          <a id="" class="{{ project.builds[0].status }}"  href="#/repositories/{{ project.username }}/{{ project.name }}">
+            {{ project.username }}/{{ project.name }}
+          </a>
+        </h2>
         <p class="tile-title col-xs-3">
-          <span class="hash"></span><a class="last_build {{ project.builds[0].status }}" href="#/repositories/{{ project.username }}/{{ project.name }}/builds/{{ project.builds[0].id_ }}">{{ project.builds[0].id_ }}</a>
+          <span class="hash"></span>
+          <a class="last_build {{ project.builds[0].status }}" href="#/repositories/{{ project.username }}/{{ project.name }}/builds/{{ project.builds[0].id_ }}">
+            {{ project.builds[0].id_ }}
+          </a>
         </p>
-
+      </div>
+      <div class="row">
+        <p class="col-xs-12">
+          <i class="fa fa-clock-o"></i>
+          Duration: 
+          <abbr class="duration" title="{{ project.builds[0].created }}">
+            {{ project.builds[0].created | timeElapsed: project.builds[0].finished }}
+          </abbr>
+        </p>
+        <p class="col-xs-12">
+          <i class="fa fa-calendar"></i>
+          Finished:
+          <abbr class="finished_at timeago">
+            <span ng-if="project.builds[0].finished">
+              {{ project.builds[0].finished | timeElapsed }}
+            </span>
+            <span ng-if="! project.builds[0].finished">
+              -
+            </span>
+          </abbr>
+        </p>
+      </div>
     </div>
-    <div class="row">
-      <p class="col-xs-12">
-        <i class="fa fa-clock-o"></i>
-        Duration: 
-        <abbr class="duration" title="{{ project.builds[0].created }}">
-          {{ project.builds[0].created | timeElapsed: project.builds[0].finished }}
-        </abbr>
-      </p>
-
-    <p class="col-xs-12">
-      <i class="fa fa-calendar"></i>
-      Finished:
-      <abbr class="finished_at timeago">
-        <span ng-if="project.builds[0].finished">
-          {{ project.builds[0].finished | timeElapsed }}
-        </span>
-        <span ng-if="! project.builds[0].finished">
-          -
-        </span>
-      </abbr>
-    </p>
-    </div>
-  </div>
-</li>
+  </li>
 </ul>
+
 </aside>

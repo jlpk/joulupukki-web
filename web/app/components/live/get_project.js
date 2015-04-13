@@ -20,12 +20,17 @@ angular.module('joulupukki.live')
 
     .service('getLatestProjects', ['$http',
         function ($http) {
-            return function ($pattern) {
-                var $url = '/v3/projects?limit=30&get_last_build=1'
-                if ($pattern){
-                    $url = '/v3/projects?limit=30&get_last_build=1&pattern=' + $pattern
+            return function (username, pattern) {
+                var url = '/v3/projects?limit=30&get_last_build=1'
+                if (username) {
+                    url = '/v3/projects?limit=30&get_last_build=1&username=' + username
                 }
-                return $http.get($url)
+                else {
+                    if (pattern){
+                        url = '/v3/projects?limit=30&get_last_build=1&pattern=' + pattern
+                    }
+                }
+                return $http.get(url)
                     .error(function () {
                         throw new Error('getLatestProjects : GET Request failed');
                     });

@@ -30,7 +30,6 @@ angular.module('joulupukki.main', ['joulupukki.filters',
                    });
             };
             
-
             // TODO split this in each controller
             $scope.$on('update_main', function() {
                 if ( $username && $project_name ){
@@ -41,6 +40,7 @@ angular.module('joulupukki.main', ['joulupukki.filters',
                                 $scope.selected_project = data;
                             });
                     } else {
+                        // not history => project info
                         getProject($username, $project_name)
                             .success(function (data) {
                                 $scope.selected_project = data;
@@ -59,7 +59,6 @@ angular.module('joulupukki.main', ['joulupukki.filters',
                                         link.href = 'assets/images/jlpk_logo.png';
                                     }
                                     document.getElementsByTagName('head')[0].appendChild(link);
-
                                 }
                             });
                     }
@@ -84,7 +83,7 @@ angular.module('joulupukki.main', ['joulupukki.filters',
                     }
                     // log
                     if ( $job_id ) {
-                      getJob($username, $project_name, $build_id, $job_id)
+                        getJob($username, $project_name, $build_id, $job_id)
                             .success(function (data) {
                                 $scope.job = data;
                                 // set favicon
@@ -101,7 +100,7 @@ angular.module('joulupukki.main', ['joulupukki.filters',
                                 }
                                 document.getElementsByTagName('head')[0].appendChild(link);
                             });
-                      getJobLog($username, $project_name, $build_id, $job_id)
+                        getJobLog($username, $project_name, $build_id, $job_id)
                             .success(function (data) {
                                 $scope.joblog = $sce.trustAsHtml(data);
                                 //Set goto functions
@@ -157,6 +156,7 @@ angular.module('joulupukki.main', ['joulupukki.filters',
                     }
                 }
             })
+
             if ( ! $username || ! $project_name ){
                 $rootScope.$watch('latest_project', function(){
                     if ( $rootScope.latest_project ){

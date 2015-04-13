@@ -130,7 +130,7 @@ a.dispatching,
 
 .search--sidebar {
     position: relative;
-    height: 7.6em;
+    height: 6em;
 }
 
 .search--sidebar .search-inner {
@@ -140,15 +140,14 @@ a.dispatching,
     left: 0;
     bottom: 0;
     margin: auto;
-    width: 90%;
     height: 33px;
+    padding-left: 1em;
 }
 
 .search--sidebar .search-inner input {
     display: inline-block;
-    width: 80%;
+    width: 100%;
     padding: .5em;
-    margin-left: 1em;
     color: #a6adad;
     font-size: 14px;
     border: 1px solid #f2f2f2;
@@ -159,7 +158,10 @@ a.dispatching,
 }
 
 .search--sidebar .search-inner i {
-    margin-left: 0.5em;
+    float: right;
+    position: relative;
+    margin-right: 12px;
+    margin-top: -28px;
     display: inline-block;
     width: 5%;
     color: #a6adad;

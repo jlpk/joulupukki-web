@@ -15,14 +15,14 @@ from joulupukki.common.datamodel.project import Project
 
 class APIUser(types.Base):
     username = wsme.wsattr(wtypes.text, mandatory=True)
-    password = wsme.wsattr(wtypes.text, mandatory=True)
-    github = wsme.wsattr(wtypes.text, mandatory=False)
+    password = wsme.wsattr(wtypes.text, mandatory=False)
     email = wsme.wsattr(wtypes.text, mandatory=False)
     name = wsme.wsattr(wtypes.text, mandatory=False)
 
 class User(APIUser):
     projects = wsme.wsattr([Project], mandatory=False)
     token = wsme.wsattr(wtypes.text, mandatory=False)
+    token_github = wsme.wsattr(wtypes.text, mandatory=False)
 
     def __init__(self, data=None, sub_objects=True):
         if data is None:
@@ -56,16 +56,17 @@ class User(APIUser):
         # Check required args
         required_args = ['username',
                          'email',
-                         'password',
+#                         'password',
                         ]
         for arg in required_args:
-            if not getattr(self, arg):
+            if not hasattr(self, arg):
                 # TODO handle error
                 return False
         # Create token
         self.token = create_token(mongo) 
         # Encrypt password
-        self.password = encrypt_password(self.password)
+        if self.password:
+            self.password = encrypt_password(self.password)
         # Write user data
         try:
             self._save()
@@ -123,3 +124,12 @@ class User(APIUser):
         projects = mongo.projects.find({"username": self.username})
         return [Project(x) for x in projects]
 
+           
+    @classmethod
+    def fetch_from_github_token(cls, token_github, sub_objects=True):
+        db_user = mongo.users.find_one({"token_github": token_github})
+        user = None
+        if db_user is not None:
+           user = cls(db_user, sub_objects=sub_objects)
+           delattr(user, 'password')
+        return user

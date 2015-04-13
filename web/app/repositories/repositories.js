@@ -9,7 +9,6 @@ angular.module('joulupukki.view.repositories', ['ngRoute',
     .value('dashboardConfig', {})
 
     .config(['$routeProvider', function ($routeProvider) {
-       // TODO mae redirecto
         $routeProvider.when('/repositories/', {
             templateUrl: 'repositories/repositories.html',
             controller: 'RepositoriesCtrl'

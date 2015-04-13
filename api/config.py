@@ -57,6 +57,9 @@ rabbit_db = "joulupukki"
 mongo_server = "127.0.0.1"
 mongo_port = 27017
 mongo_db = "joulupukki"
+github_id = "666ff51d51afc14ab79c"
+
+
 
 # TODO DELETE ME!!!!
 distros = (

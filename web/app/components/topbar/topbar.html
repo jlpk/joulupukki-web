@@ -13,7 +13,7 @@
         <li><a href="#">Help</a></li>
       </ul>
       <div class="navbar-form navbar-right" ng-if="! username">
-        <a href="" class="btn btn-success">Login</a>
+        <a href="#/auth/login" class="btn btn-success">Login</a>
       </div>
       <ul class="nav navbar-nav navbar-right">
         <li ng-if="username" class="dropdown">
@@ -22,9 +22,9 @@
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu" role="menu">
-            <li><a href="#">Account</a></li>
+            <li><a href="#/account">Account</a></li>
             <li class="divider"></li>
-            <li><a href="#">Logout</a></li>
+            <li><a href="#/auth/logout">Logout</a></li>
           </ul>
         </li>
       </ul>

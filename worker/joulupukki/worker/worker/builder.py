@@ -53,6 +53,8 @@ class Builder(Thread):
         self.folder = build.get_folder_path()
         self.folder_source = build.get_source_folder_path()
         # Create folders
+        if os.path.exists(self.folder):
+            shutil.rmtree(self.folder)
         if not os.path.exists(self.folder):
             os.makedirs(self.folder)
         if not os.path.isdir(self.folder):

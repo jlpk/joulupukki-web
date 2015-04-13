@@ -26,8 +26,6 @@ class Manager(Thread):
         self.carrier = Carrier(pecan.conf.rabbit_server, pecan.conf.rabbit_port, pecan.conf.rabbit_db)
         self.carrier.declare_builds()
 
-
-
     def shutdown(self):
         logging.debug("Stopping Manager")
         self.must_run = False

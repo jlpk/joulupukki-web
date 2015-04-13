@@ -18,12 +18,12 @@
             Build History
           </a>
         </li>
-        <li id="tab_spacer" ng-if="['build', 'output', 'job'].indexOf(selected_tab) != -1">
+        <li id="tab_spacer" ng-if="['build', 'output', 'job', 'project'].indexOf(selected_tab) != -1">
           <a>
             <i class="fa fa-chevron-right"></i>
           </a>
         </li>
-        <li ng-if="['build', 'output', 'job'].indexOf(selected_tab) != -1" role="presentation" id="tab_build" ng-class="{ 'active': selected_tab == 'build' }">
+        <li ng-if="['build', 'output', 'job', 'project'].indexOf(selected_tab) != -1" role="presentation" id="tab_build" ng-class="{ 'active': selected_tab == 'build' }">
           <a href="#/repositories/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}">
             Build #{{ build.id_ }}
           </a>
