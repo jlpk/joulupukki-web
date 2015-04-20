@@ -113,13 +113,13 @@ class DebPacker(Packer):
 
         commands.append("""apt-get update""")
         commands.append("""apt-get upgrade -y""")
-        commands.append("""mkdir -p /sources""")
-        commands.append("""rsync -rlptD --exclude '.git' --exclude 'debian' /%s/ /sources/%s""" % (docker_source_root_folder, self.config['name']))
-        # Get the correct debian folder
-        commands.append("""rsync -rlptD /%s/%s/ /sources/%s/debian""" % (docker_source_root_folder, self.config['debian'], self.config['name']))
-        # Create original archive
-        commands.append("""tar -C /sources -czf /sources/%s %s""" % (self.config['source'], self.config['name']))
-
+        # Handle PPAs
+        if self.config.get('ppa', []):
+            commands.append("""apt-get install -y software-properties-common""")
+            for ppa in self.config.get('ppa', []):
+                commands.append("""add-apt-repository %s""" % ppa)
+	    commands.append("""apt-get update -y""")
+            commands.append("""apt-get upgrade -y""")
         # Handle ccache
         if pecan.conf.ccache_path is not None and self.config.get('ccache', False):
             self.logger.info("CCACHE is enabled")
@@ -145,6 +145,15 @@ class DebPacker(Packer):
         if self.config['deps_pip']:
             commands.append("""apt-get install -y python-setuptools""")
             commands.append("""easy_install %s""" % " ".join(self.config['deps_pip']))
+
+        # Prepare sources
+        commands.append("""mkdir -p /sources""")
+        commands.append("""rsync -rlptD --exclude '.git' --exclude 'debian' /%s/ /sources/%s""" % (docker_source_root_folder, self.config['name']))
+        # Get the correct debian folder
+        commands.append("""rsync -rlptD /%s/%s/ /sources/%s/debian""" % (docker_source_root_folder, self.config['debian'], self.config['name']))
+        # Create original archive
+        commands.append("""(cd /sources/%s && debian/rules get-orig-source || tar -C /sources -czf /sources/%s %s )""" % (self.config['name'], self.config['source'], self.config['name']))
+
         # Build
         commands.append("""cd /sources/%s """ % self.config['name'])
         if self.builder.build.snapshot:

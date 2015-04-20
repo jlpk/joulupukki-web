@@ -46,4 +46,7 @@ web/app/assets/css
 web/.sass-cache/
 web/out/
 web/build/
+/api/build/
+/worker/build/
+/common/build/
 web/app/build/
