@@ -71,11 +71,11 @@ class Builder(Thread):
         username = url_splitted.username
         if username is None:
             username = 'anonymous'
-        password = url_splitted.username
+        password = url_splitted.password
         if password is None:
             password = 'anonymous'
         url_data = [d for d in list(url_splitted)]
-        new_netloc = username + ":" + password + "@" + url_data[1]
+        new_netloc = username + ":" + password + "@" + url_data[1].split('@')[-1]
         url_data[1] = new_netloc
         source_url = urlparse.urlunsplit(url_data)
         # Clone repo
