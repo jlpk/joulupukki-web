@@ -51,6 +51,9 @@ angular.module('joulupukki.live')
                 if ($build.forced_distro) {
                     $data.forced_distro = $build.forced_distro
                 }
+                if ($build.snapshot) {
+                    $data.snapshot = $build.snapshot
+                }
                 return $http.post('/v3/users/' + $username + '/' + $project_name + '/build', $data)
                     .error(function () {
                         throw new Error('getBuild: GET Request failed');
