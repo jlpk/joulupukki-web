@@ -25,7 +25,7 @@ from joulupukki.common.datamodel.project import Project
 from joulupukki.common.datamodel.job import Job
 from joulupukki.api.controllers.v3.jobs import JobsController
 from joulupukki.api.controllers.v3.download import DownloadController, OutputController
-from joulupukki.api import carrier
+from joulupukki.common.carrier import Carrier
 
 
 
@@ -122,6 +122,9 @@ class LaunchBuildController(rest.RestController):
         build.username = user.username
         build.project_name = project.name
         build.create()
+        carrier = Carrier(pecan.conf.rabbit_server, pecan.conf.rabbit_port,
+                          pecan.conf.rabbit_db)
+        carrier.declare_builds()
         if not carrier.send_build(build):
             return None
         # TODO: save build in database ???
@@ -129,9 +132,7 @@ class LaunchBuildController(rest.RestController):
         return {"result": {"build": int(build.id_)}}
 
 
-
 class BuildSubController(rest.RestController):
     download = DownloadController()
     jobs = JobsController()
     output = OutputController()
-
