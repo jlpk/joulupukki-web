@@ -12,7 +12,7 @@ import logging
 
 
 class Carrier(object):
-    def __init__(self, server, port, exchange):
+    def __init__(self, server, port, exchange, queue="default.queue"):
         """queues:
         * builds
         """
@@ -23,6 +23,7 @@ class Carrier(object):
         self.parameters = pika.ConnectionParameters(host=self.server,
                                                     port=self.port,
                                                     )
+        self.queue = queue
         self.connect()
         # self.connection = pika.BlockingConnection(self.parameters)
         # self.channel = self.connection.channel()
@@ -37,18 +38,35 @@ class Carrier(object):
             print("Connection closed, reopening in 5 seconds: (%s) %s")
             time.sleep(5)
             self.connect()
+            self.declare_queue(self.queue)
             self.declare_builds()
 
     def declare_builds(self):
         self.channel.queue_declare(queue='builds')
 
+    def declare_queue(self, queue='default.queue'):
+        self.channel.queue_declare(queue=queue)
+
+    def send_message(self, message, queue='default.queue'):
+        try:
+            self.channel.basic_publish(exchange='', routing_key=queue,
+                                       body=json.dumps(message))
+        except AMQPConnectionError:
+            self.on_connection_closed()
+            self.channel.basic_publish(exchange='', routing_key=queue,
+                                       body=json.dumps(message))
+        except Exception as exp:
+            logging.error(exp)
+            return False
+        return True
+
     def send_build(self, build):
         try:
-            self.channel.basic_publish(exchange='', routing_key='builds',
+            self.channel.basic_publish(exchange='', routing_key='builds.queue',
                                        body=json.dumps(build.dumps()))
         except AMQPConnectionError:
             self.on_connection_closed()
-            self.channel.basic_publish(exchange='', routing_key='builds',
+            self.channel.basic_publish(exchange='', routing_key='builds.queue',
                                        body=json.dumps(build.dumps()))
         except Exception as exp:
             logging.error(exp)
@@ -56,25 +74,7 @@ class Carrier(object):
         return True
 
     def get_build(self):
-        try:
-            method_frame, header_frame, body = self.channel.basic_get('builds')
-            if body is None:
-                return None
-            build_data = json.loads(body)
-            self.channel.basic_ack(method_frame.delivery_tag)
-        except AMQPConnectionError:
-            self.on_connection_closed()
-
-            method_frame, header_frame, body = self.channel.basic_get('builds')
-            if body is None:
-                return None
-            build_data = json.loads(body)
-            self.channel.basic_ack(method_frame.delivery_tag)
-
-        except Exception as exp:
-            logging.error(exp)
-            return None
-
+        build_data = self.get_message('builds.queue')
         if build_data is not None:
             build = Build(build_data)
             build.user = User.fetch(build_data['username'], sub_objects=False)
@@ -82,4 +82,30 @@ class Carrier(object):
                                           build_data['project_name'],
                                           sub_objects=False)
             return build
-        return None
+
+    def get_message(self, queue):
+        message_data = None
+        try:
+            method_frame, header_frame, body = (
+                self.channel.basic_get(queue)
+            )
+            if body is None:
+                return None
+            message_data = json.loads(body)
+            self.channel.basic_ack(method_frame.delivery_tag)
+        except AMQPConnectionError:
+            self.on_connection_closed()
+
+            method_frame, header_frame, body = (
+                self.channel.basic_get(queue)
+            )
+            if body is None:
+                return None
+            message_data = json.loads(body)
+            self.channel.basic_ack(method_frame.delivery_tag)
+
+        except Exception as exp:
+            logging.error(exp)
+            return None
+
+        return message_data

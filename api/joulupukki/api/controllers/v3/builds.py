@@ -124,8 +124,9 @@ class LaunchBuildController(rest.RestController):
         build.create()
         carrier = Carrier(pecan.conf.rabbit_server, pecan.conf.rabbit_port,
                           pecan.conf.rabbit_db)
-        carrier.declare_builds()
-        if not carrier.send_build(build):
+        carrier.declare_queue('builds.queue')
+        # carrier.declare_builds()
+        if not carrier.send_message(build.dumps(), 'builds.queue'):
             return None
         # TODO: save build in database ???
         # for now is in build.cfg ...
