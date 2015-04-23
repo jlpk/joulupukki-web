@@ -7,19 +7,10 @@ import pecan
 import git
 import yaml
 
-from joulupukki.worker.lib.rpmpacker import RpmPacker
-from joulupukki.worker.lib.debpacker import DebPacker
-from joulupukki.common.distros import supported_distros, distro_templates
-from joulupukki.common.logger import get_logger, get_logger_docker
-from joulupukki.common.datamodel.build import Build
+from joulupukki.common.logger import get_logger
 from joulupukki.common.carrier import Carrier
-from joulupukki.worker.worker.packer import Packer
-import json
-
-
 
 from docker import Client
-import re
 
 import time
 
@@ -32,7 +23,8 @@ dispatching
 finished
 """
 
-class Builder(Thread):
+
+class Dispatcher(Thread):
     def __init__(self, build):
         thread_name = "__".join((build.user.username,
                                  build.project.name,
@@ -58,11 +50,10 @@ class Builder(Thread):
         if not os.path.exists(self.folder):
             os.makedirs(self.folder)
         if not os.path.isdir(self.folder):
-        # TODO handle error
-            raise Exception("%s should be a folder" % folder)
+            # TODO handle error
+            raise Exception("%s should be a folder" % self.folder)
         # Prepare logger
         self.logger = get_logger(self)
-
 
     def git_clone(self):
         self.logger.info("Cloning")
@@ -134,74 +125,26 @@ class Builder(Thread):
             return False
         return False
 
-    """def run_packer(self, distro_name, build_conf, root_folder):
-        # DOCKER
-        failed = False
-        # TODO Put all for content a sub thread :)
-
-        # If forced_distro is set, we launch build only on 
-        # the specified distro
-        if self.build.forced_distro is not None and distro_name != self.build.forced_distro:
-            continue
-        # Check yml format
-        if not isinstance(build_conf, dict):
-            self.logger.error("Packer yml file seems malformated" )
-            self.build.set_status('bad_yml_file')
-            continue
-        # Check distro name
-        if distro_name not in supported_distros:
-            self.logger.error("Distro %s not supported", distro_name)
-            # FIXME
-            #self.set_status('distro_not_supported', distro_name)
-            continue
-        distro_type = distro_templates.get(distro_name)
-        # Prepare distro configuration
-        build_conf['distro'] = supported_distros.get(distro_name)
-        build_conf['branch'] = self.branch
-        build_conf['root_folder'] = root_folder
-        # Launcher build
-        self.logger.info("Distro %s is an %s distro", distro_name, distro_type)
-        packer_class = globals().get(distro_type.capitalize() + 'Packer')
-        packer = packer_class(self, build_conf)
-        packer.set_status('building')
-        self.logger.info("Packaging starting for %s", distro_name)
-        if packer.run() is True:
-            packer.set_status('succeeded')
-            self.logger.info("Packaging finished for %s", distro_name)
-        else:
-            packer.set_status('failed')
-            failed = True
-            self.logger.info("Packaging finished for %s", distro_name)
-
-        if failed:
-            self.build.set_status('failed')
-            return False
-    """
-
     def dispatch(self, packer_conf, root_folder):
         self.build.set_status('dispatching')
 
         carrier = Carrier(pecan.conf.rabbit_server,
                           pecan.conf.rabbit_port,
                           pecan.conf.rabbit_db)
-        carrier.declare_queue('docker.queue')
+        # carrier.declare_queue('docker.queue')
         self.logger.debug(packer_conf)
         for distro_name, build_conf in packer_conf.items():
             if 'type' not in build_conf:
-                self.logger.error("Invalid build_conf: no type present.")
+                raise Exception("Invalid build_conf: no type present.")
 
-            if not build_conf['type'] == 'docker':
-                if not carrier.send_message(build_conf,
-                                            distro_name + '.queue'):
-                    self.logger.error("Can't post message to rabbitmq")
+            # if not build_conf['type'] == 'docker':
+            queue = "%s.queue" % build_conf['type']
+            carrier.declare_queue(queue)
+            message = {'distro_name': distro_name, 'build_conf': build_conf}
+            if not carrier.send_message(message, queue):
+                self.logger.error("Can't post message to rabbitmq")
             else:
-                self.logger.debug(self.build.user.username)
-                self.logger.debug(self.build.project.name)
-                self.logger.debug(self.build.id_)
-
-                packer = Packer(self.build)
-                return packer.run_docker_packer(distro_name, build_conf,
-                                                root_folder)
+                self.logger.info("Posted build to %s" % queue)
 
         self.build.set_status('succeeded')
         self.logger.info("Packaging finished for all distros")
@@ -220,26 +163,30 @@ class Builder(Thread):
                 self.logger.debug(global_packer_conf_file_name)
                 global_packer_conf = yaml.load(global_packer_conf_stream)
 
-                # Mocking packer_conf:
-                global_packer_conf = {
-                    'ubuntu_12.04': {'debian': 'debian', 'type': 'docker'},
-                    'centos_7': {'spec': 'debian/grafana.spec', 'type': 'docker'},
-                    'centos_6': {'spec': 'debian/grafana.spec', 'type': 'docker'},
-                    'debian_8': {'debian': 'debian', 'type': 'docker'},
-                    'ubuntu_14.04': {'debian': 'debian', 'type': 'docker'}
-                }
-
                 # File with "include" directive
 
                 if 'include' in global_packer_conf:
                     for packer_file_glob in global_packer_conf.get("include"):
-                        for packer_conf_file_name in glob.glob(os.path.join(self.folder_source, packer_file_glob)):
-                            packer_conf_stream = file(packer_conf_file_name, 'r')
+                        for packer_conf_file_name in glob.glob(os.path.join(
+                            self.folder_source,
+                            packer_file_glob)
+                        ):
+                            packer_conf_stream = file(
+                                packer_conf_file_name,
+                                'r'
+                            )
                             packer_conf = yaml.load(packer_conf_stream)
                             # Get root folder of this package
-                            packer_conf_relative_file_name = packer_conf_file_name.replace(self.folder_source, "").strip("/")
-                            root_folder = os.path.dirname(packer_conf_relative_file_name)
-                            
+                            packer_conf_relative_file_name = (
+                                packer_conf_file_name.replace(
+                                    self.folder_source,
+                                    ""
+                                ).strip("/")
+                            )
+                            root_folder = os.path.dirname(
+                                packer_conf_relative_file_name
+                            )
+
                             # Run packer
                             self.dispatch(packer_conf, root_folder)
 
@@ -259,8 +206,8 @@ class Builder(Thread):
 
         # Delete tmp source folder
         self.logger.info("Tmp folders deleting")
-        if os.path.exists(os.path.join(self.folder,'tmp')):
-            shutil.rmtree(os.path.join(self.folder,'tmp'))
+        if os.path.exists(os.path.join(self.folder, 'tmp')):
+            shutil.rmtree(os.path.join(self.folder, 'tmp'))
         for tmp_dir in glob.glob(os.path.join(self.folder, '*/tmp')):
             shutil.rmtree(tmp_dir)
         if os.path.exists(self.folder_source):

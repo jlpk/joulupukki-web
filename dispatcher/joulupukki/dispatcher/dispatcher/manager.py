@@ -7,7 +7,7 @@ import pecan
 import time
 from threading import Thread
 
-from joulupukki.worker.worker.builder import Builder
+from joulupukki.dispatcher.dispatcher.dispatcher import Dispatcher
 from joulupukki.common.datamodel.build import Build
 from joulupukki.common.datamodel.project import Project
 from joulupukki.common.datamodel.user import User
@@ -48,6 +48,6 @@ class Manager(Thread):
 
             if build:
                 logging.debug("Task received")
-                builder = Builder(build)
-                self.build_list[builder.uuid2] = builder
-                builder.start()
+                dispatcher = Dispatcher(build)
+                self.build_list[dispatcher.uuid2] = dispatcher
+                dispatcher.start()
