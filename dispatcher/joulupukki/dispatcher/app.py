@@ -2,7 +2,7 @@ from pecan import make_app
 
 import logging
 
-from worker.manager import Manager
+from dispatcher.manager import Manager
 import sys
 
 import signal

@@ -7,7 +7,7 @@ except ImportError:
     from setuptools import setup, find_packages
 
 setup(
-    name='joulupukki.worker',
+    name='joulupukki.dispatcher',
     version='0.1',
     description='',
     author='',
