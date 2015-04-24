@@ -132,30 +132,32 @@ class Dispatcher(Thread):
                           pecan.conf.rabbit_port,
                           pecan.conf.rabbit_db)
         # carrier.declare_queue('docker.queue')
-        self.logger.debug(packer_conf)
         for distro_name, build_conf in packer_conf.items():
-            if 'type' not in build_conf:
-                raise Exception("Invalid build_conf: no type present.")
+            if not hasattr(self.build, "forced_distro") or (
+                    self.build.forced_distro == distro_name or
+                    not self.build.forced_distro):
+                if 'type' not in build_conf:
+                    raise Exception("Invalid build_conf: no type present.")
 
-            # if not build_conf['type'] == 'docker':
-            queue = "%s.queue" % build_conf['type']
-            carrier.declare_queue(queue)
-            build_conf['distro'] = distro_name
-            build_conf['branch'] = self.branch
-            build_conf['root_folder'] = root_folder
-            message = {
-                'distro_name': distro_name,
-                'build_conf': build_conf,
-                'root_folder': root_folder,
-                'log_path': get_logger_path(self.build),
-                'id_': self.id_,
-                'build': self.build.dumps()
+                # if not build_conf['type'] == 'docker':
+                queue = "%s.queue" % build_conf['type']
+                carrier.declare_queue(queue)
+                build_conf['distro'] = distro_name
+                build_conf['branch'] = self.branch
+                build_conf['root_folder'] = root_folder
+                message = {
+                    'distro_name': distro_name,
+                    'build_conf': build_conf,
+                    'root_folder': root_folder,
+                    'log_path': get_logger_path(self.build),
+                    'id_': self.id_,
+                    'build': self.build.dumps()
 
-            }
-            if not carrier.send_message(message, queue):
-                self.logger.error("Can't post message to rabbitmq")
-            else:
-                self.logger.info("Posted build to %s" % queue)
+                }
+                if not carrier.send_message(message, queue):
+                    self.logger.error("Can't post message to rabbitmq")
+                else:
+                    self.logger.info("Posted build to %s" % queue)
 
         self.build.set_status('succeeded')
         self.logger.info("Packaging finished for all distros")
@@ -171,7 +173,6 @@ class Dispatcher(Thread):
             global_packer_conf_file_name = os.path.join(self.folder_source, ".packer.yml")
             if os.path.exists(global_packer_conf_file_name):
                 global_packer_conf_stream = file(global_packer_conf_file_name, 'r')
-                self.logger.debug(global_packer_conf_file_name)
                 global_packer_conf = yaml.load(global_packer_conf_stream)
 
                 # File with "include" directive
@@ -203,7 +204,6 @@ class Dispatcher(Thread):
 
                 else:
                     root_folder = '.'
-                    self.logger.info(global_packer_conf)
                     packer_conf = global_packer_conf
 
                     # Standard file
@@ -216,7 +216,7 @@ class Dispatcher(Thread):
         else:
             self.build.set_status('failed')
 
-        # Delete tmp source folder
+        # Delete tmp source folder: not here, packer jobs need to be finished
         """self.logger.info("Tmp folders deleting")
         if os.path.exists(os.path.join(self.folder, 'tmp')):
             shutil.rmtree(os.path.join(self.folder, 'tmp'))
@@ -225,6 +225,6 @@ class Dispatcher(Thread):
         if os.path.exists(self.folder_source):
             shutil.rmtree(self.folder_source)
         """
-        self.logger.info("Tmp folders deleted")
+        self.logger.info("Tmp folders NOT deleted: TODO")
         # Set end time
         self.build.finishing()
