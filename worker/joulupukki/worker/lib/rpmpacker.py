@@ -79,10 +79,10 @@ class RpmPacker(Packer):
         # DOCKER FILE TEMPLATE
         # Create and user an user "builder"
         dockerfile= '''
-        FROM %(distro)s
+        FROM %s
         RUN yum upgrade -y
         RUN yum install rpm-build tar rsync -y
-        ''' % self.config
+        ''' % self.distro
         f = BytesIO(dockerfile.encode('utf-8'))
 
         # BUILD

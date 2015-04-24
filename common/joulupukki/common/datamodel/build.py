@@ -92,10 +92,7 @@ class Build(APIBuild):
     def _save(self):
         """ Write project data on disk """
         data = self.as_dict()
-        data['jobs'] = [
-            job.id_
-            for job in data['jobs']
-        ]
+        del(data['jobs'])
         mongo.builds.update({
             "id_": self.id_,
             "username": self.username,

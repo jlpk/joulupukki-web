@@ -30,7 +30,8 @@ class Packer(object):
     def __init__(self, builder, config):
 
         self.config = config
-        self.distro = config['distro']
+        import ipdb;ipdb.set_trace()
+        self.distro = supported_distros[config['distro']]
         self.source_url = builder.source_url
         self.source_type = builder.source_type
         self.cli = builder.cli
@@ -56,12 +57,7 @@ class Packer(object):
 
         self.logger = get_logger_docker(self.job)
 
-        distro = supported_distros.get(config['distro'])
-        self.logger.debug(supported_distros)
-        self.logger.debug(config['distro'])
-        self.logger.debug(distro)
-
-        self.container_tag = "joulupukki:" + distro.replace(":", "_")
+        self.container_tag = "joulupukki:" + config['distro'].replace(":", "_")
         self.container = None
 
     def set_status(self, status):
