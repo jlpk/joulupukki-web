@@ -30,7 +30,6 @@ class Packer(object):
     def __init__(self, builder, config):
 
         self.config = config
-        import ipdb;ipdb.set_trace()
         self.distro = supported_distros[config['distro']]
         self.source_url = builder.source_url
         self.source_type = builder.source_type
