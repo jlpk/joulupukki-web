@@ -76,6 +76,8 @@ docker_version = "1.14"
 ccache_path = '%(confdir)s/ccache'
 
 supported_build_type = ['docker', 'ios']
+
+thread_count = 5
 #
 # All configurations are accessible at::
 # pecan.conf

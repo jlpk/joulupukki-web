@@ -8,9 +8,6 @@ import sys
 import signal
 
 
-
-
-
 def setup_app(config):
 
     app_conf = dict(config.app)
@@ -19,14 +16,17 @@ def setup_app(config):
                    logging=getattr(config, 'logging', {}),
                    **app_conf)
 
-
-    manager = Manager(app)
-    manager.start()
-
+    thread_count = config.thread_count
+    threads = []
+    for i in range(thread_count):
+        th = Manager(app)
+        th.start()
+        threads.append(th)
 
     def signal_handler(signal, frame):
         logging.debug('You pressed Ctrl+C!')
-        manager.shutdown()
+        for th in threads:
+            th.shutdown()
         sys.exit(0)
 
     signal.signal(signal.SIGINT, signal_handler)
