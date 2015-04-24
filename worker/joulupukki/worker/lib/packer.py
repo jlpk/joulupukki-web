@@ -1,28 +1,15 @@
 #!/usr/bin/python
-from io import BytesIO
 import os
-import sys
-import tarfile
-import re
 import logging
 import shutil
-import glob
 import time
-from urlparse import urlparse
 from datetime import datetime
 
-import pecan
-from docker import Client
+from threading import Thread
 
-from deb_pkg_tools.control import parse_depends
-from deb_pkg_tools.control import load_control_file
 from joulupukki.common.logger import get_logger, get_logger_docker
-from joulupukki.common.distros import reverse_supported_distros
+from joulupukki.common.distros import reverse_supported_distros, supported_distros
 from joulupukki.common.datamodel.job import Job
-from joulupukki.common.carrier import Carrier
-
-
-
 
 
 """
@@ -37,6 +24,7 @@ failed
 succeeded
 """
 
+
 class Packer(object):
 
     def __init__(self, builder, config):
@@ -50,11 +38,11 @@ class Packer(object):
         self.folder = builder.folder
 
         job_data = {
-                    'distro': config['distro'],
-                    'username': self.builder.build.username,
-                    'project_name': self.builder.build.project_name,
-                    'build_id': self.builder.build.id_,
-                    }
+            'distro': config['distro'],
+            'username': self.builder.build.username,
+            'project_name': self.builder.build.project_name,
+            'build_id': self.builder.build.id_,
+        }
         self.job = Job(job_data)
         self.job.create()
         self.folder_output = self.job.get_folder_output()
@@ -65,13 +53,16 @@ class Packer(object):
             os.makedirs(self.folder_output)
         if not os.path.exists(self.job_tmp_folder):
             os.makedirs(self.job_tmp_folder)
-        
+
         self.logger = get_logger_docker(self.job)
 
-        distro = reverse_supported_distros.get(config['distro'])
+        distro = supported_distros.get(config['distro'])
+        self.logger.debug(supported_distros)
+        self.logger.debug(config['distro'])
+        self.logger.debug(distro)
+
         self.container_tag = "joulupukki:" + distro.replace(":", "_")
         self.container = None
-
 
     def set_status(self, status):
         self.job.set_status(status)
@@ -94,7 +85,7 @@ class Packer(object):
                 self.logger.debug("Task failed during step: %s", step_name)
                 self.set_status('failed')
                 return False
-            # Save package name in build.cfg 
+            # Save package name in build.cfg
             if self.config.get('name') is not None and self.builder.build.package_name is None:
                 self.builder.build.package_name = self.config.get('name')
                 self.builder.build._save()
@@ -106,7 +97,6 @@ class Packer(object):
                 self.builder.build._save()
         self.set_status('succeeded')
         return True
-
 
     def parse_specdeb(self):
         return False

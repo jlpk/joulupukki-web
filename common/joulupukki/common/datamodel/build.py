@@ -89,15 +89,20 @@ class Build(APIBuild):
             # TODO handle error
             return False
 
-
     def _save(self):
         """ Write project data on disk """
         data = self.as_dict()
-        mongo.builds.update({"id_": self.id_,
-                             "username": self.username,
-                             "project_name": self.project_name},
-                             data,
-                             upsert=True)
+        data['jobs'] = [
+            job.id_
+            for job in data['jobs']
+        ]
+        mongo.builds.update({
+            "id_": self.id_,
+            "username": self.username,
+            "project_name": self.project_name},
+            data,
+            upsert=True
+        )
         return True
 
 
@@ -171,6 +176,7 @@ class Build(APIBuild):
     def get_jobs(self):
         """ return all build ids """
         jobs_ids = [Job(x) for x in mongo.jobs.find({"username": self.username, "project_name": self.project_name, "build_id": int(self.id_)})]
+
         if jobs_ids:
             return sorted(jobs_ids, key=lambda x: x.id_)
         return []

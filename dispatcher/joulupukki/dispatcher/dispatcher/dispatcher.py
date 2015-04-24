@@ -7,7 +7,7 @@ import pecan
 import git
 import yaml
 
-from joulupukki.common.logger import get_logger
+from joulupukki.common.logger import get_logger, get_logger_path
 from joulupukki.common.carrier import Carrier
 
 from docker import Client
@@ -140,7 +140,18 @@ class Dispatcher(Thread):
             # if not build_conf['type'] == 'docker':
             queue = "%s.queue" % build_conf['type']
             carrier.declare_queue(queue)
-            message = {'distro_name': distro_name, 'build_conf': build_conf}
+            build_conf['distro'] = distro_name
+            build_conf['branch'] = self.branch
+            build_conf['root_folder'] = root_folder
+            message = {
+                'distro_name': distro_name,
+                'build_conf': build_conf,
+                'root_folder': root_folder,
+                'log_path': get_logger_path(self.build),
+                'id_': self.id_,
+                'build': self.build.dumps()
+
+            }
             if not carrier.send_message(message, queue):
                 self.logger.error("Can't post message to rabbitmq")
             else:
@@ -192,6 +203,7 @@ class Dispatcher(Thread):
 
                 else:
                     root_folder = '.'
+                    self.logger.info(global_packer_conf)
                     packer_conf = global_packer_conf
 
                     # Standard file
@@ -205,13 +217,14 @@ class Dispatcher(Thread):
             self.build.set_status('failed')
 
         # Delete tmp source folder
-        self.logger.info("Tmp folders deleting")
+        """self.logger.info("Tmp folders deleting")
         if os.path.exists(os.path.join(self.folder, 'tmp')):
             shutil.rmtree(os.path.join(self.folder, 'tmp'))
         for tmp_dir in glob.glob(os.path.join(self.folder, '*/tmp')):
             shutil.rmtree(tmp_dir)
         if os.path.exists(self.folder_source):
             shutil.rmtree(self.folder_source)
+        """
         self.logger.info("Tmp folders deleted")
         # Set end time
         self.build.finishing()

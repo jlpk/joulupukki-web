@@ -1,17 +1,19 @@
 
 import logging
 
-
 import pecan
 
 import time
 from threading import Thread
 
 from joulupukki.worker.worker.builder import Builder
+from joulupukki.worker.worker.docker_builder import DockerBuilder
 from joulupukki.common.datamodel.build import Build
 from joulupukki.common.datamodel.project import Project
 from joulupukki.common.datamodel.user import User
 
+
+from joulupukki.common.logger import get_logger_from_path
 from joulupukki.common.carrier import Carrier
 
 
@@ -23,7 +25,11 @@ class Manager(Thread):
         self.build_list = {}
         self.carrier = Carrier(pecan.conf.rabbit_server,
                                pecan.conf.rabbit_port, pecan.conf.rabbit_db)
-        self.carrier.declare_queue('builds.queue')
+        self.supported_build_type = pecan.conf.supported_build_type
+        for build_type in self.supported_build_type:
+            self.carrier.declare_queue('%s.queue' % build_type)
+
+        self.logger = None
 
     def shutdown(self):
         logging.debug("Stopping Manager")
@@ -36,18 +42,35 @@ class Manager(Thread):
 
         while self.must_run:
             time.sleep(0.1)
-            new_build = self.carrier.get_message('builds.queue')
-            build = None
-            if new_build is not None:
-                build = Build(new_build)
-                build.user = User.fetch(new_build['username'],
-                                        sub_objects=False)
-                build.project = Project.fetch(build.user,
-                                              new_build['project_name'],
-                                              sub_objects=False)
+            for build_type in self.supported_build_type:
+                new_build = self.carrier.get_message('%s.queue' % build_type)
 
-            if build:
-                logging.debug("Task received")
-                builder = Builder(build)
-                self.build_list[builder.uuid2] = builder
-                builder.start()
+                build = None
+                if new_build is not None:
+                    distro_name = new_build['distro_name']
+                    build_conf = new_build['build_conf']
+                    root_folder = new_build['root_folder']
+                    self.logger = get_logger_from_path(
+                        new_build['log_path'],
+                        new_build['id_'],
+                    )
+                    build = Build(new_build['build'])
+                    self.logger.debug(build.dumps())
+                    self.logger.debug("test")
+                    builder_class = globals().get(build_type.title() + 'Builder')
+                    builder = builder_class(distro_name, build_conf, root_folder, self.logger, build)
+                    builder.run()
+                    """
+                    build = Build(new_build)
+                    build.user = User.fetch(new_build['username'],
+                                            sub_objects=False)
+                    build.project = Project.fetch(build.user,
+                                                  new_build['project_name'],
+                                                  sub_objects=False)
+                    """
+                """if build:
+                    logging.debug("Task received")
+                    builder = Builder(build)
+                    self.build_list[builder.uuid2] = builder
+                    builder.start()
+                """

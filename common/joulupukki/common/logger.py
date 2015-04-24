@@ -32,6 +32,32 @@ def get_logger(build, distro=None):
     return logger
 
 
+def get_logger_path(build):
+    log_file = os.path.join(pecan.conf.workspace_path,
+                            build.user.username,
+                            build.project.name,
+                            'builds',
+                            str(build.id_),
+                            "log.txt")
+    return log_file
+
+
+def get_logger_from_path(path, id_):
+    logger = logging.getLogger("#".join(("Builder", id_)))
+    # create formatter
+    formatter = logging.Formatter('[%(msecs)d] [%(levelname)-5.5s] [%(name)s] %(message)s')
+    # create logger
+    logger.setLevel(logging.DEBUG)
+    # create file handler and set level to debug
+    ch = logging.FileHandler(path)
+    ch.setLevel(logging.DEBUG)
+
+    # add formatter to ch
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+    # return logger
+    return logger
+
 
 def get_logger_docker(job):
     job_folder = job.get_folder_path()

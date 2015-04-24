@@ -165,6 +165,9 @@ class RpmPacker(Packer):
         # RUN
         self.logger.info("RPM Build starting")
         start_time = timeit.default_timer()
+        self.logger.debug(self.container_tag)
+        self.logger.debug(command)
+        self.logger.debug(volumes)
         self.container = self.cli.create_container(self.container_tag, command=command, volumes=volumes)
         local_source_folder = os.path.join(self.folder, "sources")
         binds[local_source_folder] = {"bind": "/upstream", "ro": True}

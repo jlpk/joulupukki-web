@@ -51,6 +51,7 @@ logging = {
 #
 # foo = {'bar':'baz'}
 workspace_path = '%(confdir)s/../output'
+
 rabbit_server = "127.0.0.1"
 rabbit_port = 5672
 rabbit_db = "joulupukki"
@@ -61,24 +62,23 @@ github_id = "666ff51d51afc14ab79c"
 
 
 
-# TODO DELETE ME!!!!
 distros = (
-           ("ubuntu_10.04", "ubuntu:10.04", "deb"),
-           ("ubuntu_12.04", "ubuntu:12.04", "deb"),
-           ("ubuntu_14.04", "ubuntu:14.04", "deb"),
-           ("ubuntu_14.10", "ubuntu:14.10", "deb"),
-           ("ubuntu_15.04", "ubuntu:15.04", "deb"),
-           ("debian_7", "debian:7", "deb"),
-           ("debian_8", "debian:8", "deb"),
-           ("centos_6", "centos:6", "rpm"),
-           ("centos_7", "centos:7", "rpm"),
-           ("fedora_20", "fedora:20", "rpm"),
-           ("fedora_21", "fedora:21", "rpm"),
-        )
+    ("ubuntu_10.04", "ubuntu:10.04", "deb", "docker"),
+    ("ubuntu_12.04", "ubuntu:12.04", "deb", "docker"),
+    ("ubuntu_14.04", "ubuntu:14.04", "deb", "docker"),
+    ("ubuntu_14.10", "ubuntu:14.10", "deb", "docker"),
+    ("ubuntu_15.04", "ubuntu:15.04", "deb", "docker"),
+    ("debian_7", "debian:7", "deb", "docker"),
+    ("debian_8", "debian:8", "deb", "docker"),
+    ("centos_6", "centos:6", "rpm", "docker"),
+    ("centos_7", "centos:7", "rpm", "docker"),
+    ("fedora_20", "fedora:20", "rpm", "docker"),
+    ("fedora_21", "fedora:21", "rpm", "docker"),
+)
 docker_version = "1.14"
 ccache_path = '%(confdir)s/ccache'
 
-
+supported_build_type = ['docker', 'ios']
 #
 # All configurations are accessible at::
 # pecan.conf
