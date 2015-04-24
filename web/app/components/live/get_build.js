@@ -49,10 +49,10 @@ angular.module('joulupukki.live')
                     $data.commit = $build.commit;
                 }
                 if ($build.forced_distro) {
-                    $data.forced_distro = $build.forced_distro
+                    $data.forced_distro = $build.forced_distro;
                 }
                 if ($build.snapshot) {
-                    $data.snapshot = $build.snapshot
+                    $data.snapshot = $build.snapshot;
                 }
                 return $http.post('/v3/users/' + $username + '/' + $project_name + '/build', $data)
                     .error(function () {
