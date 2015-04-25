@@ -29,18 +29,18 @@ class LoginController(rest.RestController):
                 if raw_data:
                     # Save this new user
                     data = json.loads(raw_data)
-                    new_user = User({"username": data['login'],
-                                     "name": data['name'],
-                                     "github_url": data['html_url'],
-                                     "email": data['email'],
-                                     "token_github": access_token[0]
-                                    })
-                    if not new_user.create():
+                    user = User({"username": data['login'],
+                                 "name": data['name'],
+                                 "github_url": data['html_url'],
+                                 "email": data['email'],
+                                 "token_github": access_token
+                                 })
+                    if not user.create():
                         return None
                 else:
                     return None
-            # TODO access_token is a list should be a str
-            return access_token
+            return {"access_token": access_token,
+                    "username": user.username}
         return None
 
 

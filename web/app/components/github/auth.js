@@ -2,7 +2,8 @@
 
 angular.module('joulupukki.github')
 
- 
+/* 
+    // All all this should be in JLPK API
     .service('getUserInfo', ['$http', '$cookies',
         function ($http, $cookies) {
             return function (username) {
@@ -17,6 +18,7 @@ angular.module('joulupukki.github')
                 }
             };
         }])
+
 
     .service('getCurrentUserInfo', ['$http', '$cookies',
         function ($http, $cookies) {
@@ -57,3 +59,4 @@ angular.module('joulupukki.github')
                 }
             };
         }])
+*/

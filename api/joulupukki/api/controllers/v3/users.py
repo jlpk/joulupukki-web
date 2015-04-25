@@ -39,8 +39,8 @@ class UserController(rest.RestController):
         self.username = username
 
     # curl -X GET http://127.0.0.1:8080/v3/users/joulupukki
-    @wsme_pecan.wsexpose(User)
-    def get(self):
+    @wsme_pecan.wsexpose(User, unicode)
+    def get(self, access_token=None):
         """Returns user"""
         user = User.fetch(self.username, with_password=False)
         return user

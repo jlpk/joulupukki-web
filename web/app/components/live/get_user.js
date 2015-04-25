@@ -5,10 +5,10 @@ angular.module('joulupukki.live')
  
     .service('getUser', ['$http', 
         function ($http) {
-            return function ($username, $project_name, $build_id) {
-                return $http.get('/v3/users/' + $username + '/' + $project_name + '/builds/' + $build_id)
+            return function (username, access_token) {
+                return $http.get('/v3/users/' + username + "?access_token=" + access_token)
                     .error(function () {
-                        throw new Error('getBuild: GET Request failed');
+                        throw new Error('getUser: GET Request failed');
                     });
             };
         }])
@@ -32,7 +32,7 @@ angular.module('joulupukki.live')
                 }
                 return $http.post('/v3/users/' + $username + '/' + $project_name + '/build', $data)
                     .error(function () {
-                        throw new Error('getBuild: GET Request failed');
+                        throw new Error('postUser: POST Request failed');
                     });
             };
         }])

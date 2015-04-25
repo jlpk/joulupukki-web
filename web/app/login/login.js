@@ -27,18 +27,32 @@ angular.module('joulupukki.view.login', ['ngRoute',
                               '$window', '$http', '$cookies',
                               'postUser',
         function ($scope, $rootScope, $routeParams, $window, $http, $cookies, postUser) {
+            // Test if the user is authenticated
             if (!$cookies.token) {
-                if ($routeParams.code) {
+                // User not authenticated
+                // Test we have already ask github authorization
+                if (!$routeParams.code) {
+                    // We don't have github authorizations
+                    // So go ask them !
+                    var url = "https://github.com/login/oauth/authorize?client_id=666ff51d51afc14ab79c&scope=user:email,read:org,repo:status,repo_deployment,write:repo_hook&redirect_uri=http://jlpk.org/app/#/auth/login"
+                    // Go to github
+                    $window.location.href = url; 
+                }
+                else {
+                    // Here is the return from github
+                    // (github give us the "code" params"
                     var code = $routeParams.code;
                     var data = {code: code }
                     var url = "/v3/auth/login"
+                    // Try to login in joulupukki api
                     $http.post(url, data)
                         // Login success
                         .success(function(data, status, headers, config){
                             if (data != 'null'){ 
-                                $cookies.token = data
+                                // login APi return token
+                                $cookies.token = data.access_token
+                                $cookies.username = data.username
                                 $rootScope.$emit('token_changed')
-                                // TODO Save user data to mongo
                                 // go to repo page
                                 var url = "#/repositories"
                                 $window.location.href = url; 
@@ -55,12 +69,7 @@ angular.module('joulupukki.view.login', ['ngRoute',
                             var url = "#/auth/"
                             $window.location.href = url; 
                         })
-                }
-                else {
-                    var url = "https://github.com/login/oauth/authorize?client_id=666ff51d51afc14ab79c&scope=user:email,read:org,repo:status,repo_deployment,write:repo_hook&redirect_uri=http://jlpk.org/app/#/auth/login"
-                    //var url = "https://github.com/login/oauth/authorize?client_id=666ff51d51afc14ab79c&scope=user:email,read:org,repo:status,repo_deployment,admin:repo_hook&redirect_uri=http://jlpk.org/app/#/auth/login"
-                    // Go to github
-                    $window.location.href = url; 
+
                 }
             }
            
@@ -70,7 +79,7 @@ angular.module('joulupukki.view.login', ['ngRoute',
     .controller('logoutCtrl', ['$scope', '$rootScope', '$routeParams',
                               '$window', '$http', '$cookies',
         function ($scope, $rootScope, $routeParams, $window, $http, $cookies) {
-            //console.log("logout")
+            // Delete cookies
             delete $cookies.token;
             delete $cookies.username;
             $rootScope.$emit('token_changed')

@@ -6,6 +6,7 @@ import json
 
 import pecan
 
+
 def get_access_token(code):
 
     headers = {"User-Agent": "Joulupukki"}
@@ -30,7 +31,9 @@ def get_user(access_token):
     
     url = "api.github.com"
     conn = httplib.HTTPSConnection(url)
+    headers = {}
     headers['Authorization'] = "token " + access_token
+    headers['User-Agent'] = "Joulupukki"
     params = urllib.urlencode({
                                "client_id": pecan.conf.github_id,
                                "client_secret": pecan.conf.github_secret,
@@ -39,3 +42,41 @@ def get_user(access_token):
     conn.request("GET", "/user", params, headers)
     response = conn.getresponse()
     return response.read()
+
+
+def get_user_repos(username, access_token):
+    
+    url = "api.github.com"
+    conn = httplib.HTTPSConnection(url)
+    headers = {}
+    headers['Authorization'] = "token " + access_token
+    headers['User-Agent'] = "Joulupukki"
+    params = urllib.urlencode({
+                               "client_id": pecan.conf.github_id,
+                               "client_secret": pecan.conf.github_secret,
+                              })
+    url = "/".join(("user", username, "repos"))
+    conn.request("GET", url, params, headers)
+    response = conn.getresponse()
+    return response.read()
+
+
+def get_user_orgs(username, access_token):
+    
+    url = "api.github.com"
+    conn = httplib.HTTPSConnection(url)
+    headers = {}
+    headers['Authorization'] = "token " + access_token
+    headers['User-Agent'] = "Joulupukki"
+    params = urllib.urlencode({
+                               "client_id": pecan.conf.github_id,
+                               "client_secret": pecan.conf.github_secret,
+                              })
+    url = "/".join(("user", username, "orgs"))
+    conn.request("GET", url, params, headers)
+    response = conn.getresponse()
+    return response.read()
+
+
+def update_user_info_from_github(username, access_token):
+    pass

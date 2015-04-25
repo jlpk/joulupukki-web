@@ -1,21 +1,18 @@
 'use strict';
 
 angular.module('joulupukki.topbar', ['joulupukki.live',
-                                     'joulupukki.github'
                                     ])
 
 
-    .controller('TopBarCtrl', ['$scope', '$cookies', '$rootScope', 'getCurrentUserInfo',
-        function ($scope, $cookies, $rootScope, getCurrentUserInfo) {
+    .controller('TopBarCtrl', ['$scope', '$cookies', '$rootScope', 'getUser',
+        function ($scope, $cookies, $rootScope, getUser) {
 
-            $rootScope.$on('token_changed', function(){
-                //console.log('token_changed')
-                var $getuserinfo = getCurrentUserInfo()
-                if($getuserinfo){
-                    $getuserinfo.success(function(data) {
+           $rootScope.$on('token_changed', function(){
+                if($cookies.token){
+                    getUser($cookies.username, $cookies.token).success(function(data) {
                         if (data){
-                           $scope.username = data.login
-                           $cookies.username = data.login
+                           $scope.username = data.username
+                           $cookies.username = data.username
                         }
                         else {
                            delete $scope.username
