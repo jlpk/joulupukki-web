@@ -2,6 +2,7 @@
 
 angular.module('joulupukki.view.account', ['ngRoute',
                                            'ngCookies',
+                                           'frapontillo.bootstrap-switch',
                                            'joulupukki.github'
                                            ])
 
@@ -19,23 +20,31 @@ angular.module('joulupukki.view.account', ['ngRoute',
     .controller('accountCtrl', ['$scope', '$rootScope', '$routeParams',
                                 '$window', '$http', '$cookies',
                                 'getUserInfo', 'getUserRepos', 'getUserOrgs',
+                                'toggleProject',
         function ($scope, $rootScope, $routeParams, $window, $http, $cookies,
-                  getUserInfo, getUserRepos, getUserOrgs) {
+                  getUserInfo, getUserRepos, getUserOrgs, toggleProject) {
+            $scope.username = $cookies.username
+            $scope.switchStatus = true
+            $scope.toggle_project = toggleProject()
             if ($routeParams.githubaccount) {
-                $scope.username = $routeParams.githubaccount
+                $scope.github_username = $routeParams.githubaccount
             }
             else {
-                $scope.username = $cookies.username
+                $scope.github_username = $scope.username
             }
             getUserInfo($scope.username)
-                .success(function(data, status, headers, config){
-                    $scope.name = data.name
+            .success(function(data, status, headers, config){
+                $scope.name = data.name
                 })
-            getUserRepos($scope.username)
+            getUserInfo($scope.github_username)
                 .success(function(data, status, headers, config){
-                    $scope.repos = data
+                    $scope.github_name = data.name
                 })
-            getUserOrgs($cookies.username)
+            getUserRepos($scope.github_username)
+                .success(function(data, status, headers, config){
+                    $scope.github_repos = data
+                })
+            getUserOrgs($scope.username)
                 .success(function(data, status, headers, config){
                     $scope.orgs = data
                 })

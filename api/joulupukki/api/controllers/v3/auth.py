@@ -8,6 +8,7 @@ import wsmeext.pecan as wsme_pecan
 from pecan import rest
 
 from joulupukki.common.datamodel.user import User
+from joulupukki.api.libs import github
 
 class LoginController(rest.RestController):
 
@@ -15,37 +16,16 @@ class LoginController(rest.RestController):
     def post(self, code):
         if code is None:
             return None
-        headers = {"User-Agent": "Joulupukki"}
-        url = 'github.com'
-        conn = httplib.HTTPSConnection(url)
-        params = urllib.urlencode({"code": code,
-                                   "client_id": pecan.conf.github_id,
-                                   "client_secret": pecan.conf.github_secret,
-                                  })
-        conn.request("POST", "/login/oauth/access_token", params, headers)
-        response = conn.getresponse()
-        data = response.read()
-        params = parse_qs(data)
-        access_token = params.get("access_token")
+
+        access_token = github.get_access_token(code)
+
         if access_token:
             # Check if this user exists in DB
             # if not we need to create it
-            user = User.fetch_from_github_token(access_token[0])
-            print user
+            user = User.fetch_from_github_token(access_token)
             if user is None:
                 # Get data from github
-                url = "api.github.com"
-                conn = httplib.HTTPSConnection(url)
-                headers['Authorization'] = "token " + access_token[0]
-                params = urllib.urlencode({
-                                           "client_id": pecan.conf.github_id,
-                                           "client_secret": pecan.conf.github_secret,
-                                          })
-
-
-                conn.request("GET", "/user", params, headers)
-                response = conn.getresponse()
-                raw_data = response.read()
+                raw_data = github.get_user(access_token)
                 if raw_data:
                     # Save this new user
                     data = json.loads(raw_data)

@@ -1,36 +1,27 @@
-from pecan import expose, redirect
-import wsmeext.pecan as wsme_pecan
-import pecan
-from pecan import rest
-
-import wsme.types as wtypes
-
-from wsme.types import File
-
-
 import zipfile
 import tarfile
-
+import httplib
 import glob
 import os
 import json
 import uuid
 import datetime
 import shutil
-
 from io import BytesIO
 
+from pecan import expose, redirect
+import pecan
+from pecan import rest
+import wsmeext.pecan as wsme_pecan
+import wsme.types as wtypes
+from wsme.types import File
 
 from joulupukki.common.datamodel.user import User
 from joulupukki.common.datamodel.result import APIResult
 from joulupukki.common.datamodel.project import Project, APIProject
-
-
+from joulupukki.common.distros import supported_distros, reverse_supported_distros
 from joulupukki.api.controllers.v3.builds import BuildsController
 from joulupukki.api.controllers.v3.builds import LaunchBuildController
-
-from joulupukki.common.distros import supported_distros, reverse_supported_distros
-
 
 
 class ProjectsController(rest.RestController):
@@ -95,11 +86,32 @@ class ProjectController(rest.RestController):
 
 
 
+class GithubController(rest.RestController):
+    # curl -X GET http://127.0.0.1:8080/v3/joulupukki/myproject
+    @wsme_pecan.wsexpose(Project, bool)
+    def get(self, get_last_build=False):
+        """Returns project"""
+        project = Project.fetch(self.user, self.project_name, get_last_build=get_last_build)
+        return project
+
+
+    # curl -X POST -H "Content-Type: application/json" -i  -d '{"name": "project"}' http://127.0.0.1:8081/v3/titilambert/myproject
+    @wsme_pecan.wsexpose(wtypes.text)
+    def post(self, project):
+        """toogle project"""
+        project_name = pecan.request.context['project_name']
+        user = User.fetch(pecan.request.context['username'])
+
+        pass
+        " /repos/:owner/:repo/hooks"
+
+
 
 
 class ProjectSubController(rest.RestController):
     builds = BuildsController()
     build = LaunchBuildController()
+    github = GithubController()
 #    jobs = JobsController()
 
 

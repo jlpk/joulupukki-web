@@ -1,3 +1,66 @@
-#404 {
+#account {
     padding-left: 0px;
 }
+
+
+#account div#repos ul {
+    list-style-type: none;
+    color: #484849;
+    font-size: 14px;
+    padding-left: 20px;
+}
+
+#account div#repos ul li {
+    clear: left;
+    margin-bottom: .8em;
+}
+
+
+#account div#repos ul li div.switch,
+#account div#repos ul li div.repo {
+    float: left;
+    line-height: 30px;
+    margin-bottom: .8em;
+}
+
+#account div#repos ul li div.switch {
+    max-width: 80px;
+    margin-right: 30px
+}
+
+#account div#repos ul li div.repo {
+    width: 70%;
+    padding-left: 8px;
+
+}
+
+#account div#repos ul li div.repo:hover {
+    background-color: #ededec;
+}
+
+#account div#repos ul li div.repo a{
+    color: #666;
+    text-decoration: none;
+
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#account div#repos ul li div.repo a span {
+//    visibility: hidden;
+    color: #484849;
+    padding-left: 25px;
+    position: absolute;
+//    display: inline-block;
+    display: none;
+    height: 30px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+#account div#repos ul li div.repo:hover a span {
+    visibility: visible;
+}
+

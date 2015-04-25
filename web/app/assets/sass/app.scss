@@ -12,12 +12,16 @@
 @import "../../bower_components/font-awesome-sass/assets/stylesheets/font-awesome.scss";
 @import "../../bower_components/font-awesome-sass/assets/stylesheets/_font-awesome-sprockets.scss";
 
+
+@import "../../bower_components/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.min.css";
+
 //----------------------------------*\
 // INTERFACE MODULES
 //----------------------------------*/
 @import 'jlpk';
 @import '../../repositories/repositories';
 @import '../../404/404';
+@import '../../account/account';
 @import '../../login/login';
 @import '../../components/topbar/topbar';
 @import '../../components/sidebar/sidebar';

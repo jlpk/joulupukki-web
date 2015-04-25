@@ -35,5 +35,17 @@ angular.module('joulupukki.live')
                         throw new Error('getLatestProjects : GET Request failed');
                     });
             };
-        }]);
+        }])
+
+
+    .service('toggleProject', ['$http',
+        function ($http) {
+            return function (username, project_name, state) {
+                var url = '/v3/users' + username + '/' + project_name + '?';
+                return $http.post($url)
+                    .error(function () {
+                        throw new Error('getProject : GET Request failed');
+                });
+            };
+    }]);
 

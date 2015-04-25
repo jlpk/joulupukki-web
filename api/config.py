@@ -59,6 +59,7 @@ mongo_server = "127.0.0.1"
 mongo_port = 27017
 mongo_db = "joulupukki"
 github_id = "666ff51d51afc14ab79c"
+github_secret = "67c5dc2cf8dbb94c4d002ce08a406b64697e7265"
 
 
 
