@@ -17,6 +17,9 @@ class APIProject(types.Base):
 
 class Project(APIProject):
     username = wsme.wsattr(wtypes.text, mandatory=False)
+    url = wsme.wsattr(wtypes.text, mandatory=False)
+    description = wsme.wsattr(wtypes.text, mandatory=False)
+    enabled = wsme.wsattr(bool, mandatory=False, default=False)
     builds = wsme.wsattr([Build], mandatory=False)
 
     def __init__(self, data=None, sub_objects=True):
@@ -54,10 +57,14 @@ class Project(APIProject):
             # TODO handle error
             return False
 
+    # TODO merge this function
+    def update(self):
+        self._save()
+
     @classmethod
     def fetch(cls, user, project_name, sub_objects=True, get_last_build=False):
         db_project = mongo.projects.find_one({"name": project_name,
-                                              "username": user.username})
+                                              "username": user})
         project = None
         if db_project is not None:
             project = cls(db_project, sub_objects)
@@ -88,7 +95,6 @@ class Project(APIProject):
         except Exception as exp:
             # TODO handle 
             return False
-
 
 
     def get_builds(self):
@@ -133,8 +139,15 @@ class Project(APIProject):
         if db_projects is not None:
             projects = [cls(db_project, sub_objects=False) for db_project in db_projects]
             if get_last_build:
+                # Get all projects with its last build
                 for p in projects:
-                    p.builds = [p.get_latest_build()]
+                    latest_build = p.get_latest_build()
+                    p.builds = [latest_build]
+                    if latest_build is None:
+                        p.builds = []
+                # Delete from with any build
+                projects = [p for p in projects if p.builds != []]
+                # Sort project
                 projects.sort(key=lambda p: p.builds[0].created, reverse=True)
         return projects
 

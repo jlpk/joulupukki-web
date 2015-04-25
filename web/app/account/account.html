@@ -2,12 +2,12 @@
   <div class="row">
     <div class="col-xs-12 col-sm-3" id="orgs">
       <div>
-        <a href="#/account/">{{ name }}</a>
+        <a href="#/account/">{{ username }}</a>
       </div>
       <div>
         <ul>
           <li ng-repeat="org in orgs" >
-            <a href="#/account/{{ org.login }}">{{ org.login }}</a>
+            <a href="#/account/{{ org }}">{{ org }}</a>
           </li>
         </ul>
       </div>
@@ -15,7 +15,7 @@
     <div class="col-xs-12 col-sm-9" id="repos">
       <div>
         <h2>
-          {{ github_name }}
+          {{ selected_username }}
         </h2>
         <button ng-click="count = count + 1" ng-init="count=0" class="btn btn-info">
           Sync
@@ -23,17 +23,18 @@
       </div>
       <div>
         <ul>
-          <li ng-repeat="repo in github_repos">
+          <li ng-repeat="project in projects">
             <div class="switch">
-              <input bs-switch ng-model="repo.is_active" type="checkbox"
-                    ng-click="toggleProject()"
-                   switch-on-color="success" switch-off-color="danger" switch-size="small">
+              <input id="{{project.name}}" name="{{project.name}}" bs-switch
+                     ng-model="project.enabled" type="checkbox"
+                     ng-change="enableProject(project)" switch-on-color="success"
+                     switch-off-color="danger" switch-size="small">
             </div>
             <div class="repo">
-              <a href="{{ repo.html_url }}" >
-                {{ repo.full_name }}
+              <a href="{{ project.url }}" >
+                {{ project.username }}/{{ project.name }}
                 <span>
-                  {{ repo.description }}
+                  {{ project.description }}
                 </span>
               </a>
             </div>

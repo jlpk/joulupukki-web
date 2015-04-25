@@ -21,6 +21,7 @@ class APIUser(types.Base):
 
 class User(APIUser):
     projects = wsme.wsattr([Project], mandatory=False)
+    orgs = wsme.wsattr([wtypes.text], mandatory=False)
     token = wsme.wsattr(wtypes.text, mandatory=False)
     token_github = wsme.wsattr(wtypes.text, mandatory=False)
 

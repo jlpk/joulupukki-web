@@ -25,10 +25,9 @@ class LoginController(rest.RestController):
             user = User.fetch_from_github_token(access_token)
             if user is None:
                 # Get data from github
-                raw_data = github.get_user(access_token)
-                if raw_data:
+                data = github.get_user_from_token(access_token)
+                if data:
                     # Save this new user
-                    data = json.loads(raw_data)
                     user = User({"username": data['login'],
                                  "name": data['name'],
                                  "github_url": data['html_url'],
@@ -37,6 +36,7 @@ class LoginController(rest.RestController):
                                  })
                     if not user.create():
                         return None
+                    github.update_user_info_from_github(user.username, user.token_github)
                 else:
                     return None
             return {"access_token": access_token,

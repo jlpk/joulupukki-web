@@ -22,6 +22,7 @@ from joulupukki.common.datamodel.project import Project, APIProject
 from joulupukki.common.distros import supported_distros, reverse_supported_distros
 from joulupukki.api.controllers.v3.builds import BuildsController
 from joulupukki.api.controllers.v3.builds import LaunchBuildController
+from joulupukki.api.libs import github
 
 
 class ProjectsController(rest.RestController):
@@ -86,32 +87,23 @@ class ProjectController(rest.RestController):
 
 
 
-class GithubController(rest.RestController):
-    # curl -X GET http://127.0.0.1:8080/v3/joulupukki/myproject
-    @wsme_pecan.wsexpose(Project, bool)
-    def get(self, get_last_build=False):
-        """Returns project"""
-        project = Project.fetch(self.user, self.project_name, get_last_build=get_last_build)
-        return project
-
-
-    # curl -X POST -H "Content-Type: application/json" -i  -d '{"name": "project"}' http://127.0.0.1:8081/v3/titilambert/myproject
-    @wsme_pecan.wsexpose(wtypes.text)
-    def post(self, project):
+class EnableController(rest.RestController):
+    # curl -X GET http://127.0.0.1:8080/v3/joulupukki/myproject/enable?access_token
+    @wsme_pecan.wsexpose(wtypes.text, unicode)
+    def get(self, access_token):
         """toogle project"""
-        project_name = pecan.request.context['project_name']
         user = User.fetch(pecan.request.context['username'])
-
-        pass
-        " /repos/:owner/:repo/hooks"
-
-
+        project = Project.fetch(user.username, pecan.request.context['project_name'])
+        new_state = github.toggle_project_webjook(user, project, access_token)
+        if new_state is None:
+            return {"result": "error"}
+        return {"result": new_state}
 
 
 class ProjectSubController(rest.RestController):
     builds = BuildsController()
     build = LaunchBuildController()
-    github = GithubController()
+    enable = EnableController()
 #    jobs = JobsController()
 
 

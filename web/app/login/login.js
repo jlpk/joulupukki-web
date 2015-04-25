@@ -49,10 +49,11 @@ angular.module('joulupukki.view.login', ['ngRoute',
                         // Login success
                         .success(function(data, status, headers, config){
                             if (data != 'null'){ 
-                                // login APi return token
+                                // login API return token
                                 $cookies.token = data.access_token
                                 $cookies.username = data.username
                                 $rootScope.$emit('token_changed')
+                                // Launch user update
                                 // go to repo page
                                 var url = "#/repositories"
                                 $window.location.href = url; 

@@ -18,6 +18,7 @@ angular.module('joulupukki.live')
         }])
 
 
+
     .service('getLatestProjects', ['$http',
         function ($http) {
             return function (username, pattern) {
@@ -38,14 +39,16 @@ angular.module('joulupukki.live')
         }])
 
 
-    .service('toggleProject', ['$http',
-        function ($http) {
-            return function (username, project_name, state) {
-                var url = '/v3/users' + username + '/' + project_name + '?';
-                return $http.post($url)
-                    .error(function () {
-                        throw new Error('getProject : GET Request failed');
-                });
+    .service('enableProject', ['$http', "$cookies",
+        function ($http, $cookies) {
+            return function (project) {
+                if ($cookies.token) {
+                    var url = '/v3/users/' + project.username + '/' + project.name + '/enable?access_token=' + $cookies.token;
+                    return $http.get(url)
+                        .error(function () {
+                            throw new Error('enableProject : GET Request failed');
+                    });
+                }
             };
     }]);
 

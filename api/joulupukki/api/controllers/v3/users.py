@@ -63,6 +63,16 @@ class UserController(rest.RestController):
                 return {"result": "Error editing"}
             return {"result": "User %s edited" % self.username}
 
+    @wsme_pecan.wsexpose(wtypes.text, unicode)
+    def put(self, access_token):
+        """ Update user from github """
+        user = User.fetch(self.username, with_password=False)
+        if user is None:
+            return {"result": "bad user"}
+        get
+
+
+
     # curl -X DELETE -H "Content-Type: application/json" -i  -d '{"username": "titilambert", "password": "titilambert"}' http://127.0.0.1:8081/v3/titilambert
     @wsme_pecan.wsexpose(wtypes.text, body=APIUser, status_code=201)
     def delete(self, sent_user):
