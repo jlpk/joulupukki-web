@@ -29,6 +29,7 @@ class Manager(Thread):
             pecan.conf.rabbit_port,
             pecan.conf.rabbit_user,
             pecan.conf.rabbit_password,
+            pecan.conf.rabbit_vhost,
             pecan.conf.rabbit_db
         )
         self.supported_build_type = pecan.conf.supported_build_type
