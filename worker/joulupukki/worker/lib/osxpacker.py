@@ -40,10 +40,37 @@ class OsxPacker(object):
         self.job.set_build_time(build_time)
 
     def run(self):
-        self.logger.debug("TESTTTTTTT")
-        """steps = (('setup', self.setup),
-                 ('preparing', self.parse_s
-        """
+        steps = (
+            ('setup', self.setup),
+            ('compiling', self.compile_),
+        )
+        for step_name, step_function in steps:
+            self.set_status(step_name)
+            if step_function() is not True:
+                self.logger.debug("Task failed during step: %s", step_name)
+                self.set_status('failed')
+                return False
+            # Save package name in build.cfg
+            if (self.config.get('name') is not None and
+                    self.builder.build.package_name is None):
+                self.builder.build.package_name = self.config.get('name')
+                self.builder.build._save()
+        self.set_status('succeeded')
+        return True
+
+    def setup(self):
+        # Installing dependencies
+        os.system("sudo brew install automake libtool gettext libtoolize yasm"
+                  " autoconf pkg-config qt5")
+
+    def compile_(self):
+        # Compiling ring-daemon
+        os.system("git clone git@git.savoirfairelinux.com:ring-daemon.git")
+        os.system("cd ring-daemon/contrib")
+        os.system("mkdir native")
+        os.system("cd native")
+        os.system("../bootstrap")
+        os.system("make -j3")
 
     def parse_specdeb(self):
         pass
