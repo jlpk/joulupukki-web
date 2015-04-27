@@ -14,7 +14,10 @@ from collections import OrderedDict
 from datetime import datetime
 
 from docker import Client
-import rpm
+try:
+    import rpm
+except:
+    pass
 
 from joulupukki.worker.lib.packer import Packer
 

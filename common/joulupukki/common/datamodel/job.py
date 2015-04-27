@@ -92,7 +92,7 @@ class Job(APIJob):
     def _save(self):
         """ Write job data on disk """
         data = self.as_dict()
-        mongo.jobs.update({"id_": self.id_,
+        mongo.jobs.update_one({"id_": self.id_,
                            "username": self.username,
                            "project_name": self.project_name,
                            "build_id": self.build_id},
@@ -105,14 +105,17 @@ class Job(APIJob):
 
     def get_folder_output(self):
         """ Return build folder path"""
-        distro = reverse_supported_distros.get(self.distro, self.distro)
+        if self.distro != "osx":
+            self.distro = reverse_supported_distros.get(self.distro, self.distro)
+        else:
+            self.distro = "osx"
         return os.path.join(pecan.conf.workspace_path,
                             self.username,
                             self.project_name,
                             "builds",
                             str(self.build_id),
                             "output",
-                            distro,
+                            self.distro,
                             )
 
     def get_folder_path(self):

@@ -5,9 +5,7 @@ import shutil
 import time
 from datetime import datetime
 
-from threading import Thread
-
-from joulupukki.common.logger import get_logger, get_logger_docker
+from joulupukki.common.logger import get_logger, get_logger_job
 from joulupukki.common.distros import reverse_supported_distros, supported_distros
 from joulupukki.common.datamodel.job import Job
 
@@ -30,11 +28,12 @@ class Packer(object):
     def __init__(self, builder, config):
 
         self.config = config
+
+        self.builder = builder
         self.distro = supported_distros[config['distro']]
         self.source_url = builder.source_url
         self.source_type = builder.source_type
         self.cli = builder.cli
-        self.builder = builder
         self.folder = builder.folder
 
         job_data = {
@@ -54,7 +53,7 @@ class Packer(object):
         if not os.path.exists(self.job_tmp_folder):
             os.makedirs(self.job_tmp_folder)
 
-        self.logger = get_logger_docker(self.job)
+        self.logger = get_logger_job(self.job)
 
         self.container_tag = "joulupukki:" + config['distro'].replace(":", "_")
         self.container = None

@@ -14,7 +14,10 @@ class Builder(Thread, ):
         self.logger = logger
         self.build = build
 
-        self.cli = Client(base_url='unix://var/run/docker.sock', version=pecan.conf.docker_version)
+        try:
+            self.cli = Client(base_url='unix://var/run/docker.sock', version=pecan.conf.docker_version)
+        except:
+            pass
 
         self.folder = build.get_folder_path()
 

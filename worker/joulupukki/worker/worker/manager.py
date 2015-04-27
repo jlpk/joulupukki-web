@@ -8,6 +8,7 @@ from threading import Thread
 
 from joulupukki.worker.worker.builder import Builder
 from joulupukki.worker.worker.docker_builder import DockerBuilder
+from joulupukki.worker.worker.osx_builder import OsxBuilder
 from joulupukki.common.datamodel.build import Build
 from joulupukki.common.datamodel.project import Project
 from joulupukki.common.datamodel.user import User
