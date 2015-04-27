@@ -24,8 +24,13 @@ class Manager(Thread):
         self.must_run = False
         self.app = app
         self.build_list = {}
-        self.carrier = Carrier(pecan.conf.rabbit_server,
-                               pecan.conf.rabbit_port, pecan.conf.rabbit_db)
+        self.carrier = Carrier(
+            pecan.conf.rabbit_server,
+            pecan.conf.rabbit_port,
+            pecan.conf.rabbit_user,
+            pecan.conf.rabbit_password,
+            pecan.conf.rabbit_db
+        )
         self.supported_build_type = pecan.conf.supported_build_type
         for build_type in self.supported_build_type:
             self.carrier.declare_queue('%s.queue' % build_type)

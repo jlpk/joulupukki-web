@@ -12,7 +12,8 @@ import logging
 
 
 class Carrier(object):
-    def __init__(self, server, port, exchange, queue="default.queue"):
+    def __init__(self, server, port, username, password, exchange,
+                 queue="default.queue"):
         """queues:
         * builds
         """
@@ -20,9 +21,13 @@ class Carrier(object):
         self.port = port
         self.exchange = exchange
         self.closing = False
-        self.parameters = pika.ConnectionParameters(host=self.server,
-                                                    port=self.port,
-                                                    )
+        rabbit_credentials = pika.PlainCredentials(username, password)
+        self.parameters = pika.ConnectionParameters(
+            host=self.server,
+            port=self.port,
+            credentials=rabbit_credentials,
+        )
+
         self.queue = queue
         self.connect()
         # self.connection = pika.BlockingConnection(self.parameters)
