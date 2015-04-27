@@ -12,7 +12,7 @@ import logging
 
 
 class Carrier(object):
-    def __init__(self, server, port, username, vhost, password, exchange,
+    def __init__(self, server, port, username, password, vhost, exchange,
                  queue="default.queue"):
         """queues:
         * builds
