@@ -1,23 +1,16 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
-try:
-    from setuptools import setup, find_packages
-except ImportError:
-    from ez_setup import use_setuptools
-    use_setuptools()
-    from setuptools import setup, find_packages
+import os
 
-setup(
-    name='joulupukki.worker',
-    version='0.1',
-    description='',
-    author='',
-    author_email='',
-    install_requires=[
-        "pecan",
-    ],
-    namespace_packages=['joulupukki'],
-    test_suite='joulupukki',
-    zip_safe=False,
-    include_package_data=True,
-    packages=find_packages(exclude=['ez_setup'])
+
+from joulupukki.worker import VERSION
+os.environ['PBR_VERSION'] = VERSION
+
+import setuptools
+
+
+setuptools.setup(
+    setup_requires=['pbr'],
+    version=VERSION,
+    pbr=True,
 )
