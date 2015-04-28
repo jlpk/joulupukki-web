@@ -2,7 +2,6 @@
 
 import sys
 import os
-from pecan.commands import CommandRunner
 
 VERSION = "0.1"
 
@@ -15,4 +14,5 @@ def run():
 #            print("%s doesn't exists" % config_file_path)
 #            sys.exit(1)
         sys.argv.append("config.py")
+    from pecan.commands import CommandRunner
     CommandRunner.handle_command_line()
