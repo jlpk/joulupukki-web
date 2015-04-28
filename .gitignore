@@ -49,6 +49,8 @@ web/app/assets/css
 web/.sass-cache/
 web/out/
 web/build/
+web/app/bower_components
+web/app/build
 /api/build/
 /worker/build/
 /common/build/
