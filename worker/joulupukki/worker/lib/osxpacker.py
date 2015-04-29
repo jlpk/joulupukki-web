@@ -60,9 +60,9 @@ class OsxPacker(object):
         return True
 
     def setup(self):
+        # Installing dependencies
         cmd = "brew install automake libtool gettext yasm autoconf pkg-config qt5"
         cmd_list = cmd.split(" ")
-        # Installing dependencies
         process = subprocess.Popen(
             ["brew", "install", "automake", "libtool", "gettext",
              "yasm", "autoconf", "pkg-config", "qt5"],
@@ -71,19 +71,62 @@ class OsxPacker(object):
         )
         stdout, stderr = process.communicate()
         self.logger.debug(stdout)
-        self.logger.error(stderr)
-        if process:
+        self.logger.info(stderr)
+        if process.returncode:
+            self.logger.error("Error in setup: %d" % process.returncode)
             return False
         return True
 
     def compile_(self):
         # Compiling ring-daemon
-        os.system("git clone git@git.savoirfairelinux.com:ring-daemon.git")
-        os.system("cd ring-daemon/contrib")
-        os.system("mkdir native")
-        os.system("cd native")
-        os.system("../bootstrap")
-        os.system("make -j3")
+        cmds = [
+            'echo "Deamon"',
+            'git clone git@git.savoirfairelinux.com:ring:daemon.git',
+            'cd ring-deamon',
+            'cd contrib',
+            'mkdir native',
+            'cd native',
+            '../bootstrap',
+            'make -j3',
+            'cd ../../',
+            './autogen.sh && configure --without-alsa --without-pulse --without-dbus --prefix=%(prefix_path)s',
+            'make install -j',
+            'cd ..',
+            'echo "LRC"',
+            'export CMAKE_PREFIX=/usr/Cellar/qt5/5.4.0',
+            'git clone git@git.kde.org:libringclient',
+            'cd libringclient',
+            'mkdir build',
+            'cd build',
+            'cmake .. -DCMAKE_INSTALL_PREFIX=%(prefix_path) -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=/usr/local/opt/llvm/bin/clang -DCMAKE_CXX_COMPILER=/usr/local/opt/llvm/bin/clang++',
+            'make install',
+            'cd ..',
+            'echo "Client"',
+            'git clone git@git.savoirfairelinux.com:ring-client-macosx.git',
+            'cd ring-client-macosx',
+            'mkdir build && cd build',
+            'export CMAKE_PREFIX_PATH=/usr/local/Cellar/qt5/5.4.0',
+            'cmake ../ -DCMAKE_INSTALL_PREFIX=%(prefix_path)s',
+            'make install -j',
+            'cpack -G DragNDrop Ring',
+        ]
+
+        for cmd in cmds:
+            cmd_args_list = cmd.split(" ")
+            process = subprocess.Popen(
+                cmd_args_list,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
+            stdout, stderr = process.communicate()
+            self.logger.debug(stdout)
+            self.logger.info(stderr)
+            if process.returncode:
+                self.logger.error("Error in setup: %d" % process.returncode)
+                return False
+        return True
+
+
 
     def parse_specdeb(self):
         pass
