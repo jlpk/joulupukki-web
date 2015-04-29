@@ -1,15 +1,11 @@
 --- a/joulupukki/dispatcher/__init__.py
 +++ b/joulupukki/dispatcher/__init__.py
-@@ -9,10 +9,10 @@
+@@ -9,7 +9,7 @@
      sys.argv.insert(1, "serve")
      if len(sys.argv) <= 2:
          # set default file
 -        config_file_path = os.path.join(os.getcwd(), "config.py")
-+        config_file_path = os.path.join(os.getcwd(), "/etc/joulupukki/dispatcher/config.py")
- #        if not os.path.is_file(config_file_path):
- #            print("%s doesn't exists" % config_file_path)
- #            sys.exit(1)
--        sys.argv.append("config.py")
-+        sys.argv.append("/etc/joulupukki/dispatcher/config.py")
++        config_file_path = os.path.join("/etc/joulupukki/dispatcher", "config.py")
+         sys.argv.append(config_file_path)
      from pecan.commands import CommandRunner
      CommandRunner.handle_command_line()
