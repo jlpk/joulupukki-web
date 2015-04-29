@@ -61,19 +61,20 @@ class OsxPacker(object):
 
     def setup(self):
         # Installing dependencies
-        cmd = "brew install automake libtool gettext yasm autoconf pkg-config qt5"
-        cmd_list = cmd.split(" ")
-        process = subprocess.Popen(
-            ["brew", "install", "automake", "libtool", "gettext",
-             "yasm", "autoconf", "pkg-config", "qt5"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
-        stdout, stderr = process.communicate()
-        self.logger.debug(stdout)
-        self.logger.info(stderr)
-        if process.returncode:
-            self.logger.error("Error in setup: %d" % process.returncode)
+        dependencies = ["automake", "libtool", "gettext", "yasm", "autoconf",
+                        "pkg-config", "qt5", "llvm --with-clang --with-asan"]
+        for depen in dependencies:
+            cmd_list = ["brew", "install"].append(depen.split(" "))
+            process = subprocess.Popen(
+                cmd_list,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            stdout, stderr = process.communicate()
+            self.logger.debug(stdout)
+            self.logger.info(stderr)
+            if process.returncode:
+                self.logger.error("Error in setup: %d" % process.returncode)
             return False
         return True
 
@@ -81,8 +82,8 @@ class OsxPacker(object):
         # Compiling ring-daemon
         cmds = [
             'echo "Deamon"',
-            'git clone git@git.savoirfairelinux.com:ring:daemon.git',
-            'cd ring-deamon',
+            'git clone https://gerrit-ring.savoirfairelinux.com/ring-daemon daemon',
+            'cd deamon',
             'cd contrib',
             'mkdir native',
             'cd native',
@@ -94,7 +95,7 @@ class OsxPacker(object):
             'cd ..',
             'echo "LRC"',
             'export CMAKE_PREFIX=/usr/Cellar/qt5/5.4.0',
-            'git clone git@git.kde.org:libringclient',
+            'git clone git://anongit.kde.org/libringclient.git libringclient',
             'cd libringclient',
             'mkdir build',
             'cd build',
@@ -102,7 +103,7 @@ class OsxPacker(object):
             'make install',
             'cd ..',
             'echo "Client"',
-            'git clone git@git.savoirfairelinux.com:ring-client-macosx.git',
+            'git clone https://gerrit-ring.savoirfairelinux.com/ring-client-macosx',
             'cd ring-client-macosx',
             'mkdir build && cd build',
             'export CMAKE_PREFIX_PATH=/usr/local/Cellar/qt5/5.4.0',
