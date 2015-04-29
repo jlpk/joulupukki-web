@@ -3,6 +3,7 @@ from joulupukki.api.controllers.v3.users import UsersController
 from joulupukki.api.controllers.v3.projects import ProjectsController
 from joulupukki.api.controllers.v3.stats import StatsController
 from joulupukki.api.controllers.v3.auth import AuthController
+from joulupukki.api.controllers.v3.builds import LaunchBuildGithubController
 
 
 class V3Controller(object):
@@ -11,3 +12,5 @@ class V3Controller(object):
     projects = ProjectsController()
     stats = StatsController()
     auth = AuthController()
+    githubbuild = LaunchBuildGithubController()
+

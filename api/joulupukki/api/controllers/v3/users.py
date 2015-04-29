@@ -63,13 +63,14 @@ class UserController(rest.RestController):
                 return {"result": "Error editing"}
             return {"result": "User %s edited" % self.username}
 
+    # TODO
     @wsme_pecan.wsexpose(wtypes.text, unicode)
     def put(self, access_token):
         """ Update user from github """
         user = User.fetch(self.username, with_password=False)
         if user is None:
             return {"result": "bad user"}
-        get
+        # TODO
 
 
 

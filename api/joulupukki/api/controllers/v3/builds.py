@@ -1,7 +1,7 @@
 from pecan import expose, redirect
 import wsmeext.pecan as wsme_pecan
 import pecan
-from pecan import rest
+from pecan import rest, abort
 
 import wsme.types as wtypes
 
@@ -17,6 +17,8 @@ import json
 import uuid
 import datetime
 import shutil
+import hmac
+import hashlib
 
 from io import BytesIO
 from joulupukki.common.datamodel.build import Build, APIBuild
@@ -96,6 +98,14 @@ class BuildsController(rest.RestController):
         return BuildController(build_id), remainder
 
 
+
+class BuildSubController(rest.RestController):
+    download = DownloadController()
+    jobs = JobsController()
+    output = OutputController()
+
+
+
 class LaunchBuildController(rest.RestController):
     # curl -X POST -H "Content-Type: application/json" -i  -d '{"source_url": "/home/tcohen/projet_communautaire/kaji/meta/packages/shinken", "source_type": "local", "branch": "kaji"}' http://127.0.0.1:8080/v3/titilambert/shinken/build
     # curl -X POST -H "Content-Type: application/json" -i  -d '{"source_url": "/home/tcohen/projet_communautaire/kaji/meta/packages/shinken", "source_type": "local", "branch": "kaji", "forced_distro": "centos_7"}' http://127.0.0.1:8080/v3/titilambert/shinken/build
@@ -105,7 +115,7 @@ class LaunchBuildController(rest.RestController):
         """ launch build """
         project_name = pecan.request.context['project_name']
         user = User.fetch(pecan.request.context['username'])
-        project = Project.fetch(user, project_name)
+        project = Project.fetch(user.username, project_name)
 
         if project is None:
             # The project doesn't exist
@@ -128,12 +138,63 @@ class LaunchBuildController(rest.RestController):
         # carrier.declare_builds()
         if not carrier.send_message(build.dumps(), 'builds.queue'):
             return None
-        # TODO: save build in database ???
-        # for now is in build.cfg ...
         return {"result": {"build": int(build.id_)}}
 
+class LaunchBuildGithubController(rest.RestController):
+    @expose()
+    def post(self):
+        """ launch build  from github webhook"""
+        body = pecan.request.json
+        # Get user
+        if not body.get('sender'):
+            abort(403)
 
-class BuildSubController(rest.RestController):
-    download = DownloadController()
-    jobs = JobsController()
-    output = OutputController()
+        user = User.fetch(body.get('sender').get('login'))
+        if user is None:
+            abort(403)
+        # Check signature
+        signature = pecan.request.headers.get('X-Hub-Signature')
+        sha_name, signature = signature.split("=")
+        if sha_name != 'sha1':
+            abort(403)
+        mac = hmac.new(user.token.encode("utf-8"), pecan.request.text, digestmod=hashlib.sha1)
+        if not hmac.compare_digest(mac.hexdigest(), signature):
+            abort(403)
+
+        if pecan.request.headers.get('X-Github-Event') == 'ping':
+            return {"result": True , "event": "ping"}
+
+        if pecan.request.headers.get('X-Github-Event') == 'push':
+            if not body.get('repository'):
+                abort(403)
+            repository = body.get('repository')
+            project_name = repository.get('name')
+            if not project_name:
+                abort(403)
+
+            project = Project.fetch(user.username, project_name)
+            if project is None:
+                # Error project doesn't exits
+                # Maybe We should create it
+                return {"result": False , "error": "project not found"}
+            new_build = {"source_url": repository.get('clone_url'),
+                         "source_type": "github",
+                         "commit": repository.get('commit'),
+                         # TODO Find how decide if is a snapshot or not
+                         "snapshot": True,
+                         # TODO Check if branch ~= ref
+                         "branch": repository.get('ref'),
+                         }
+            build = Build(send_build)
+            build.username = user.username
+            build.project_name = project.name
+            build.create()
+            carrier = Carrier(pecan.conf.rabbit_server, pecan.conf.rabbit_port,
+                              pecan.conf.rabbit_db)
+            carrier.declare_queue('builds.queue')
+            # carrier.declare_builds()
+            if not carrier.send_message(build.dumps(), 'builds.queue'):
+                return None
+            return {"result": {"build": int(build.id_)}}
+
+        abort(403)
