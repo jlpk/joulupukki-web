@@ -1,0 +1,19 @@
+#!/usr/bin/make -f
+
+
+%:
+	dh $@
+
+
+override_dh_auto_build:
+	source dev_virtualenv
+	npm install
+	npm install grunt
+	source dev_virtualenv
+	grunt uglify
+	grunt sass
+	rm -rf node_modules
+	dh_auto_build
+
+override_dh_install:
+	dh_install
