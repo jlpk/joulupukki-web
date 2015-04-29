@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 from joulupukki.worker.lib.packer import Packer
 from joulupukki.common.logger import get_logger, get_logger_job
@@ -59,9 +60,20 @@ class OsxPacker(object):
         return True
 
     def setup(self):
+        cmd = "sudo brew install automake libtool gettext libtoolize yasm autoconf pkg-config qt5"
+        cmd_list = cmd.split(" ")
         # Installing dependencies
-        os.system("sudo brew install automake libtool gettext libtoolize yasm"
-                  " autoconf pkg-config qt5")
+        process = subprocess.Popen(
+            ["sudo", "brew", "install", "automake", "libtool", "gettext",
+             "libtoolize", "yasm", "autoconf", "pkg-config", "qt5"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+        stdout, stderr = process.communicate()
+        self.logger.debug(stdout)
+        self.logger.error(stderr)
+        if process:
+            raise Exception("Subprocess failed: %s" % stderr)
 
     def compile_(self):
         # Compiling ring-daemon

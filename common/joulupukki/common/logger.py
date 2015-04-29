@@ -34,7 +34,7 @@ def get_logger(build, distro=None):
 
 def get_logger_path(build):
     log_file = os.path.join(pecan.conf.workspace_path,
-                            build.user.username,
+                            build.username,
                             build.project.name,
                             'builds',
                             str(build.id_),

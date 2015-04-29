@@ -14,7 +14,7 @@ from joulupukki.common.datamodel.project import Project
 from joulupukki.common.datamodel.user import User
 
 
-from joulupukki.common.logger import get_logger_from_path
+from joulupukki.common.logger import get_logger_path
 from joulupukki.common.carrier import Carrier
 
 
@@ -57,10 +57,7 @@ class Manager(Thread):
                     distro_name = new_build['distro_name']
                     build_conf = new_build['build_conf']
                     root_folder = new_build['root_folder']
-                    self.logger = get_logger_from_path(
-                        new_build['log_path'],
-                        new_build['id_'],
-                    )
+                    self.logger = get_logger_path(build)
                     build = Build(new_build['build'])
                     self.logger.debug(build.dumps())
                     self.logger.debug("test")

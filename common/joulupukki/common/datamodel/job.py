@@ -92,7 +92,7 @@ class Job(APIJob):
     def _save(self):
         """ Write job data on disk """
         data = self.as_dict()
-        mongo.jobs.update_one({"id_": self.id_,
+        mongo.jobs.update({"id_": self.id_,
                            "username": self.username,
                            "project_name": self.project_name,
                            "build_id": self.build_id},
