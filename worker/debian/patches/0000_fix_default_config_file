@@ -1,0 +1,10 @@
+--- a/joulupukki/worker/__init__.py
++++ b/joulupukki/worker/__init__.py
+@@ -10,6 +10,6 @@
+     sys.argv.insert(1, "serve")
+     if len(sys.argv) <= 2:
+         # set default file
+-        config_file_path = os.path.join(os.getcwd(), "config.py")
++        config_file_path = os.path.join("/etc/joulupukki/worker", "config.py")
+         sys.argv.append(config_file_path)
+     CommandRunner.handle_command_line()
