@@ -1,4 +1,0 @@
-pika==0.9.14
-passlib==1.6.2
-pbr
-pymongo==3.0.1

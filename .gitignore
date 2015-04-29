@@ -23,35 +23,15 @@ env/
 
 # vim
 *~
+*.swp
+*.swo
+
 
 # Project tmp folders
 /tmp/
 /ccache/
 /output/
+/build/
 
-
-
-
-# Logs
-web/logs/*
-web/*.log
-web/*.orig
 
 !.gitkeep
-web/node_modules/
-web/bower_components/
-web/tmp
-web/.DS_Store
-web/.idea
-*.swp
-*.swo
-web/app/assets/css
-web/.sass-cache/
-web/out/
-web/build/
-web/app/bower_components
-web/app/build
-/api/build/
-/worker/build/
-/common/build/
-web/app/build/
