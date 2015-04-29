@@ -11,12 +11,12 @@ from joulupukki.common.datamodel.job import Job
 
 def get_logger(build, distro=None):
     log_file = os.path.join(pecan.conf.workspace_path,
-                            build.user.username,
-                            build.project.name,
+                            build.username,
+                            build.project_name,
                             'builds',
-                            build.id_,
+                            str(build.id_),
                             "log.txt")
-    logger = logging.getLogger("#".join(("Builder", build.id_)))
+    logger = logging.getLogger("#".join(("Builder", str(build.id_))))
     # create formatter
     formatter = logging.Formatter('[%(msecs)d] [%(levelname)-5.5s] [%(name)s] %(message)s')
     # create logger
@@ -35,7 +35,7 @@ def get_logger(build, distro=None):
 def get_logger_path(build):
     log_file = os.path.join(pecan.conf.workspace_path,
                             build.username,
-                            build.project.name,
+                            build.project_name,
                             'builds',
                             str(build.id_),
                             "log.txt")

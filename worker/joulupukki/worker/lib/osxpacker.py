@@ -60,12 +60,12 @@ class OsxPacker(object):
         return True
 
     def setup(self):
-        cmd = "sudo brew install automake libtool gettext libtoolize yasm autoconf pkg-config qt5"
+        cmd = "brew install automake libtool gettext yasm autoconf pkg-config qt5"
         cmd_list = cmd.split(" ")
         # Installing dependencies
         process = subprocess.Popen(
-            ["sudo", "brew", "install", "automake", "libtool", "gettext",
-             "libtoolize", "yasm", "autoconf", "pkg-config", "qt5"],
+            ["brew", "install", "automake", "libtool", "gettext",
+             "yasm", "autoconf", "pkg-config", "qt5"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
@@ -73,7 +73,8 @@ class OsxPacker(object):
         self.logger.debug(stdout)
         self.logger.error(stderr)
         if process:
-            raise Exception("Subprocess failed: %s" % stderr)
+            return False
+        return True
 
     def compile_(self):
         # Compiling ring-daemon

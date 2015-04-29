@@ -1,4 +1,4 @@
-
+import os
 import logging
 
 import pecan
@@ -14,7 +14,7 @@ from joulupukki.common.datamodel.project import Project
 from joulupukki.common.datamodel.user import User
 
 
-from joulupukki.common.logger import get_logger_path
+from joulupukki.common.logger import get_logger_path, get_logger
 from joulupukki.common.carrier import Carrier
 
 
@@ -57,8 +57,10 @@ class Manager(Thread):
                     distro_name = new_build['distro_name']
                     build_conf = new_build['build_conf']
                     root_folder = new_build['root_folder']
-                    self.logger = get_logger_path(build)
                     build = Build(new_build['build'])
+                    path = os.path.dirname(get_logger_path(build))
+                    os.makedirs(path)
+                    self.logger = get_logger(build, distro_name)
                     self.logger.debug(build.dumps())
                     self.logger.debug("test")
                     builder_class = globals().get(build_type.title() + 'Builder')
