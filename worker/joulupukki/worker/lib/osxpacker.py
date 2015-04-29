@@ -75,10 +75,11 @@ class OsxPacker(object):
             self.logger.info(stderr)
             if process.returncode:
                 self.logger.error("Error in setup: %d" % process.returncode)
-            return False
+                return False
         return True
 
     def compile_(self):
+        self.logger.info("Start compiling")
         # Compiling ring-daemon
         cmds = [
             'echo "Deamon"',
@@ -114,6 +115,7 @@ class OsxPacker(object):
 
         for cmd in cmds:
             cmd_args_list = cmd.split(" ")
+            self.logger.info("Cmd: %s" % cmd_args_list)
             process = subprocess.Popen(
                 cmd_args_list,
                 stdout=subprocess.PIPE,
