@@ -11,8 +11,8 @@ angular.module('joulupukki.main', ['joulupukki.filters',
     .controller('MainCtrl', ['$scope', '$rootScope', '$route', '$routeParams', '$sce',
                              '$location', '$anchorScroll',
                              '$interval', 'getProject', 'getBuild', 'getJob', 'getJobLog',
-                             'getBuildOutput', 'postBuild',
-        function ($scope, $rootScope, $route, $routeParams, $sce, $location, $anchorScroll, $interval, getProject, getBuild, getJob, getJobLog, getBuildOutput, postBuild) {
+                             'getBuildOutput', 'getBuildLog', 'postBuild',
+        function ($scope, $rootScope, $route, $routeParams, $sce, $location, $anchorScroll, $interval, getProject, getBuild, getJob, getJobLog, getBuildOutput, getBuildLog, postBuild) {
             var $username = $routeParams.user;
             var $project_name = $routeParams.project;
 
@@ -153,6 +153,49 @@ angular.module('joulupukki.main', ['joulupukki.filters',
                                     $scope.output = false;
                                 }
                             });
+                    }
+                    if ( $controller_name == 'buildlog' ){
+                        getBuildLog($username, $project_name, $build_id)
+                            .success(function (data) {
+                                $scope.buildlog = $sce.trustAsHtml(data);
+                                //Set goto functions
+                                $scope.gotoTop = function() {
+                                    var old = $location.hash();
+                                    $location.hash('');
+                                    $anchorScroll();
+                                    $location.hash(old);
+                                };
+                                $scope.gotoBot = function() {
+                                    var old = $location.hash();
+                                    $location.hash('logbottom');
+                                    $anchorScroll();
+                                    $location.hash(old);
+                                };
+
+                                // Handle log scrolling 
+                                angular.element(document).bind("scroll", function() {
+                                    var $pre_log = angular.element(document.querySelector('#prelog'))
+                                    var logheight = $pre_log.prop('offsetHeight');
+                                    var winheight = window.innerHeight;
+                                    var yoffset = window.pageYOffset;
+                                    var $top_btn = angular.element(document.querySelector('#to-top'))
+                                    var $bot_btn = angular.element(document.querySelector('#to-bot'))
+                                    if (yoffset > winheight - 500){
+                                        var new_height =  logheight - winheight - yoffset + 500;
+                                        if (new_height < 15) {
+                                            new_height = 15;
+                                        }
+                                        $top_btn.css("bottom", new_height +"px");
+                                        $top_btn.css("visibility", "visible");
+                                        var new_height = yoffset - 460
+                                        $bot_btn.css("top", new_height + "px");
+                                        $bot_btn.css("visibility", "visible");
+                                    }
+                                    else {
+                                        $bot_btn.css("visibility", "hidden");
+                                    }
+                                });
+                        });
                     }
                 }
             })

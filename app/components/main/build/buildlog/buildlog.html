@@ -1,0 +1,24 @@
+<section ng-controller="MainBuildLogCtrl" id="log-container" ng-if="selected_tab == 'job'" class="tile-job container-fluid">
+  <div class="log row">
+    <menu class="log-header">
+      <a class="btn btn-primary btn-xs" href="/v3/users/{{selected_project.username}}/{{ selected_project.name }}/builds/{{ build.id }}/log"> 
+        <i class="fa fa-download"></i>
+        Download Log
+      </a>
+      <a class="btn btn-primary btn-xs" ng-click="gotoBot()" >
+        <i class="fa fa-angle-double-down"></i>
+        Scroll to end of log
+      </a>
+    </menu>
+    <div class="log-body">
+      <a ng-click="gotoBot()" id="to-bot" class="to-bot" >
+        <i class="fa fa-angle-double-down"></i>
+      </a>
+      <pre id="prelog" ng-bind-html="buildlog"></pre>
+      <a ng-click="gotoTop()" id="to-top" class="to-top" >
+        <i class="fa fa-angle-double-up"></i>
+      </a>
+      <div id="logbottom"></div>
+    </div>        
+  </div>        
+</section>

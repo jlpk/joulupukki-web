@@ -33,6 +33,11 @@
             Output
           </a>
         </li>
+        <li ng-if="['build', 'output', 'build_log'].indexOf(selected_tab) != -1" role="presentation" ng-class="{ 'active': selected_tab == 'build_log' }">
+          <a href="#/repositories/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/log">
+            Build Log
+          </a>
+        </li>
         <li ng-if="['job'].indexOf(selected_tab) != -1" role="presentation" ng-class="{ 'active': selected_tab == 'job' }">
           <a href="#/repositories/{{ selected_project.username }}/{{ selected_project.name }}/builds/{{ build.id_ }}/jobs/{{ job.id_ }}">
             Job #{{ build.id_ }}.{{ job.id_ }}

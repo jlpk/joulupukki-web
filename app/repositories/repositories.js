@@ -37,6 +37,11 @@ angular.module('joulupukki.view.repositories', ['ngRoute',
             controller: 'RepositoriesCtrl',
             controllerAs: 'output'
         })
+        $routeProvider.when('/repositories/:user/:project/builds/:build/log', {
+            templateUrl: 'repositories/repositories.html',
+            controller: 'RepositoriesCtrl',
+            controllerAs: 'buildlog'
+        })
         $routeProvider.when('/repositories/:user/:project/builds/:build/jobs/:job', {
             templateUrl: 'repositories/repositories.html',
             controller: 'RepositoriesCtrl',

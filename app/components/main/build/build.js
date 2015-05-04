@@ -2,6 +2,7 @@
 
 angular.module('joulupukki.main.build', ['joulupukki.filters',
                                          'joulupukki.live',
+                                         'joulupukki.main.build.log',
                                          'joulupukki.main.build.job',
                                          'joulupukki.main.build.jobs',
                                          'joulupukki.main.build.output',

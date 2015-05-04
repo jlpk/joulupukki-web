@@ -13,6 +13,16 @@ angular.module('joulupukki.live')
             };
         }])
 
+    .service('getBuildLog', ['$http',
+        function ($http) {
+            return function ($username, $project_name, $build_id) {
+                return $http.get('/v3/users/' + $username + '/' + $project_name + '/builds/' + $build_id + '/log?html=1')
+                    .error(function () {
+                        throw new Error('getBuildLog : GET Request failed');
+                    });
+            };
+        }])
+
 
     .service('getLatestBuilds', ['$http',
         function ($http) {
