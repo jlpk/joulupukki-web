@@ -32,6 +32,12 @@ env/
 /ccache/
 /output/
 /build/
+/.sass-cache/
+/app/assets/css/
+/app/bower_components/
+/app/build/
+/node_modules/
+
 
 
 !.gitkeep
