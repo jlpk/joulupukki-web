@@ -27,9 +27,15 @@ angular.module('joulupukki.view.account', ['ngRoute',
             $scope.switchStatus = true
             $scope.enableProject = enableProject
 
-$scope.toto = function() {
-        console.log("TOT")
-      };
+            // TODO define this in a service
+            $scope.sync_repos = function() {
+                console.log("Synrepos")
+                getUser($scope.selected_username, $cookies.token)
+                    .success(function(data, status, headers, config){
+                        $scope.projects = data.projects
+                })
+            };
+
             if ($routeParams.githubaccount) {
                 $scope.selected_username = $routeParams.githubaccount
             }

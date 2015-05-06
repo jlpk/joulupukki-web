@@ -13,6 +13,17 @@ angular.module('joulupukki.live')
             };
         }])
 
+
+    .service('SyncUserRepos', ['$http', '$cookies',
+        function ($http, $cookies) {
+            return function (username) {
+                var access_token = $cookies.access_token;
+                $http.post('/v3/users/' + username + "?access_token=" + access_token)
+            }
+        }])
+    
+    
+/*
     .service('postUser', ['$http', 
         function ($http) {
             return function ($build, $job) {
@@ -37,4 +48,4 @@ angular.module('joulupukki.live')
             };
         }])
 
-
+*/
