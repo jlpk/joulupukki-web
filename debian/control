@@ -6,7 +6,7 @@ Vcs-Git: https://github.com/jlpk/joulupukki-web.git
 Vcs-Browser: https://github.com/jlpk/joulupukki-web
 Standards-Version: 3.9.6
 XS-Python-Version: >= 2.5, << 2.8
-Build-Depends: debhelper (>= 9), quilt, npm, ruby-sass, nodejs-legacy
+Build-Depends: debhelper (>= 9), quilt, npm, ruby-sass, nodejs-legacy, git-core
 Homepage: https://github.com/jlpk/joulupukki-web
 
 Package: joulupukki-web

@@ -8,8 +8,9 @@ override_dh_auto_clean:
 
 override_dh_auto_build:
 	npm install grunt-cli
+	npm install bower
 	npm install
-	node_modules/bower/bin/bower install
+	node_modules/bower/bin/bower install --allow-root -q
 	node_modules/grunt-cli/bin/grunt uglify
 	node_modules/grunt-cli/bin/grunt sass
 	rm -rf node_modules
