@@ -35,6 +35,10 @@ a.packaging,
 .packaging,
 a.cleaning,
 .cleaning,
+a.building,
+.building,
+a.reading,
+.reading,
 a.dispatching,
 .dispatching {
 //    color: #D2C93B;
@@ -83,6 +87,8 @@ a.dispatching,
 .sidebar div.tile-created,
 .sidebar div.tile-clonning,
 .sidebar div.tile-cleaning,
+.sidebar div.tile-building,
+.sidebar div.tile-rearead
 .sidebar div.tile-dispatching {
     border-color: #D2C93B;
 }
