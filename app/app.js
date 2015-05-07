@@ -20,6 +20,7 @@ angular.module('joulupukki', [
     'joulupukki.view.repositories',
     'joulupukki.view.404',
     'joulupukki.view.login',
+    'joulupukki.view.login.gitlab',
     'joulupukki.view.account',
 ])
 

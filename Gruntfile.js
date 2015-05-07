@@ -89,8 +89,6 @@ module.exports = function (grunt) {
                     '<%= project.build %>/js/joulupukki.min.js' : [
                         '<%= project.app %>/app.js',
                         '<%= project.app %>/components/config/config.js',
-                        '<%= project.app %>/components/github/github.js',
-                        '<%= project.app %>/components/github/auth.js',
                         '<%= project.app %>/components/live/live.js',
                         '<%= project.app %>/components/live/get_project.js',
                         '<%= project.app %>/components/live/get_build.js',
@@ -110,6 +108,7 @@ module.exports = function (grunt) {
                         '<%= project.app %>/repositories/repositories.js',
                         '<%= project.app %>/404/404.js',
                         '<%= project.app %>/login/login.js',
+                        '<%= project.app %>/login/gitlab/login.js',
                         '<%= project.app %>/account/account.js'
                     ]
                 }],
@@ -122,8 +121,6 @@ module.exports = function (grunt) {
                     {
                         '<%= project.build %>/app.js': '<%= project.app %>/app.js',
                         '<%= project.build %>/components/config/config.js': '<%= project.app %>/components/config/config.js',
-                        '<%= project.build %>/components/github/github.js': '<%= project.app %>/components/github/github.js',
-                        '<%= project.build %>/components/github/auth.js': '<%= project.app %>/components/github/auth.js',
                         '<%= project.build %>/components/live/live.js': '<%= project.app %>/components/live/live.js',
                         '<%= project.build %>/components/live/get_project.js': '<%= project.app %>/components/live/get_project.js',
                         '<%= project.build %>/components/live/get_build.js': '<%= project.app %>/components/live/get_build.js',
@@ -143,14 +140,13 @@ module.exports = function (grunt) {
                         '<%= project.build %>/repositories/repositories.js': '<%= project.app %>/repositories/repositories.js',
                         '<%= project.build %>/404/404.js': '<%= project.app %>/404/404.js',
                         '<%= project.build %>/login/login.js': '<%= project.app %>/login/login.js',
+                        '<%= project.build %>/login/gitlab/login.js': '<%= project.app %>/login/gitlab/login.js',
                         '<%= project.build %>/account/account.js': '<%= project.app %>/account/account.js'
                     },
                     {
                         '<%= project.build %>/js/joulupukki.min.js' : [
                             '<%= project.build %>/app.js',
                             '<%= project.build %>/components/config/config.js',
-                            '<%= project.build %>/components/github/github.js',
-                            '<%= project.build %>/components/github/auth.js',
                             '<%= project.build %>/components/live/live.js',
                             '<%= project.build %>/components/live/get_project.js',
                             '<%= project.build %>/components/live/get_build.js',
@@ -170,6 +166,7 @@ module.exports = function (grunt) {
                             '<%= project.build %>/repositories/repositories.js',
                             '<%= project.build %>/404/404.js',
                             '<%= project.build %>/login/login.js',
+                            '<%= project.build %>/login/gitlab/login.js',
                             '<%= project.build %>/account/account.js'
                         ]
                     }

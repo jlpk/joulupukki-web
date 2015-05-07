@@ -33,7 +33,7 @@
           <i class="fa fa-clock-o"></i>
         </div>
         <div class="col-md-10">
-            {{ job.build_time | timeElapsed : 0}}
+            {{ job.created | timeElapsed: job.finished }}
         </div>
       </div>
     </a>

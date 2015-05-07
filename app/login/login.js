@@ -77,6 +77,8 @@ angular.module('joulupukki.view.login', ['ngRoute',
         }])
 
 
+
+
     .controller('logoutCtrl', ['$scope', '$rootScope', '$routeParams',
                               '$window', '$http', '$cookies',
         function ($scope, $rootScope, $routeParams, $window, $http, $cookies) {

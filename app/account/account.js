@@ -19,10 +19,10 @@ angular.module('joulupukki.view.account', ['ngRoute',
 
     .controller('accountCtrl', ['$scope', '$rootScope', '$routeParams',
                                 '$window', '$http', '$cookies',
-                                'getUser', 
-                                'enableProject',
+                                'getUser', 'enableProject',
+                                'SyncUserRepos', 'SyncUserOrgs',
         function ($scope, $rootScope, $routeParams, $window, $http, $cookies,
-                  getUser, enableProject) {
+                  getUser, enableProject, SyncUserRepos, SyncUserOrgs) {
             $scope.username = $cookies.username
             $scope.switchStatus = true
             $scope.enableProject = enableProject
@@ -30,9 +30,12 @@ angular.module('joulupukki.view.account', ['ngRoute',
             // TODO define this in a service
             $scope.sync_repos = function() {
                 console.log("Synrepos")
-                getUser($scope.selected_username, $cookies.token)
+                SyncUserRepos($scope.selected_username, $cookies.token)
                     .success(function(data, status, headers, config){
-                        $scope.projects = data.projects
+                        getUser($scope.selected_username, $cookies.token)
+                            .success(function(data, status, headers, config){
+                                $scope.projects = data.projects
+                        })
                 })
             };
 
@@ -42,6 +45,11 @@ angular.module('joulupukki.view.account', ['ngRoute',
             else {
                 $scope.selected_username = $scope.username
             }
+
+            // Update organisations
+            SyncUserOrgs($scope.username, $cookies.token)
+                //.success(function(data, status, headers, config){
+                //})
 
             // Get user orgs
             getUser($scope.username, $cookies.token)
