@@ -25,10 +25,24 @@ angular.module('joulupukki.view.login.gitlab', ['ngRoute',
                             "password": credential.password}
                 $http.post("/v3/auth/login", data)
                     .success(function(data, status, headers, config){
-                        console.log("SSS")
+                        if (data != 'null'){ 
+                            // login API return token
+                            $cookies.token = data.access_token
+                            $cookies.username = data.username
+                            $rootScope.$emit('token_changed')
+                            // Launch user update
+                            // go to repo page
+                            var url = "#/repositories"
+                            $window.location.href = url;
+                        }
+                        else {
+                            // go to auth page 
+                            var url = "#/auth/login/gitlab"
+                            $window.location.href = url; 
+                        }
                     })
                     .error(function(data, status, headers, config){
-                         console.log("EEE")
+                         console.log("Error login to gitlab")
                     })                   
             }
 
