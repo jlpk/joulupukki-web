@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="assets/css/app.css">
     <meta name="description" content="">
 
-
+    <!-- build:js js/app.min.js -->
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap.js"></script>
     <script src="bower_components/bootstrap-switch/dist/js/bootstrap-switch.js"></script>
@@ -24,17 +24,38 @@
     <script src="bower_components/angular-cookies/angular-cookies.js"></script>
     <script src="bower_components/angular-bootstrap-switch/dist/angular-bootstrap-switch.js"></script>
 
-    <script src="bower_components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script>    
-    <script src="bower_components/moment/moment.js"></script>    
+    <script src="bower_components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script>
+    <script src="bower_components/moment/moment.js"></script>
+    <!-- endbuild -->
 
-
-
-
-
-    <script src="build/js/joulupukki.min.js"></script>
+    <!-- build:js js/joulupukki.min.js -->
+    <script src="app.js"></script>
+    <script src="components/config/config.js"></script>
+    <script src="components/live/live.js"></script>
+    <script src="components/live/get_project.js"></script>
+    <script src="components/live/get_build.js"></script>
+    <script src="components/live/get_job.js"></script>
+    <script src="components/live/get_user.js"></script>
+    <script src="components/filters/filters.js"></script>
+    <script src="components/sidebar/sidebar.js"></script>
+    <script src="components/topbar/topbar.js"></script>
+    <script src="components/main/main.js"></script>
+    <script src="components/main/history/history.js"></script>
+    <script src="components/main/build/build.js"></script>
+    <script src="components/main/build/jobs/jobs.js"></script>
+    <script src="components/main/build/output/output.js"></script>
+    <script src="components/main/build/buildlog/buildlog.js"></script>
+    <script src="components/main/build/job/job.js"></script>
+    <script src="components/main/build/job/joblog/joblog.js"></script>
+    <script src="repositories/repositories.js"></script>
+    <script src="404/404.js"></script>
+    <script src="login/login.js"></script>
+    <script src="login/gitlab/login.js"></script>
+    <script src="account/account.js"></script>
+    <!-- endbuild -->
   </head>
 
-  <body class="layout color-scheme--dark">
+  <body class="layout color-scheme--dark" ng-app="joulupukki">
     <!--[if lt IE 7]> <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p> <![endif]-->
     <div class="layout__container">
 <!--      <aside class="layout__aside sidebar-wrapper collapse" id="sidebarWrapper">

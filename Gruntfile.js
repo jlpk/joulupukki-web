@@ -2,6 +2,8 @@
 
 module.exports = function (grunt) {
 
+    require('load-grunt-tasks')(grunt);
+
     grunt.initConfig({
 
         pkg: grunt.file.readJSON('package.json'),
@@ -10,7 +12,7 @@ module.exports = function (grunt) {
             app: ['app'],
             assets: ['<%= project.app %>/assets'],
             css: ['<%= project.assets %>/sass/app.scss'],
-            build: ['<%= project.app %>/build/']
+            build: ['dist']
         },
 
         sass: {
@@ -43,7 +45,61 @@ module.exports = function (grunt) {
                 ],
                 tasks: ['uglify:dev']
             }
+        }, 
+
+        useminPrepare: {
+            html: {
+                src: ['<%= project.app %>/index.html']
+            },
+            options: {
+                dest: '<%= project.build %>/'
+            }
         },
+
+        usemin: {
+            html: '<%= project.build %>/index.html'
+        },
+
+        copy: {
+            prod: {
+                files: [
+                    {
+                        src: '<%= project.app %>/index.html',
+                        dest: '<%= project.build %>/index.html'
+                    },
+                    {
+                        cwd: '<%= project.app %>/bower_components/bootstrap-switch/dist/css/',
+                        expand: true,
+                        src: ['**.*'],
+                        dest: '<%= project.build %>/bower_components/bootstrap-switch/dist/css/'
+                    },
+                    {
+                        cwd: '<%= project.app %>/bower_components/font-awesome-sass/assets/fonts/font-awesome/',
+                        expand: true,
+                        src: ['**.*'],
+                        dest: '<%= project.build %>/bower_components/font-awesome-sass/assets/fonts/font-awesome/'
+                    },
+                    {
+                        cwd: '<%= project.app %>/assets/',
+                        expand: true,
+                        src: ['**/*.*'],
+                        dest: '<%= project.build %>/assets/'
+                    },
+                    {
+                        src: '<%= project.app %>/components/config/config.json',
+                        dest: '<%= project.build %>/components/config/config.json'
+                    },
+                    {
+                        cwd: '<%= project.app %>/',
+                        expand: true,
+                        src: ['**/*.html'],
+                        dest: '<%= project.build %>/'
+                    }
+                ]
+            }
+        },
+
+
 
         jslint: { // configure the task
 
@@ -81,6 +137,7 @@ module.exports = function (grunt) {
                 }
             }
         },
+
 
         // Minify and concatenate joulupukki in one file
         uglify: {
@@ -179,10 +236,6 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.loadNpmTasks('grunt-contrib-sass');
-    grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-jslint');
-
     grunt.registerTask('default', ['watch', 'jslint', 'uglify']);
+    grunt.registerTask('build', ['sass', 'copy:prod', 'useminPrepare:html', 'concat:generated', 'uglify:generated', 'usemin:html']);
 };

@@ -35,9 +35,12 @@ env/
 /.sass-cache/
 /app/assets/css/
 /app/bower_components/
-/app/build/
 /node_modules/
 
 
 
 !.gitkeep
+
+# Grunt generated
+.tmp/
+dist/
