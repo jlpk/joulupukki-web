@@ -9,11 +9,7 @@ override_dh_auto_clean:
 override_dh_auto_build:
 	npm install grunt-cli
 	npm install
-	ls app/
-	ls app/bower_components/
-	ls app/bower_components/bootstrap-sass-official
-	ls app/bower_components/bootstrap-sass-official/assets/
-	ls app/bower_components/bootstrap-sass-official/assets/stylesheets/
+	node_modules/bower/bin/bower install --allow-root -q
 	node_modules/grunt-cli/bin/grunt build
 
 override_dh_install:
