@@ -3,6 +3,17 @@
 angular.module('joulupukki.live')
 
  
+    .service('getActiveAuth', ['$http', 
+        function ($http) {
+            return function () {
+                return $http.get('/v3/auth/active')
+                    .error(function () {
+                        throw new Error('getActiveAuth: GET Request failed');
+                    });
+            };
+        }])
+
+
     .service('getUser', ['$http', 
         function ($http) {
             return function (username, access_token) {
@@ -12,6 +23,7 @@ angular.module('joulupukki.live')
                     });
             };
         }])
+
 
 
     .service('SyncUserRepos', ['$http', '$cookies',

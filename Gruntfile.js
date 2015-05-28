@@ -68,10 +68,10 @@ module.exports = function (grunt) {
                         dest: '<%= project.build %>/index.html'
                     },
                     {
-                        cwd: '<%= project.app %>/bower_components/bootstrap-switch/dist/css/',
+                        cwd: '<%= project.app %>/bower_components/bootstrap-switch/dist/css/bootstrap3',
                         expand: true,
                         src: ['**.*'],
-                        dest: '<%= project.build %>/bower_components/bootstrap-switch/dist/css/'
+                        dest: '<%= project.build %>/bower_components/bootstrap-switch/dist/css/bootstrap3'
                     },
                     {
                         cwd: '<%= project.app %>/bower_components/font-awesome-sass/assets/fonts/font-awesome/',

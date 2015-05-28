@@ -37,7 +37,8 @@ angular.module('joulupukki.view.login.gitlab', ['ngRoute',
                         }
                         else {
                             // go to auth page 
-                            var url = "#/auth/login/gitlab"
+                            var url = "#/auth/login/gitlab";
+                            $scope.message = "Bad username/password";
                             $window.location.href = url; 
                         }
                     })

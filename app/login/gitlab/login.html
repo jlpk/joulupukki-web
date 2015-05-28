@@ -1,12 +1,25 @@
 <div class="container"  id="login">
 
   <div class="jumbotron">
-    <h1>Joulupukki</h1>
-    
+
+
     <form class="form-horizontal"
           name="loginForm"
           ng-controller="GitlabLoginCtrl"
           ng-submit="login(credentials)" novalidate>
+
+      <div class="form-group">
+        <div class="col-sm-offset-1 col-sm-4">
+          <h2>Gitlab authentication</h2>
+        </div>
+      </div>
+    
+      <div class="form-group" ng-if="message" >
+        <div class="col-sm-offset-2 col-sm-4">
+          <span class="label label-danger">{{ message }}</span>
+        </div>
+      </div>
+
       <div class="form-group">
         <label class= "col-sm-1" for="username">Username</label>
         <div class="col-sm-5">
@@ -25,6 +38,7 @@
         <div class="col-sm-offset-1 col-sm-5">
           <button type="submit" class="btn btn-default">Sign in</button>
         </div>
+
       </div>
     </form>
 

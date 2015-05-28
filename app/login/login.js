@@ -19,14 +19,21 @@ angular.module('joulupukki.view.login', ['ngRoute',
     }])
 
     .controller('authCtrl', ['$scope', '$rootScope', '$routeParams',
-                              '$window', '$http', '$cookies',
-        function ($scope, $rootScope, $routeParams, $window, $http, $cookies) {
+                              '$window', '$http', '$cookies', 'getActiveAuth',
+        function ($scope, $rootScope, $routeParams, $window, $http, $cookies, getActiveAuth) {
+            $scope.jlpk_web_url = window.location.protocol + "//" + $window.location.hostname + $window.location.pathname;
+            $scope.active_auth = new Array();
+            getActiveAuth()
+                .success(function(data, status, headers, config){
+                    $scope.active_auth = data.result.active_auth;
+                });
         }])
 
     .controller('loginCtrl', ['$scope', '$rootScope', '$routeParams',
                               '$window', '$http', '$cookies',
                               'postUser',
         function ($scope, $rootScope, $routeParams, $window, $http, $cookies, postUser) {
+            $scope.jlpk_web_url = window.location.protocol + "//" + $window.location.hostname + $window.location.pathname;
             // Test if the user is authenticated
             if (!$cookies.token) {
                 // User not authenticated
@@ -34,7 +41,7 @@ angular.module('joulupukki.view.login', ['ngRoute',
                 if (!$routeParams.code) {
                     // We don't have github authorizations
                     // So go ask them !
-                    var url = "https://github.com/login/oauth/authorize?client_id=666ff51d51afc14ab79c&scope=user:email,read:org,repo:status,repo_deployment,write:repo_hook&redirect_uri=http://jlpk.org/app/#/auth/login"
+                    var url = "https://github.com/login/oauth/authorize?client_id=666ff51d51afc14ab79c&scope=user:email,read:org,repo:status,repo_deployment,write:repo_hook&redirect_uri=" + $scope.jlpk_web_url + "#/auth/login";
                     // Go to github
                     $window.location.href = url; 
                 }
