@@ -2,12 +2,12 @@
   <div class="row">
     <div class="col-xs-12 col-sm-3" id="orgs">
       <div>
-        <a href="#/account/">{{ username }}</a>
+        <a href="#/account/{{ username }}/repositories">{{ username }}</a>
       </div>
       <div>
         <ul>
           <li ng-repeat="org in orgs" >
-            <a href="#/account/{{ org }}">{{ org }}</a>
+            <a href="#/account/{{ org }}/repositories">{{ org }}</a>
           </li>
         </ul>
       </div>
