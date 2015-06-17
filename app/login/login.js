@@ -26,6 +26,12 @@ angular.module('joulupukki.view.login', ['ngRoute',
             getActiveAuth()
                 .success(function(data, status, headers, config){
                     $scope.active_auth = data.result.active_auth;
+                    if ($scope.active_auth == 'github') {
+                        getActiveAuthId()
+                            .success(function(data){
+                                $scope.active_auth_id = data.result.github_id
+                            })
+                    }
                 });
         }])
 
@@ -41,9 +47,12 @@ angular.module('joulupukki.view.login', ['ngRoute',
                 if (!$routeParams.code) {
                     // We don't have github authorizations
                     // So go ask them !
-                    var url = "https://github.com/login/oauth/authorize?client_id=666ff51d51afc14ab79c&scope=user:email,read:org,repo:status,repo_deployment,write:repo_hook&redirect_uri=" + $scope.jlpk_web_url + "#/auth/login";
-                    // Go to github
-                    $window.location.href = url; 
+                    getActiveAuthId()
+                        .success(function(data){
+                            var url = "https://github.com/login/oauth/authorize?client_id=" + data.result.github_id + "&scope=user:email,read:org,repo:status,repo_deployment,write:repo_hook&redirect_uri=" + $scope.jlpk_web_url + "#/auth/login";
+                            // Go to github
+                            $window.location.href = url;
+                        })
                 }
                 else {
                     // Here is the return from github
@@ -82,8 +91,6 @@ angular.module('joulupukki.view.login', ['ngRoute',
             }
            
         }])
-
-
 
 
     .controller('logoutCtrl', ['$scope', '$rootScope', '$routeParams',

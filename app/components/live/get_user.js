@@ -14,6 +14,17 @@ angular.module('joulupukki.live')
         }])
 
 
+    .service('getActiveAuthId', ['$http',
+        function ($http) {
+            return function () {
+                return $http.get('/v3/externalservice/clientid')
+                    .error(function () {
+                        throw new Error('getActiveAuthId: GET Request failed');
+                    });
+            };
+        }])
+
+
     .service('getUser', ['$http', 
         function ($http) {
             return function (username, access_token) {

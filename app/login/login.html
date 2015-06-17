@@ -3,7 +3,7 @@
   <div class="jumbotron">
     <h1>Joulupukki</h1>
     <p ng-if="active_auth.indexOf('github') != -1">
-      <a type="button" class="btn btn-info btn-lg" href="https://github.com/login/oauth/authorize?client_id=666ff51d51afc14ab79c&scope=user:email,read:org,repo:status,repo_deployment,write:repo_hook&redirect_uri={{ jlpk_web_url }}#/auth/login">
+      <a type="button" class="btn btn-info btn-lg" href="https://github.com/login/oauth/authorize?client_id={{ active_auth_id }}&scope=user:email,read:org,repo:status,repo_deployment,write:repo_hook&redirect_uri={{ jlpk_web_url }}#/auth/login">
         Signin with Github
       </a>
     </p>
