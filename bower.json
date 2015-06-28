@@ -13,11 +13,14 @@
     "angular-mocks": "1.4.1",
     "angular-aria": "1.4.1",
     "angular-animate": "1.4.1",
-    "angular-material": "~0.10.0",
+    "angular-material": "0.10.0",
     "html5-boilerplate": "~4.3.0",
     "bootstrap-sass-official": "3.3.1",
     "angular-bootstrap-switch": "0.3.0",
     "font-awesome-sass": "4.2.0",
     "moment": "~2.9.0"
+  },
+  "resolutions": {
+    "angular": "1.4.1"
   }
 }

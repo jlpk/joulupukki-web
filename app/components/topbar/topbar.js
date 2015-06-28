@@ -1,6 +1,7 @@
 'use strict';
 
 angular.module('joulupukki.topbar', ['joulupukki.live',
+                                     'ngMaterial'
                                     ])
 
 

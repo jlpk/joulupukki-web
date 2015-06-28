@@ -1,4 +1,43 @@
-<nav ng-app="joulupukki.topbar" id="topbar" class="navbar navbar-default" role="navigation" ng-controller="TopBarCtrl">
+<div  id="topbar" ng-controller="TopBarCtrl">
+  <md-toolbar class="md-whiteframe-glow-z1 site-content-toolbar md-default-theme">
+    <div class="md-toolbar-tools docs-toolbar-tools">
+      <div layout="row" flex="" class="fill-height">
+        <md-button href="#/repositories" class="md-fab md-mini" aria-label="joulupukki">
+          <md-icon md-svg-src="assets/images/jlpk_logo_barb_24.svg"></md-icon>
+        </md-button>
+        <h2>
+          <a href="#/repositories">Joulupukki</a>
+        </h2>
+        <span flex></span>
+        <md-button ng-if="! username" class="md-raised" href="#/auth">
+            Login
+        </md-button>
+        <md-menu md-position-mode="target-right target" ng-if="username">
+          <md-button md-menu-origin ng-click="$mdOpenMenu()">
+            {{ username }}
+          </md-button>
+          <md-menu-content>
+            <md-menu-item>
+              <md-button href="#/account/{{ username }}/profile">
+                <p md-menu-align-target>Profile</p>
+              </md-button>
+            </md-menu-item>
+            <md-menu-item>
+              <md-button href="#/account/{{ username }}/Repositories">
+                <p md-menu-align-target>Repositories</p>
+              </md-button>
+            </md-menu-item>
+            <md-menu-item>
+              <md-button href="#/auth/logout">
+                <p md-menu-align-target>Logout</p>
+              </md-button>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
+      </div>
+    </div>
+  </md-toolbar>
+<!-- 
   <div class="container-fluid">
     <div class="navbar-header">
         <a class="navbar-brand" href="#/repositories">
@@ -29,6 +68,8 @@
           </ul>
         </li>
       </ul>
-    </div><!-- /.navbar-collapse -->
+    </div>
   </div>
-</nav>
+-->
+</div>
+
