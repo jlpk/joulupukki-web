@@ -237,5 +237,5 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('default', ['watch', 'jslint', 'uglify']);
-    grunt.registerTask('build', ['sass', 'copy:prod', 'useminPrepare:html', 'concat:generated', 'uglify:generated', 'usemin:html']);
+    grunt.registerTask('build', ['sass', 'copy:prod', 'useminPrepare:html', 'concat:generated', 'uglify:generated', 'cssmin:generated', 'usemin:html']);
 };
